@@ -1,6 +1,7 @@
 import { MessageCircleHeart, Plus, X, Menu } from 'lucide-react';
 import React, { useState } from 'react';
 
+// ... (Interface dan type declarations yang sama)
 interface HistorySummary {
     id: string;
     date: Date;
@@ -48,7 +49,12 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
 
     return (
         <div className={`
+            // FIXED: Tambahkan md:top-16 di sini
             fixed inset-y-0 left-0 z-40 bg-white border-r border-gray-200 h-full overflow-y-auto flex-shrink-0 flex flex-col shadow-lg
+            
+            // Perbaikan agar sidebar mulai di bawah Navbar (tinggi Navbar = h-16)
+            md:top-16 
+            
             transition-all duration-300 ease-in-out
 
             // Mobile
@@ -56,19 +62,20 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
             ${isOpen ? 'translate-x-0' : '-translate-x-full'}
 
             // Desktop (lg)
-            lg:static 
+            // Di desktop, kita perlu memastikan bahwa 'bottom' (karena ada fixed) juga diatur
+            lg:static lg:h-auto lg:inset-y-0 
             ${isOpen ? 'lg:w-72 lg:translate-x-0' : 'lg:w-16 lg:translate-x-0 lg:overflow-visible'} 
         `}>
 
             {/* Header Sidebar (Selalu terlihat) */}
             <div className={`
+                // Tambahkan h-16 agar tinggi header tetap konsisten dengan Navlink di desktop
                 p-4 border-b flex items-center flex-shrink-0 
                 ${isOpen ? 'justify-between' : 'justify-center'} 
                 transition-all duration-300
             `}>
                 
                 {/* Tombol Hamburger/Menu (di Kiri Atas Sidebar) */}
-                {/* Ini adalah tombol TOGGLE di desktop dan di mobile saat terbuka */}
                 <button 
                     onClick={onToggleSidebar}
                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition duration-150"
@@ -88,8 +95,8 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                 <button
                     onClick={onClose}
                     className={`text-gray-500 hover:text-gray-900 p-1 rounded-md transition-opacity duration-150 
-                        ${isOpen && window.innerWidth < 1024 ? '' : 'hidden'}
-                        ${isOpen && window.innerWidth >= 1024 ? 'lg:hidden' : ''}
+                        ${isOpen && window.innerWidth < 768 ? '' : 'hidden'} // Hanya tampil di mobile saat sidebar terbuka
+                        ${isOpen && window.innerWidth >= 768 ? 'md:hidden' : ''}
                     `}
                     aria-label="Tutup Sidebar"
                 >
