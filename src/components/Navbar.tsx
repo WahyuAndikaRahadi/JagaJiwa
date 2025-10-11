@@ -23,6 +23,7 @@ function Navbar() {
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/tracker', icon: BarChart3, label: 'Tracker' },
+    { path: '/about', icon: BarChart3, label: 'About' },
     { path: '/journal', icon: BookHeart, label: 'Journal' },
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
   ];
