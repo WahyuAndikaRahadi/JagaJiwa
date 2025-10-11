@@ -40,7 +40,7 @@ function ChatWindow({ conversation, onSendMessage }: ChatWindowProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] md:h-[600px] bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-[550px] md:h-[600px] bg-white rounded-2xl shadow-lg overflow-hidden">
       <div className="bg-gradient-to-r from-primary-600 to-secondary-600 px-4 md:px-6 py-4 text-white">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">

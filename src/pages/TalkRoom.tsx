@@ -134,7 +134,12 @@ function TalkRoom() {
 
     useEffect(() => {
         const handleResize = () => {
-            // Logika resize sederhana
+             // Opsional: Atur ulang state isSidebarOpen saat resize di desktop
+             if (window.innerWidth >= 1024) {
+                 setIsSidebarOpen(true);
+             } else {
+                 // Biarkan state mobile
+             }
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -175,7 +180,7 @@ function TalkRoom() {
             
             let moodEmoji = '😐';
             let summaryText = "Sesi curhat yang intens.";
-            // ... (Logika parsing summary tetap sama)
+            
             if (rawSummary.includes('|')) {
                 const [moodPart, ...summaryParts] = rawSummary.split('|').map(s => s.trim());
                 moodEmoji = moodPart.length <= 2 ? moodPart : '😐'; 
@@ -219,7 +224,7 @@ function TalkRoom() {
     // FUNGSI PANGGILAN GEMINI (Chat Utama)
     const generateAIResponse = async (userMessage: string) => {
         setIsLoading(true);
-        // ... (Logika generate AI response tetap sama)
+        
         try {
             const chat = chatRef.current;
             const response = await chat.sendMessage({
@@ -251,7 +256,7 @@ function TalkRoom() {
 
     const handleSendMessage = (message: string) => {
         if (!message.trim()) return; 
-        // ... (Logika send message tetap sama)
+        
         const userMessage: Message = {
             role: 'user',
             text: message,
@@ -280,7 +285,7 @@ function TalkRoom() {
             },
         ]);
         chatRef.current = createNewChatSession();
-        // Di desktop, kita tidak perlu mengubah state open, biarkan di tangan user
+        // Tutup sidebar di mobile saat sesi baru dimulai
         if(window.innerWidth < 1024) {
              setIsSidebarOpen(false); 
         }
@@ -325,15 +330,15 @@ function TalkRoom() {
     return (
         <div className="min-h-screen bg-gray-50 flex"> 
             
-            {/* 1. Sidebar Riwayat - Sekarang mengurus dirinya sendiri */}
+            {/* 1. Sidebar Riwayat */}
             <ChatHistorySidebar 
                 history={historySummaries} 
                 onSelectHistory={handleSelectHistory} 
                 onStartNewSession={startNewSession} 
                 currentChatId={currentChatId}
                 onClose={() => setIsSidebarOpen(false)} 
-                onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} // Fungsi toggle
-                isOpen={isSidebarOpen} // Pass the state
+                onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
+                isOpen={isSidebarOpen} 
             />
 
             {/* Overlay untuk Mobile ketika sidebar terbuka */}
@@ -345,14 +350,26 @@ function TalkRoom() {
             )}
             
             {/* 2. Area Chat Utama */}
-            {/* Menggunakan margin kiri jika sidebar terbuka di desktop */}
-            <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out 
-                ${isSidebarOpen ? 'lg:ml-72' : 'lg:ml-0'}`}>
+            {/* Hapus kelas ml-*, biarkan static sidebar menangani layout desktop */}
+            <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out`}>
                 
-                {/* Header Utama - Minimalis tanpa tombol Menu */}
+                {/* Header Utama - Sekarang memiliki tombol Menu untuk mobile */}
                  <header className={`px-4 sm:px-6 lg:px-8 py-4 bg-white border-b sticky top-0 z-20 shadow-sm`}>
                     <div className="flex items-center space-x-3">
-                        {/* Hapus tombol Menu di sini */}
+                        
+                        {/* Tombol Hamburger HANYA di Mobile DAN saat Sidebar Tertutup */}
+                        {!isSidebarOpen && (
+                            <button 
+                                onClick={() => setIsSidebarOpen(true)}
+                                // Hanya tampil di bawah lg
+                                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg lg:hidden" 
+                                aria-label="Buka Riwayat"
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                        )}
+                        
+                        {/* Ikon dan Judul Chat Utama */}
                         <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
                             <MessageCircleHeart className="w-6 h-6 text-white" />
                         </div>
@@ -360,8 +377,8 @@ function TalkRoom() {
                     </div>
                 </header>
 
-                <div className="flex-grow flex flex-col max-w-4xl mx-auto w-full">
-                    <div className="px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex-grow flex flex-col">
+                <div className="flex-grow flex flex-col max-w-5xl mx-auto w-full">
+                    <div className="px-4 sm:px-6 lg:px-8 py-6 md:py-8  flex-grow flex flex-col">
                         
                         {/* Judul & Deskripsi */}
                         <div className="mb-6 flex-shrink-0">
@@ -371,17 +388,6 @@ function TalkRoom() {
                              </p>
                         </div>
 
-                        {/* Disclaimer */}
-                        <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 rounded-lg p-4 flex items-start space-x-3 flex-shrink-0">
-                            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                            <div className='flex-grow'>
-                                <p className="text-sm text-amber-900 font-medium mb-1">Catatan Penting</p>
-                                <p className="text-xs text-amber-800">
-                                    Ini adalah simulasi AI yang terintegrasi. Jika kamu mengalami masalah
-                                    kesehatan mental yang serius, silakan hubungi profesional kesehatan mental.
-                                </p>
-                            </div>
-                        </div>
 
                         {/* Chat Window */}
                         <div className="flex-grow min-h-[40vh] mb-6">

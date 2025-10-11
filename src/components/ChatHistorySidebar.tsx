@@ -36,7 +36,7 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
     onStartNewSession,
     currentChatId,
     onClose,
-    onToggleSidebar, // Gunakan ini
+    onToggleSidebar, 
     isOpen
 }) => {
     const [moodFilter, setMoodFilter] = useState<MoodFilter>('');
@@ -55,15 +55,20 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
             w-full max-w-xs md:max-w-72
             ${isOpen ? 'translate-x-0' : '-translate-x-full'}
 
-            // Desktop
+            // Desktop (lg)
             lg:static 
             ${isOpen ? 'lg:w-72 lg:translate-x-0' : 'lg:w-16 lg:translate-x-0 lg:overflow-visible'} 
         `}>
 
-            {/* Header Sidebar (Selalu terlihat, lebarnya menyesuaikan) */}
-            <div className={`p-4 border-b flex justify-between items-center flex-shrink-0 transition-all duration-300`}>
+            {/* Header Sidebar (Selalu terlihat) */}
+            <div className={`
+                p-4 border-b flex items-center flex-shrink-0 
+                ${isOpen ? 'justify-between' : 'justify-center'} 
+                transition-all duration-300
+            `}>
                 
                 {/* Tombol Hamburger/Menu (di Kiri Atas Sidebar) */}
+                {/* Ini adalah tombol TOGGLE di desktop dan di mobile saat terbuka */}
                 <button 
                     onClick={onToggleSidebar}
                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition duration-150"
@@ -72,15 +77,20 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                     <Menu className="w-6 h-6" />
                 </button>
 
-                {/* Judul hanya tampil jika terbuka penuh */}
-                <h2 className={`text-lg font-semibold text-gray-800 flex items-center absolute left-16 transition-opacity duration-150 ${isOpen ? 'opacity-100' : 'opacity-0 lg:hidden'}`}>
-                    Riwayat Curhat
-                </h2>
+                {/* Judul (Hanya tampil saat terbuka penuh) */}
+                {isOpen && (
+                    <h2 className={`text-lg font-semibold text-gray-800 flex items-center absolute left-16 transition-opacity duration-150 ${isOpen ? 'opacity-100' : 'opacity-0 lg:static lg:opacity-100'}`}>
+                        Riwayat Curhat
+                    </h2>
+                )}
 
-                {/* Tombol Close untuk Mobile (Posisi Kanan) */}
+                {/* Tombol Close untuk Mobile (Hanya tampil saat terbuka) */}
                 <button
                     onClick={onClose}
-                    className={`text-gray-500 hover:text-gray-900 p-1 rounded-md transition-opacity duration-150 ${isOpen ? 'lg:hidden' : 'hidden'}`}
+                    className={`text-gray-500 hover:text-gray-900 p-1 rounded-md transition-opacity duration-150 
+                        ${isOpen && window.innerWidth < 1024 ? '' : 'hidden'}
+                        ${isOpen && window.innerWidth >= 1024 ? 'lg:hidden' : ''}
+                    `}
                     aria-label="Tutup Sidebar"
                 >
                     <X className="w-6 h-6" />
