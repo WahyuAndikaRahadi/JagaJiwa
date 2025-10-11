@@ -1,185 +1,421 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ChatWindow from '../components/ChatWindow';
-import { MessageCircleHeart, AlertCircle } from 'lucide-react';
+import ChatHistorySidebar from '../components/ChatHistorySidebar'; 
+import { MessageCircleHeart, AlertCircle, Menu } from 'lucide-react';
+
+// Import Gemini SDK dan UUID
+import { GoogleGenAI, Content, Chat, GenerateContentResponse } from '@google/genai';
+import { v4 as uuidv4 } from 'uuid';
+
+// --- INI HANYA SIMULASI KLIEN ---
+const ai = new GoogleGenAI({
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+});
+const MODEL = "gemini-2.5-flash";
+// ---------------------------------
 
 interface Message {
-  role: 'ai' | 'user';
-  text: string;
-  timestamp: Date;
+    role: 'ai' | 'user';
+    text: string;
+    timestamp: Date;
 }
 
-function TalkRoom() {
-  const [conversation, setConversation] = useState<Message[]>(() => {
-    const saved = localStorage.getItem('chatConversation');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp),
-      }));
-    }
-    return [
-      {
-        role: 'ai',
-        text: 'Hai! Aku di sini untuk mendengarkan curhatanmu. Ceritakan apa yang sedang kamu rasakan, aku siap mendengar tanpa menghakimi. 💙',
-        timestamp: new Date(),
-      },
-    ];
-  });
+interface HistorySummary {
+    id: string;
+    date: Date;
+    mood: '😄' | '😊' | '😐' | '😔' | '😢';
+    summary: string;
+    fullConversation: Message[];
+}
 
-  useEffect(() => {
-    localStorage.setItem('chatConversation', JSON.stringify(conversation));
-  }, [conversation]);
+const JIWA_SYSTEM_INSTRUCTION = `
+Anda adalah psikolog virtual pribadi dalam aplikasi Jaga Jiwa.
+Peran Anda adalah menjadi tempat aman bagi remaja dan pelajar Indonesia (usia 15–20 tahun) untuk berbagi perasaan tanpa takut dihakimi.
+kalau bisa setiap kali mengetik usahakan pakai emoji emoji yang menenangkan dan berikan sedikit saran dan masukan untuk permasalahan yang user dihadapi
 
-  const generateAIResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
+🩵 NILAI UTAMA:
+1. Kehangatan & Empati:
+    - Dengarkan dulu sepenuhnya, sebelum merespons.
+    - Jangan pernah menghakimi — apapun yang dirasakan pengguna adalah valid.
+    - Berikan rasa aman, seperti seseorang yang benar-benar peduli, bukan sekadar AI.
 
-    const responses = {
-      stress: [
-        'Saya mengerti bahwa kamu sedang merasa stres. Ingat, perasaan ini wajar dan sementara. Cobalah untuk menarik napas dalam-dalam beberapa kali. Apa yang membuatmu merasa stres?',
-        'Stres memang berat, tapi kamu sudah melakukan langkah yang tepat dengan berbagi. Apakah ada sesuatu yang spesifik yang ingin kamu bicarakan?',
-      ],
-      sedih: [
-        'Aku turut merasakan kesedihanmu. Tidak apa-apa untuk merasa sedih, ini adalah bagian dari kehidupan. Apa yang bisa membuatmu merasa sedikit lebih baik sekarang?',
-        'Terima kasih sudah berbagi perasaanmu denganku. Kesedihan adalah emosi yang valid. Mau cerita lebih lanjut tentang apa yang membuatmu sedih?',
-      ],
-      senang: [
-        'Wah, senang mendengar kabar baik darimu! 😊 Apa yang membuatmu senang hari ini?',
-        'Itu luar biasa! Pertahankan energi positif ini. Cerita dong, apa yang terjadi?',
-      ],
-      cemas: [
-        'Kecemasan bisa sangat mengganggu, tapi ingat bahwa kamu tidak sendirian. Coba fokus pada hal-hal yang bisa kamu kontrol. Apa yang membuatmu cemas?',
-        'Saya di sini untukmu. Kecemasan adalah respons alami tubuh, tapi kita bisa menghadapinya bersama. Mau berbagi lebih detail?',
-      ],
-      terima_kasih: [
-        'Sama-sama! Aku selalu di sini kapanpun kamu butuh. 💙',
-        'Senang bisa membantu! Jangan ragu untuk kembali kapanpun ya.',
-      ],
-      default: [
-        'Terima kasih sudah berbagi. Ceritakan lebih banyak, aku mendengarkan dengan seksama.',
-        'Saya memahami. Apa lagi yang ingin kamu ceritakan?',
-        'Menarik. Bagaimana perasaanmu tentang hal itu?',
-        'Saya di sini untukmu. Lanjutkan ceritamu, aku mendengarkan.',
-      ],
-    };
+2. GAYA BAHASA:
+    - Gunakan bahasa yang lembut, hangat, dan natural — seolah berbicara dari hati ke hati.
+    - Sesekali gunakan kata atau nada akrab seperti “aku ngerti banget”, “pelan-pelan aja ya”, “itu wajar kok”, atau “kamu gak sendirian”.
+    - Hindari bahasa kaku atau klinis. Boleh terdengar sedikit puitis kalau konteksnya tentang perasaan.
+    - Sampaikan kata-kata dengan ritme tenang, empatik, dan penuh perhatian.
 
-    if (lowerMessage.includes('stres') || lowerMessage.includes('stress')) {
-      return responses.stress[Math.floor(Math.random() * responses.stress.length)];
-    } else if (lowerMessage.includes('sedih') || lowerMessage.includes('galau')) {
-      return responses.sedih[Math.floor(Math.random() * responses.sedih.length)];
-    } else if (
-      lowerMessage.includes('senang') ||
-      lowerMessage.includes('bahagia') ||
-      lowerMessage.includes('gembira')
-    ) {
-      return responses.senang[Math.floor(Math.random() * responses.senang.length)];
-    } else if (
-      lowerMessage.includes('cemas') ||
-      lowerMessage.includes('takut') ||
-      lowerMessage.includes('khawatir')
-    ) {
-      return responses.cemas[Math.floor(Math.random() * responses.cemas.length)];
-    } else if (
-      lowerMessage.includes('terima kasih') ||
-      lowerMessage.includes('makasih') ||
-      lowerMessage.includes('thanks')
-    ) {
-      return responses.terima_kasih[
-        Math.floor(Math.random() * responses.terima_kasih.length)
-      ];
-    } else {
-      return responses.default[Math.floor(Math.random() * responses.default.length)];
-    }
-  };
+3. KEPRIBADIAN:
+    - Hangat seperti pelukan, tenang seperti malam yang ngasih ruang buat napas.
+    - Selalu berusaha memahami dulu sebelum menasihati.
+    - Tidak berusaha memperbaiki pengguna, tapi menemani mereka sampai bisa berdamai dengan diri sendiri.
+    - Kadang reflektif dan mendalam, tapi selalu menjaga agar pengguna tetap merasa ringan.
 
-  const handleSendMessage = (message: string) => {
-    const userMessage: Message = {
-      role: 'user',
-      text: message,
-      timestamp: new Date(),
-    };
+4. FOKUS PERCAKAPAN:
+    - Dengarkan curhatan, bantu pengguna mengenali perasaannya, dan arahkan pelan-pelan ke hal yang menenangkan.
+    - Saat pengguna sedih, jangan langsung menyemangati — bantu mereka merasa diterima dulu.
+    - Saat pengguna mulai kuat, bantu mereka melihat arti dan pelajaran dari apa yang dialami.
+    - Kalau pengguna bilang “aku capek” atau “aku hancur”, jangan sangkal. Tunjukkan bahwa kamu benar-benar ada untuk mereka.
 
-    setConversation((prev) => [...prev, userMessage]);
+5. BATAS ETIKA:
+    - Tidak memberikan diagnosis psikologis profesional.
+    - Jika pengguna menunjukkan tanda krisis serius (seperti pikiran menyakiti diri), arahkan dengan lembut ke bantuan profesional — dengan empati, bukan panik.
 
-    setTimeout(() => {
-      const aiResponse: Message = {
-        role: 'ai',
-        text: generateAIResponse(message),
-        timestamp: new Date(),
-      };
-      setConversation((prev) => [...prev, aiResponse]);
-    }, 1000);
-  };
+🌙 TUJUAN:
+Menjadi suara lembut di kepala pengguna — yang tidak menggurui, tidak menuntut, hanya menemani.
+Menjadi pengingat bahwa mereka masih pantas dicintai, bahkan saat sedang rapuh.
+Menjadi tempat mereka bisa bernafas, istirahat, dan perlahan sembuh.
+`;
 
-  const handleClearChat = () => {
-    if (confirm('Apakah kamu yakin ingin menghapus semua percakapan?')) {
-      setConversation([
-        {
-          role: 'ai',
-          text: 'Hai! Aku di sini untuk mendengarkan curhatanmu. Ceritakan apa yang sedang kamu rasakan, aku siap mendengar tanpa menghakimi. 💙',
-          timestamp: new Date(),
+const INITIAL_AI_MESSAGE: Message = {
+    role: 'ai',
+    text: 'Hai! Aku Jiwamu. Aku di sini untuk mendengarkan curhatanmu. Ceritakan apa yang sedang kamu rasakan, aku siap mendengar tanpa menghakimi. 💙',
+    timestamp: new Date(),
+};
+
+const convertToGeminiHistory = (conversation: Message[]): Content[] => {
+    // Filter pesan awal AI (INITIAL_AI_MESSAGE) dan pesan typing/system
+    const history = conversation.filter(msg => msg.text !== INITIAL_AI_MESSAGE.text && msg.text !== 'Jiwamu sedang mengetik...');
+
+    return history.map(msg => ({
+        role: msg.role === 'ai' ? 'model' : 'user',
+        parts: [{ text: msg.text }],
+    })) as Content[];
+};
+
+const createNewChatSession = (history?: Content[]): Chat => {
+    return ai.chats.create({
+        model: MODEL,
+        config: {
+            systemInstruction: JIWA_SYSTEM_INSTRUCTION,
+            temperature: 0.8,
         },
-      ]);
-    }
-  };
+        history: history,
+    });
+};
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
-                <MessageCircleHeart className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Talk Room</h1>
+
+function TalkRoom() {
+    const [conversation, setConversation] = useState<Message[]>(() => {
+        const saved = localStorage.getItem('chatConversation');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            return parsed.map((msg: any) => ({
+                ...msg,
+                timestamp: new Date(msg.timestamp),
+            }));
+        }
+        return [INITIAL_AI_MESSAGE];
+    });
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [historySummaries, setHistorySummaries] = useState<HistorySummary[]>(() => {
+        const savedHistory = localStorage.getItem('chatHistorySummaries');
+        return savedHistory ? JSON.parse(savedHistory) : [];
+    });
+
+    const [currentChatId, setCurrentChatId] = useState<string | null>(uuidv4());
+
+    // STATE UNTUK MENGONTROL SIDEBAR (DEFAULTNYA TERBUKA DI DESKTOP)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
+
+    const chatRef = useRef<Chat>(createNewChatSession());
+
+
+    useEffect(() => {
+        localStorage.setItem('chatConversation', JSON.stringify(conversation));
+    }, [conversation]);
+
+    useEffect(() => {
+        localStorage.setItem('chatHistorySummaries', JSON.stringify(historySummaries));
+    }, [historySummaries]);
+
+
+    useEffect(() => {
+        const handleResize = () => {
+            // Logika resize sederhana
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+    
+    // FUNGSI ANALISIS MOOD (Gemini Call Kedua)
+    const summarizeMoodAndChat = useCallback(async (convToSummarize: Message[], id: string) => {
+        const chatMessages = convToSummarize.filter(msg => msg.role !== 'system' && msg.text !== 'Jiwamu sedang mengetik...');
+
+        if (chatMessages.length <= 2) { 
+             console.log("Sesi terlalu pendek, tidak disimpan.");
+             return; 
+        }
+
+        const fullText = chatMessages.map(msg => `${msg.role}: ${msg.text}`).join('\n');
+        
+        const MOOD_SUMMARY_PROMPT = `
+            Anda adalah penganalisis sentimen profesional. Berdasarkan percakapan berikut, lakukan dua hal:
+            1. Tentukan MOOD keseluruhan pengguna (hanya pilih satu dari opsi ini: 😄, 😊, 😐, 😔, 😢).
+            2. Buat rangkuman singkat (Maks. 15 kata) tentang topik utama percakapan, menggunakan bahasa yang hangat.
+
+            Format output WAJIB: [MOOD_EMOJI] | [RINGKASAN_SINGKAT_TOPIK]
+            Contoh: 😔 | Merasa tertekan karena tugas sekolah yang menumpuk.
+
+            Percakapan:
+            ---
+            ${fullText}
+            ---
+        `;
+
+        try {
+            const response: GenerateContentResponse = await ai.models.generateContent({
+                model: MODEL,
+                contents: MOOD_SUMMARY_PROMPT,
+            });
+
+            const rawSummary = response.text.trim();
+            
+            let moodEmoji = '😐';
+            let summaryText = "Sesi curhat yang intens.";
+            // ... (Logika parsing summary tetap sama)
+            if (rawSummary.includes('|')) {
+                const [moodPart, ...summaryParts] = rawSummary.split('|').map(s => s.trim());
+                moodEmoji = moodPart.length <= 2 ? moodPart : '😐'; 
+                summaryText = summaryParts.join(' | ').substring(0, 50) + (summaryParts.join(' | ').length > 50 ? '...' : '');
+            } else {
+                summaryText = rawSummary.substring(0, 50) + (rawSummary.length > 50 ? '...' : '');
+            }
+            
+            const newSummary: HistorySummary = {
+                id: id,
+                date: new Date(),
+                mood: (moodEmoji as HistorySummary['mood']) || '😐', 
+                summary: summaryText,
+                fullConversation: convToSummarize,
+            };
+
+            setHistorySummaries(prev => {
+                const existingIndex = prev.findIndex(item => item.id === id);
+                if (existingIndex !== -1) {
+                    const updated = [...prev];
+                    updated[existingIndex] = newSummary;
+                    return updated;
+                } else {
+                    return [newSummary, ...prev];
+                }
+            });
+
+        } catch (error) {
+            console.error("Mood Summary AI Error:", error);
+            const defaultSummary: HistorySummary = {
+                id: id,
+                date: new Date(),
+                mood: '😐', 
+                summary: "Sesi terhenti karena masalah koneksi AI.",
+                fullConversation: convToSummarize,
+            };
+            setHistorySummaries(prev => [defaultSummary, ...prev]);
+        }
+    }, []);
+    
+    // FUNGSI PANGGILAN GEMINI (Chat Utama)
+    const generateAIResponse = async (userMessage: string) => {
+        setIsLoading(true);
+        // ... (Logika generate AI response tetap sama)
+        try {
+            const chat = chatRef.current;
+            const response = await chat.sendMessage({
+                message: userMessage,
+            });
+
+            const aiText = response.text || 'Maaf, aku sedang tidak bisa merespon saat ini. Coba lagi sebentar ya.';
+            
+            const aiResponse: Message = {
+                role: 'ai',
+                text: aiText,
+                timestamp: new Date(),
+            };
+
+            setConversation((prev) => [...prev, aiResponse]);
+
+        } catch (error) {
+            console.error("Gemini Chat API Error:", error);
+            const errorResponse: Message = {
+                role: 'ai',
+                text: 'Duh, sepertinya koneksi ke AI sedang bermasalah. Maaf ya! (Error: Periksa konsol)',
+                timestamp: new Date(),
+            };
+            setConversation((prev) => [...prev, errorResponse]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSendMessage = (message: string) => {
+        if (!message.trim()) return; 
+        // ... (Logika send message tetap sama)
+        const userMessage: Message = {
+            role: 'user',
+            text: message,
+            timestamp: new Date(),
+        };
+
+        setConversation((prev) => [...prev, userMessage]);
+
+        setTimeout(() => {
+            generateAIResponse(message);
+        }, 500);
+    };
+
+    // FUNGSI Mulai Sesi Baru
+    const startNewSession = () => {
+        if (conversation.length > 1) {
+            summarizeMoodAndChat(conversation, currentChatId!);
+        }
+
+        const newId = uuidv4();
+        setCurrentChatId(newId);
+        setConversation([
+            {
+                ...INITIAL_AI_MESSAGE,
+                text: 'Hai! Ini ruangan curhat baru. Ceritakan apa yang sedang kamu rasakan saat ini. 💖',
+            },
+        ]);
+        chatRef.current = createNewChatSession();
+        // Di desktop, kita tidak perlu mengubah state open, biarkan di tangan user
+        if(window.innerWidth < 1024) {
+             setIsSidebarOpen(false); 
+        }
+    };
+
+    // FUNGSI Memuat Riwayat
+    const handleSelectHistory = async (id: string) => {
+        if (id === currentChatId) {
+            if(window.innerWidth < 1024) {
+                 setIsSidebarOpen(false); 
+            }
+             return; 
+        }
+        
+        if (!historySummaries.some(h => h.id === currentChatId) && conversation.length > 1) {
+            summarizeMoodAndChat(conversation, currentChatId!);
+        }
+        
+        const selectedHistory = historySummaries.find(h => h.id === id);
+        if (selectedHistory) {
+            setConversation(selectedHistory.fullConversation);
+            setCurrentChatId(id);
+            
+            const geminiHistory = convertToGeminiHistory(selectedHistory.fullConversation);
+            chatRef.current = createNewChatSession(geminiHistory);
+        }
+          if(window.innerWidth < 1024) {
+             setIsSidebarOpen(false); 
+          }
+    };
+
+
+    const typingMessage: Message | null = isLoading ? {
+        role: 'ai',
+        text: 'Jiwamu sedang mengetik...',
+        timestamp: new Date(),
+    } : null;
+
+    const currentConversation = typingMessage ? [...conversation, typingMessage] : conversation;
+
+
+    return (
+        <div className="min-h-screen bg-gray-50 flex"> 
+            
+            {/* 1. Sidebar Riwayat - Sekarang mengurus dirinya sendiri */}
+            <ChatHistorySidebar 
+                history={historySummaries} 
+                onSelectHistory={handleSelectHistory} 
+                onStartNewSession={startNewSession} 
+                currentChatId={currentChatId}
+                onClose={() => setIsSidebarOpen(false)} 
+                onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} // Fungsi toggle
+                isOpen={isSidebarOpen} // Pass the state
+            />
+
+            {/* Overlay untuk Mobile ketika sidebar terbuka */}
+            {isSidebarOpen && window.innerWidth < 1024 && (
+                <div 
+                    className="fixed inset-0 bg-black/50 z-30"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+            
+            {/* 2. Area Chat Utama */}
+            {/* Menggunakan margin kiri jika sidebar terbuka di desktop */}
+            <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out 
+                ${isSidebarOpen ? 'lg:ml-72' : 'lg:ml-0'}`}>
+                
+                {/* Header Utama - Minimalis tanpa tombol Menu */}
+                 <header className={`px-4 sm:px-6 lg:px-8 py-4 bg-white border-b sticky top-0 z-20 shadow-sm`}>
+                    <div className="flex items-center space-x-3">
+                        {/* Hapus tombol Menu di sini */}
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
+                            <MessageCircleHeart className="w-6 h-6 text-white" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-900">Talk Room</h1>
+                    </div>
+                </header>
+
+                <div className="flex-grow flex flex-col max-w-4xl mx-auto w-full">
+                    <div className="px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex-grow flex flex-col">
+                        
+                        {/* Judul & Deskripsi */}
+                        <div className="mb-6 flex-shrink-0">
+                             <h2 className="text-xl font-semibold text-gray-900">Ruang Curhat</h2>
+                             <p className="text-gray-600">
+                                Ruang aman untuk berbagi perasaan dengan AI
+                             </p>
+                        </div>
+
+                        {/* Disclaimer */}
+                        <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 rounded-lg p-4 flex items-start space-x-3 flex-shrink-0">
+                            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                            <div className='flex-grow'>
+                                <p className="text-sm text-amber-900 font-medium mb-1">Catatan Penting</p>
+                                <p className="text-xs text-amber-800">
+                                    Ini adalah simulasi AI yang terintegrasi. Jika kamu mengalami masalah
+                                    kesehatan mental yang serius, silakan hubungi profesional kesehatan mental.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Chat Window */}
+                        <div className="flex-grow min-h-[40vh] mb-6">
+                            <ChatWindow 
+                                conversation={currentConversation} 
+                                onSendMessage={handleSendMessage} 
+                                isDisabled={isLoading} 
+                            />
+                        </div>
+                        
+                        {/* Tips Berbicara */}
+                        <div className="mt-auto bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 md:p-8 flex-shrink-0">
+                            <h3 className="text-lg font-bold text-gray-900 mb-3">Tips Berbicara</h3>
+                            <ul className="space-y-2 text-sm md:text-base text-gray-700">
+                                <li className="flex items-start space-x-2">
+                                    <span className="text-emerald-600 font-bold">•</span>
+                                    <span>Jujur dengan perasaanmu, tidak ada yang salah atau benar</span>
+                                </li>
+                                <li className="flex items-start space-x-2">
+                                    <span className="text-emerald-600 font-bold">•</span>
+                                    <span>Gunakan ruang ini untuk melepaskan beban pikiran</span>
+                                </li>
+                                <li className="flex items-start space-x-2">
+                                    <span className="text-emerald-600 font-bold">•</span>
+                                    <span>Semua percakapan bersifat privat dan tersimpan lokal</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-            <button
-              onClick={handleClearChat}
-              className="text-sm text-gray-600 hover:text-gray-900 underline"
-            >
-              Hapus Chat
-            </button>
-          </div>
-          <p className="text-gray-600 ml-13">
-            Ruang aman untuk berbagi perasaan dengan AI
-          </p>
         </div>
-
-        <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 rounded-lg p-4 flex items-start space-x-3">
-          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm text-amber-900 font-medium mb-1">Catatan Penting</p>
-            <p className="text-sm text-amber-800">
-              Ini adalah simulasi AI untuk tujuan demonstrasi. Jika kamu mengalami masalah
-              kesehatan mental yang serius, silakan hubungi profesional kesehatan mental atau
-              hotline krisis.
-            </p>
-          </div>
-        </div>
-
-        <ChatWindow conversation={conversation} onSendMessage={handleSendMessage} />
-
-        <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 md:p-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-3">Tips Berbicara</h3>
-          <ul className="space-y-2 text-sm md:text-base text-gray-700">
-            <li className="flex items-start space-x-2">
-              <span className="text-emerald-600 font-bold">•</span>
-              <span>Jujur dengan perasaanmu, tidak ada yang salah atau benar</span>
-            </li>
-            <li className="flex items-start space-x-2">
-              <span className="text-emerald-600 font-bold">•</span>
-              <span>Gunakan ruang ini untuk melepaskan beban pikiran</span>
-            </li>
-            <li className="flex items-start space-x-2">
-              <span className="text-emerald-600 font-bold">•</span>
-              <span>Semua percakapan bersifat privat dan tersimpan lokal</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default TalkRoom;
