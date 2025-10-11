@@ -1,10 +1,12 @@
+// File: Navbar.jsx
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, BarChart3, BookHeart, MessageCircleHeart } from 'lucide-react';
 
-// Komponen Logo/Brand
+// === Brand Component ===
 const Brand = () => (
-  <div className="flex items-center space-x-2 pl-4">
+  <div className="flex items-center space-x-2 pl-0 lg:pl-4">
     <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl shadow-lg flex items-center justify-center transform hover:scale-105 transition duration-300 ease-in-out">
       <BookHeart className="w-6 h-6 text-white" fill="white" />
     </div>
@@ -14,6 +16,7 @@ const Brand = () => (
   </div>
 );
 
+// === Navbar Component ===
 function Navbar() {
   const location = useLocation();
 
@@ -24,9 +27,8 @@ function Navbar() {
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
 
-  // Kelas Tailwind untuk state aktif dan tidak aktif
   const activeClass =
     'text-white bg-gradient-to-r from-primary-500 to-secondary-500 shadow-md shadow-primary-200/50';
   const inactiveClass =
@@ -34,30 +36,28 @@ function Navbar() {
 
   return (
     <>
-      {/* Desktop Navigation (Top Bar) */}
-      <nav className="hidden md:block fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50 transition-all duration-300 h-16">
-        {/* Container utama navbar */}
-        <div className="flex items-center justify-between h-full max-w-7xl mx-auto">
-          {/* Kiri: Brand Logo */}
-          <Brand />
+      {/* === Desktop Navigation (Top Bar) === */}
+      <nav className="hidden md:block fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50 h-16 transition-all duration-300">
+        <div className="flex items-center h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          {/* Brand Logo (Absolute Left) */}
+          <div className="absolute left-0 pl-4 sm:pl-6 lg:pl-8">
+            <Brand />
+          </div>
 
-          {/* Kanan: Navigasi */}
-          <div className="flex space-x-1 p-1 rounded-xl bg-gray-50/50 border border-gray-100 mr-4">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
+          {/* Center Navigation */}
+          <div className="flex gap-0 lg:gap-5 mx-auto w-fit p-1 rounded-xl ">
+            {navItems.map(({ path, icon: Icon, label }) => {
+              const active = isActive(path);
               return (
                 <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`
-                    flex-grow px-4 py-2 rounded-lg flex items-center justify-center space-x-2
-                    transition-all duration-200 ease-in-out
-                    ${active ? activeClass : inactiveClass}
-                  `}
+                  key={path}
+                  to={path}
+                  className={`flex-shrink-0 px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 ease-in-out ${
+                    active ? activeClass : inactiveClass
+                  }`}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-semibold text-sm">{item.label}</span>
+                  <span className="font-semibold text-sm">{label}</span>
                 </Link>
               );
             })}
@@ -65,35 +65,35 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Navigation (Bottom Bar) */}
+      {/* === Mobile Navigation (Bottom Bar) === */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-xl shadow-gray-200/50 border-t border-gray-100 z-50 transition-all duration-300">
         <div className="flex items-center justify-around h-16">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
+          {navItems.map(({ path, icon: Icon, label }) => {
+            const active = isActive(path);
             return (
               <Link
-                key={item.path}
-                to={item.path}
-                className={`
-                  flex flex-col items-center justify-center flex-1 h-full py-1 group
-                  transition-colors duration-200 ease-in-out relative
-                  ${active ? 'text-primary-600' : 'text-gray-500 hover:text-primary-500'}
-                `}
+                key={path}
+                to={path}
+                className={`flex flex-col items-center justify-center flex-1 h-full py-1 group transition-colors duration-200 ease-in-out relative ${
+                  active
+                    ? 'text-primary-600'
+                    : 'text-gray-500 hover:text-primary-500'
+                }`}
               >
-                {/* Titik indikator aktif */}
+                {/* Active Indicator */}
                 {active && (
                   <div className="absolute top-0 w-1.5 h-1.5 rounded-full bg-primary-600 transform -translate-y-1 animate-pulse" />
                 )}
 
                 <Icon
-                  className={`
-                    w-6 h-6 transform transition-transform duration-200
-                    ${active ? 'scale-105 stroke-2 text-primary-600' : 'group-hover:scale-110'}
-                  `}
+                  className={`w-6 h-6 transform transition-transform duration-200 ${
+                    active
+                      ? 'scale-105 stroke-2 text-primary-600'
+                      : 'group-hover:scale-110'
+                  }`}
                 />
                 <span className="text-xs mt-1 font-medium leading-none">
-                  {item.label}
+                  {label}
                 </span>
               </Link>
             );
@@ -105,6 +105,3 @@ function Navbar() {
 }
 
 export default Navbar;
-
-
-

@@ -354,7 +354,7 @@ function TalkRoom() {
             <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out`}>
                 
                 {/* Header Utama - Sekarang memiliki tombol Menu untuk mobile */}
-                 <header className={`px-4 sm:px-6 lg:px-8 py-4 bg-white border-b sticky top-0 z-20 shadow-sm`}>
+                 <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white border-b sticky top-0 z-20 shadow-sm`}>
                     <div className="flex items-center space-x-3">
                         
                         {/* Tombol Hamburger HANYA di Mobile DAN saat Sidebar Tertutup */}
