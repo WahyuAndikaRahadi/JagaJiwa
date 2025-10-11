@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, BarChart3, BookHeart, MessageCircleHeart } from 'lucide-react';
+import { Home, BarChart3,BookA, BookHeart, MessageCircleHeart } from 'lucide-react';
 
 // === Brand Component ===
 const Brand = () => (
@@ -22,8 +22,8 @@ function Navbar() {
 
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
+    { path: '/about', icon: BookA, label: 'About' },
     { path: '/tracker', icon: BarChart3, label: 'Tracker' },
-    { path: '/about', icon: BarChart3, label: 'About' },
     { path: '/journal', icon: BookHeart, label: 'Journal' },
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
   ];
