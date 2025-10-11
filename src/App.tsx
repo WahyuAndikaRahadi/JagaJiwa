@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import MoodTracker from './pages/MoodTracker';
 import JournalMood from './pages/JournalMood';
 import TalkRoom from './pages/TalkRoom';
+import About from './components/About';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <main className="pt-16 md:pt-20">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/tracker" element={<MoodTracker />} />
           <Route path="/journal" element={<JournalMood />} />
           <Route path="/talkroom" element={<TalkRoom />} />
