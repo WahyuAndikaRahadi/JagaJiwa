@@ -6,7 +6,7 @@ import { Home, BarChart3,BookA, BookHeart, MessageCircleHeart } from 'lucide-rea
 
 // === Brand Component ===
 const Brand = () => (
-  <div className="flex items-center space-x-2 pl-0 lg:pl-4">
+  <div className="flex items-center space-x-2 pl-0 lg:pl-4 mr-4">
     <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl shadow-lg flex items-center justify-center transform hover:scale-105 transition duration-300 ease-in-out">
       <BookHeart className="w-6 h-6 text-white" fill="white" />
     </div>
@@ -53,7 +53,7 @@ function Navbar() {
                 <Link
                   key={path}
                   to={path}
-                  className={`flex-shrink-0 px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 ease-in-out ${
+                  className={`flex-shrink-0 px-4 py-2 rounded-full flex items-center justify-center space-x-2 transition-all duration-200 ease-in-out ${
                     active ? activeClass : inactiveClass
                   }`}
                 >
