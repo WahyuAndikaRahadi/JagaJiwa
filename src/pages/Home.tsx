@@ -104,7 +104,7 @@ function Home() {
             return (
               <div
                 key={index}
-                className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100 backdrop-blur-sm transition-all duration-500 hover:shadow-purple-200/50 hover:border-purple-300 transform hover:-translate-y-3 group flex flex-col items-center text-center animate-slide-up"
+                className="bg-white rounded-3xl p-8 shadow-2xl border-2 border-purple-200/150 backdrop-blur-sm transition-all duration-500 hover:shadow-purple-200/50 hover:border-purple-300 transform hover:-translate-y-3 group flex flex-col items-center text-center animate-slide-up"
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 <div className={`inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br ${feature.color} rounded-full mb-6 shadow-xl`}>
