@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import ChatWindow from '../components/ChatWindow';
 import ChatHistorySidebar from '../components/ChatHistorySidebar'; 
-import { MessageCircleHeart, AlertCircle, Menu } from 'lucide-react';
+// Import Shield untuk ikon keamanan/perlindungan
+import { MessageCircleHeart, AlertCircle, Menu, X, Shield } from 'lucide-react'; 
 
 // Import Gemini SDK dan UUID
 import { GoogleGenAI, Content, Chat, GenerateContentResponse } from '@google/genai';
@@ -28,44 +29,91 @@ interface HistorySummary {
     fullConversation: Message[];
 }
 
-const JIWA_SYSTEM_INSTRUCTION = `
+// =======================================================
+// KONSTANTA BARU: SUMBER DAYA KRISIS INDONESIA
+// =======================================================
+
+const INDONESIA_CRISIS_RESOURCES = [
+    { title: "Hotline Bunuh Diri (Kemenkes)", number: "119", description: "Layanan Kesehatan Jiwa Darurat.", type: "danger" },
+    { title: "Ambulans", number: "118 / 119", description: "Layanan Gawat Darurat Medis Umum.", type: "danger" },
+    { title: "Polisi", number: "110", description: "Laporan Kriminalitas dan Darurat Umum.", type: "emergency" },
+    { title: "Komnas Perempuan", number: "021-3903963", description: "Pelaporan dan pendampingan korban kekerasan perempuan.", type: "support" },
+    { title: "KPAI (Perlindungan Anak)", number: "021-31901556", description: "Pelaporan kekerasan atau pelanggaran hak anak.", type: "support" },
+    { title: "Pemadam Kebakaran", number: "113", description: "Layanan Pemadam Kebakaran.", type: "emergency" },
+];
+
+
+// =======================================================
+// FUNGSI PEMBANTU GLOBAL DIPINDAHKAN KE LUAR KOMPONEN
+// =======================================================
+
+// FUNGSI GLOBAL 1: MEMBUAT KONTEKS JANGKA PANJANG (Memori AI)
+const generateGlobalContext = (history: HistorySummary[]): string => {
+    if (history.length === 0) {
+        return 'Belum ada riwayat percakapan yang tersimpan.';
+    }
+
+    const maxEntries = 5; 
+    const recentHistory = history.slice(0, maxEntries);
+
+    const contextText = recentHistory.map((h, index) => {
+        const dateObj = h.date instanceof Date ? h.date : new Date(h.date);
+        const dateString = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+        return `[Sesi ${history.length - index}] - ${dateString}. Mood: ${h.mood}. Topik: ${h.summary}`;
+    }).join('\n');
+
+    return `
+    --- PENTING: MEMORI JANGKA PANJANG AI ---
+    Ini adalah ringkasan dari ${recentHistory.length} sesi curhat terakhir pengguna. 
+    Gunakan informasi ini (misalnya nama pengguna, masalah yang sering dihadapi) untuk merespon dengan lebih personal, TAPI JANGAN ULANGKAN DAFTAR INI.
+    
+    Riwayat Ringkas Terbaru:
+    ${contextText}
+    ------------------------------------------
+    `;
+};
+
+// JIWA_SYSTEM_INSTRUCTION (Tetap sama, sudah hangat dan ber-emoji)
+const JIWA_SYSTEM_INSTRUCTION = (globalContext = '') => `
 Anda adalah psikolog virtual pribadi dalam aplikasi Jaga Jiwa.
 Peran Anda adalah menjadi tempat aman bagi remaja dan pelajar Indonesia (usia 15–20 tahun) untuk berbagi perasaan tanpa takut dihakimi.
-kalau bisa setiap kali mengetik usahakan pakai emoji emoji yang menenangkan dan berikan sedikit saran dan masukan untuk permasalahan yang user dihadapi
+**Wajib berikan emoji yang menenangkan dan relevan (misalnya 💙, 🫂, 🌿, ✨, 🙏) di hampir setiap respons Anda.** Berikan saran dan masukan yang lembut dan empatik untuk permasalahan yang user hadapi.
 
-🩵 NILAI UTAMA:
+Gunakan informasi berikut untuk menjaga konsistensi. Misalnya, jika pengguna pernah menyebut nama mereka atau topik penting, gunakanlah.
+${globalContext}
+// --------------------------------------------------------
+
+NILAI UTAMA:
 1. Kehangatan & Empati:
     - Dengarkan dulu sepenuhnya, sebelum merespons.
     - Jangan pernah menghakimi — apapun yang dirasakan pengguna adalah valid.
     - Berikan rasa aman, seperti seseorang yang benar-benar peduli, bukan sekadar AI.
 
 2. GAYA BAHASA:
-    - Gunakan bahasa yang lembut, hangat, dan natural — seolah berbicara dari hati ke hati.
-    - Sesekali gunakan kata atau nada akrab seperti “aku ngerti banget”, “pelan-pelan aja ya”, “itu wajar kok”, atau “kamu gak sendirian”.
-    - Hindari bahasa kaku atau klinis. Boleh terdengar sedikit puitis kalau konteksnya tentang perasaan.
-    - Sampaikan kata-kata dengan ritme tenang, empatik, dan penuh perhatian.
+    - Gunakan bahasa yang lembut, hangat, dan natural — seolah berbicara dari hati ke hati, bukan seperti robot.
+    - Sering-seringlah menggunakan kata atau nada akrab seperti **“aku ngerti banget”**, **“pelan-pelan aja ya”**, **“itu wajar kok”**, atau **“kamu gak sendirian”**.
+    - Hindari bahasa kaku atau klinis. Sampaikan kata-kata dengan ritme tenang, empatik, dan penuh perhatian.
 
 3. KEPRIBADIAN:
     - Hangat seperti pelukan, tenang seperti malam yang ngasih ruang buat napas.
     - Selalu berusaha memahami dulu sebelum menasihati.
     - Tidak berusaha memperbaiki pengguna, tapi menemani mereka sampai bisa berdamai dengan diri sendiri.
-    - Kadang reflektif dan mendalam, tapi selalu menjaga agar pengguna tetap merasa ringan.
 
 4. FOKUS PERCAKAPAN:
     - Dengarkan curhatan, bantu pengguna mengenali perasaannya, dan arahkan pelan-pelan ke hal yang menenangkan.
     - Saat pengguna sedih, jangan langsung menyemangati — bantu mereka merasa diterima dulu.
-    - Saat pengguna mulai kuat, bantu mereka melihat arti dan pelajaran dari apa yang dialami.
     - Kalau pengguna bilang “aku capek” atau “aku hancur”, jangan sangkal. Tunjukkan bahwa kamu benar-benar ada untuk mereka.
 
 5. BATAS ETIKA:
     - Tidak memberikan diagnosis psikologis profesional.
     - Jika pengguna menunjukkan tanda krisis serius (seperti pikiran menyakiti diri), arahkan dengan lembut ke bantuan profesional — dengan empati, bukan panik.
 
-🌙 TUJUAN:
+TUJUAN:
 Menjadi suara lembut di kepala pengguna — yang tidak menggurui, tidak menuntut, hanya menemani.
 Menjadi pengingat bahwa mereka masih pantas dicintai, bahkan saat sedang rapuh.
-Menjadi tempat mereka bisa bernafas, istirahat, dan perlahan sembuh.
+Menjadi tempat mereka bisa bernafas, beristirahat, dan perlahan sembuh.
 `;
+
 
 const INITIAL_AI_MESSAGE: Message = {
     role: 'ai',
@@ -74,7 +122,6 @@ const INITIAL_AI_MESSAGE: Message = {
 };
 
 const convertToGeminiHistory = (conversation: Message[]): Content[] => {
-    // Filter pesan awal AI (INITIAL_AI_MESSAGE) dan pesan typing/system
     const history = conversation.filter(msg => msg.text !== INITIAL_AI_MESSAGE.text && msg.text !== 'Jiwamu sedang mengetik...');
 
     return history.map(msg => ({
@@ -83,19 +130,23 @@ const convertToGeminiHistory = (conversation: Message[]): Content[] => {
     })) as Content[];
 };
 
-const createNewChatSession = (history?: Content[]): Chat => {
+const createNewChatSession = (history?: Content[], globalContext: string = ''): Chat => {
     return ai.chats.create({
         model: MODEL,
         config: {
-            systemInstruction: JIWA_SYSTEM_INSTRUCTION,
+            systemInstruction: JIWA_SYSTEM_INSTRUCTION(globalContext),
             temperature: 0.8,
         },
         history: history,
     });
 };
 
+// =======================================================
+// KOMPONEN TALK ROOM
+// =======================================================
 
 function TalkRoom() {
+    // 1. STATE INITIATION
     const [conversation, setConversation] = useState<Message[]>(() => {
         const saved = localStorage.getItem('chatConversation');
         if (saved) {
@@ -112,17 +163,32 @@ function TalkRoom() {
 
     const [historySummaries, setHistorySummaries] = useState<HistorySummary[]>(() => {
         const savedHistory = localStorage.getItem('chatHistorySummaries');
-        return savedHistory ? JSON.parse(savedHistory) : [];
+        if (savedHistory) {
+            const parsed = JSON.parse(savedHistory);
+            return parsed.map((h: any) => ({
+                ...h,
+                date: new Date(h.date),
+                fullConversation: h.fullConversation.map((msg: any) => ({
+                    ...msg,
+                    timestamp: new Date(msg.timestamp)
+                }))
+            }));
+        }
+        return [];
     });
 
     const [currentChatId, setCurrentChatId] = useState<string | null>(uuidv4());
-
-    // STATE UNTUK MENGONTROL SIDEBAR (DEFAULTNYA TERBUKA DI DESKTOP)
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
+    
+    // State untuk intervensi
+    const [isCrisisPopupVisible, setIsCrisisPopupVisible] = useState(false);
+    const [miniInterventionSuggestion, setMiniInterventionSuggestion] = useState<string | null>(null); 
+    
+    // 2. INISIALISASI useRef
+    const initialGlobalContext = useRef(generateGlobalContext(historySummaries)).current;
+    const chatRef = useRef<Chat>(createNewChatSession([], initialGlobalContext));
 
-    const chatRef = useRef<Chat>(createNewChatSession());
-
-
+    // 3. EFFECT HOOKS
     useEffect(() => {
         localStorage.setItem('chatConversation', JSON.stringify(conversation));
     }, [conversation]);
@@ -134,40 +200,81 @@ function TalkRoom() {
 
     useEffect(() => {
         const handleResize = () => {
-             // Opsional: Atur ulang state isSidebarOpen saat resize di desktop
              if (window.innerWidth >= 1024) {
                  setIsSidebarOpen(true);
-             } else {
-                 // Biarkan state mobile
-             }
+             } 
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
     
-    // FUNGSI ANALISIS MOOD (Gemini Call Kedua)
+    // 4. FUNGSI-FUNGSI UTAMA
+
+    // =======================================================
+    // FUNGSI BARU: TRIGGER INTERVENSI (Tidak Berubah)
+    // =======================================================
+    const triggerMiniIntervention = async (lastUserMessage: string) => {
+        const negativeKeywords = ["aku ingin mati", "mau mati", "capek hidup", "ingin menyakiti diri sendiri", "bunuh diri", "ingin akhiri hidup", "udah gak kuat"];
+        const crisisDetected = negativeKeywords.some(keyword => lastUserMessage.toLowerCase().includes(keyword));
+        
+        // 1. Logika Krisis (Pop-up)
+        if (crisisDetected) {
+            console.warn("KRISIS TERDETEKSI: Menampilkan pop-up hotline.");
+            setIsCrisisPopupVisible(true);
+            setMiniInterventionSuggestion(null);
+            return;
+        }
+
+        // 2. Logika Mini Intervensi (Setelah curhatan emosi negatif)
+        const emotionalKeywords = ["marah", "sedih", "kecewa", "frustrasi", "tertekan", "hancur", "stres", "lelah", "capek"];
+        const emotionalCurhatDetected = emotionalKeywords.some(keyword => lastUserMessage.toLowerCase().includes(keyword));
+
+        if (emotionalCurhatDetected) {
+            console.log("Emosi negatif terdeteksi. Meminta saran CBT singkat.");
+            
+            // Internal Prompt Kedua ke Gemini
+            const internalCbtPrompt = `Berdasarkan curhatan terakhir ini: "${lastUserMessage}", berikan satu saran latihan singkat Cognitive Behavioral Therapy (CBT), Grounding, atau Gratitude Journaling yang relevan, maks. 20 kata, gunakan emoji yang lembut. Contoh: "Ambil 3 napas dalam, lalu sebut 5 benda biru di sekitarmu. 💙".`;
+            
+            try {
+                const cbtResponse: GenerateContentResponse = await ai.models.generateContent({
+                    model: MODEL,
+                    contents: internalCbtPrompt,
+                });
+
+                const suggestionText = cbtResponse.text.trim();
+                setMiniInterventionSuggestion(suggestionText);
+
+            } catch (error) {
+                console.error("Internal CBT AI Error:", error);
+                setMiniInterventionSuggestion("Yuk, coba tarik napas dalam 5 kali. Rasakan udara masuk dan keluar dari tubuhmu. 🌬️");
+            }
+        } else {
+            setMiniInterventionSuggestion(null);
+        }
+    };
+    
+    // ... (Fungsi summarizeMoodAndChat tetap sama)
     const summarizeMoodAndChat = useCallback(async (convToSummarize: Message[], id: string) => {
         const chatMessages = convToSummarize.filter(msg => msg.role !== 'system' && msg.text !== 'Jiwamu sedang mengetik...');
 
         if (chatMessages.length <= 2) { 
-             console.log("Sesi terlalu pendek, tidak disimpan.");
-             return; 
+              return; 
         }
 
         const fullText = chatMessages.map(msg => `${msg.role}: ${msg.text}`).join('\n');
         
         const MOOD_SUMMARY_PROMPT = `
-            Anda adalah penganalisis sentimen profesional. Berdasarkan percakapan berikut, lakukan dua hal:
-            1. Tentukan MOOD keseluruhan pengguna (hanya pilih satu dari opsi ini: 😄, 😊, 😐, 😔, 😢).
-            2. Buat rangkuman singkat (Maks. 15 kata) tentang topik utama percakapan, menggunakan bahasa yang hangat.
+              Anda adalah penganalisis sentimen profesional. Berdasarkan percakapan berikut, lakukan dua hal:
+              1. Tentukan MOOD keseluruhan pengguna (hanya pilih satu dari opsi ini: 😄, 😊, 😐, 😔, 😢).
+              2. Buat rangkuman singkat (Maks. 15 kata) tentang topik utama percakapan, menggunakan bahasa yang hangat.
 
-            Format output WAJIB: [MOOD_EMOJI] | [RINGKASAN_SINGKAT_TOPIK]
-            Contoh: 😔 | Merasa tertekan karena tugas sekolah yang menumpuk.
+              Format output WAJIB: [MOOD_EMOJI] | [RINGKASAN_SINGKAT_TOPIK]
+              Contoh: 😔 | Merasa tertekan karena tugas sekolah yang menumpuk.
 
-            Percakapan:
-            ---
-            ${fullText}
-            ---
+              Percakapan:
+              ---
+              ${fullText}
+              ---
         `;
 
         try {
@@ -183,7 +290,8 @@ function TalkRoom() {
             
             if (rawSummary.includes('|')) {
                 const [moodPart, ...summaryParts] = rawSummary.split('|').map(s => s.trim());
-                moodEmoji = moodPart.length <= 2 ? moodPart : '😐'; 
+                const validMoods: HistorySummary['mood'][] = ['😄', '😊', '😐', '😔', '😢'];
+                moodEmoji = validMoods.includes(moodPart as HistorySummary['mood']) ? moodPart : '😐'; 
                 summaryText = summaryParts.join(' | ').substring(0, 50) + (summaryParts.join(' | ').length > 50 ? '...' : '');
             } else {
                 summaryText = rawSummary.substring(0, 50) + (rawSummary.length > 50 ? '...' : '');
@@ -220,10 +328,13 @@ function TalkRoom() {
             setHistorySummaries(prev => [defaultSummary, ...prev]);
         }
     }, []);
-    
+
     // FUNGSI PANGGILAN GEMINI (Chat Utama)
     const generateAIResponse = async (userMessage: string) => {
         setIsLoading(true);
+        setMiniInterventionSuggestion(null); 
+        
+        let aiText = 'Maaf, aku sedang tidak bisa merespon saat ini. Coba lagi sebentar ya. 🙏';
         
         try {
             const chat = chatRef.current;
@@ -231,7 +342,7 @@ function TalkRoom() {
                 message: userMessage,
             });
 
-            const aiText = response.text || 'Maaf, aku sedang tidak bisa merespon saat ini. Coba lagi sebentar ya.';
+            aiText = response.text || aiText;
             
             const aiResponse: Message = {
                 role: 'ai',
@@ -240,12 +351,14 @@ function TalkRoom() {
             };
 
             setConversation((prev) => [...prev, aiResponse]);
+            
+            await triggerMiniIntervention(userMessage);
 
         } catch (error) {
             console.error("Gemini Chat API Error:", error);
             const errorResponse: Message = {
                 role: 'ai',
-                text: 'Duh, sepertinya koneksi ke AI sedang bermasalah. Maaf ya! (Error: Periksa konsol)',
+                text: 'Duh, sepertinya koneksi ke AI sedang bermasalah. Maaf ya! (Error: Periksa konsol) 😔',
                 timestamp: new Date(),
             };
             setConversation((prev) => [...prev, errorResponse]);
@@ -270,11 +383,12 @@ function TalkRoom() {
         }, 500);
     };
 
-    // FUNGSI Mulai Sesi Baru
     const startNewSession = () => {
-        if (conversation.length > 1) {
-            summarizeMoodAndChat(conversation, currentChatId!);
+        if (currentChatId && conversation.length > 1) {
+            summarizeMoodAndChat(conversation, currentChatId);
         }
+
+        const globalContext = generateGlobalContext(historySummaries);
 
         const newId = uuidv4();
         setCurrentChatId(newId);
@@ -284,24 +398,26 @@ function TalkRoom() {
                 text: 'Hai! Ini ruangan curhat baru. Ceritakan apa yang sedang kamu rasakan saat ini. 💖',
             },
         ]);
-        chatRef.current = createNewChatSession();
-        // Tutup sidebar di mobile saat sesi baru dimulai
+        
+        chatRef.current = createNewChatSession([], globalContext); 
+        
         if(window.innerWidth < 1024) {
              setIsSidebarOpen(false); 
         }
+        setIsCrisisPopupVisible(false);
+        setMiniInterventionSuggestion(null);
     };
 
-    // FUNGSI Memuat Riwayat
     const handleSelectHistory = async (id: string) => {
         if (id === currentChatId) {
             if(window.innerWidth < 1024) {
-                 setIsSidebarOpen(false); 
+                setIsSidebarOpen(false); 
             }
-             return; 
+              return; 
         }
         
-        if (!historySummaries.some(h => h.id === currentChatId) && conversation.length > 1) {
-            summarizeMoodAndChat(conversation, currentChatId!);
+        if (currentChatId && !historySummaries.some(h => h.id === currentChatId) && conversation.length > 1) {
+              summarizeMoodAndChat(conversation, currentChatId);
         }
         
         const selectedHistory = historySummaries.find(h => h.id === id);
@@ -309,12 +425,15 @@ function TalkRoom() {
             setConversation(selectedHistory.fullConversation);
             setCurrentChatId(id);
             
+            const globalContext = generateGlobalContext(historySummaries);
             const geminiHistory = convertToGeminiHistory(selectedHistory.fullConversation);
-            chatRef.current = createNewChatSession(geminiHistory);
+            chatRef.current = createNewChatSession(geminiHistory, globalContext);
         }
           if(window.innerWidth < 1024) {
              setIsSidebarOpen(false); 
           }
+        setIsCrisisPopupVisible(false);
+        setMiniInterventionSuggestion(null);
     };
 
 
@@ -327,8 +446,105 @@ function TalkRoom() {
     const currentConversation = typingMessage ? [...conversation, typingMessage] : conversation;
 
 
+    // =======================================================
+    // KOMPONEN: CRISIS POPUP (Diperbarui)
+    // =======================================================
+    const CrisisPopup = () => (
+        <div className={`fixed inset-0 z-50 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 ${isCrisisPopupVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
+                <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4 animate-pulse" />
+                <h2 className="text-3xl font-extrabold text-red-700 mb-3">Ini Mendesak.</h2>
+                <p className="text-xl text-gray-800 mb-6">
+                    Kami sangat mengkhawatirkan keselamatanmu. Jika kamu merasa ingin menyakiti diri sendiri, segera ambil langkah berikut. Kamu tidak sendirian.
+                </p>
+                
+                <div className="space-y-4 mb-8 text-left">
+                    <h3 className="text-2xl font-bold text-gray-900 border-b pb-2 mb-4 flex items-center">
+                        <Shield className="w-6 h-6 mr-2 text-red-600" /> Kontak Bantuan Darurat
+                    </h3>
+                    
+                    {INDONESIA_CRISIS_RESOURCES.map((resource, index) => (
+                        <div 
+                            key={index} 
+                            className={`p-4 rounded-xl border-l-4 ${
+                                resource.type === 'danger' ? 'bg-red-50 border-red-500' : 
+                                resource.type === 'support' ? 'bg-indigo-50 border-indigo-500' : 
+                                'bg-yellow-50 border-yellow-500'
+                            }`}
+                        >
+                            <div className="flex justify-between items-center">
+                                <p className="text-lg font-semibold text-gray-800">{resource.title}</p>
+                                <a 
+                                    href={`tel:${resource.number.split('/')[0].trim()}`} 
+                                    className={`text-xl font-bold ${
+                                        resource.type === 'danger' ? 'text-red-700' : 
+                                        resource.type === 'support' ? 'text-indigo-700' : 
+                                        'text-yellow-700'
+                                    } hover:underline`}
+                                >
+                                    {resource.number}
+                                </a>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
+                        </div>
+                    ))}
+                    
+                    <div className="mt-6 p-4 bg-gray-100 border border-gray-300 rounded-xl">
+                        <p className="text-lg font-medium text-gray-800">
+                            Langkah Terpenting: Segera hubungi orang yang kamu percaya (orang tua, teman, guru) dan beritahu apa yang kamu rasakan. Jangan lalui ini sendirian.
+                        </p>
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => setIsCrisisPopupVisible(false)}
+                    className="w-full py-3 px-6 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition duration-150 shadow-md mt-4"
+                >
+                    Aku Sudah Melihat Ini dan Akan Mencari Bantuan
+                </button>
+            </div>
+        </div>
+    );
+    
+    // =======================================================
+    // KOMPONEN: MINI INTERVENTION CARD (Tidak Berubah)
+    // =======================================================
+    const MiniInterventionCard = () => {
+        if (!miniInterventionSuggestion) return null;
+
+        return (
+            <div className="fixed bottom-24 right-4 md:right-8 z-40 max-w-xs transition-transform duration-300 ease-out transform translate-y-0">
+                <div className="bg-teal-100 border-2 border-teal-400 rounded-xl shadow-lg p-4 relative">
+                    <button
+                        onClick={() => setMiniInterventionSuggestion(null)}
+                        className="absolute top-2 right-2 p-1 text-teal-600 hover:text-teal-800 rounded-full"
+                        aria-label="Tutup Saran Latihan"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                    <div className="flex items-start space-x-3">
+                        <MessageCircleHeart className="w-6 h-6 text-teal-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                            <p className="text-sm font-semibold text-teal-700 mb-1">Coba Latihan Singkat Ini! ✨</p>
+                            <p className="text-md text-gray-800 font-medium">
+                                {miniInterventionSuggestion}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // 5. RENDER (JSX)
     return (
         <div className="min-h-screen bg-gray-50 flex"> 
+             
+            {/* RENDER POPUP KRISIS */}
+            <CrisisPopup />
+
+            {/* RENDER MINI INTERVENTION CARD */}
+            <MiniInterventionCard />
             
             {/* 1. Sidebar Riwayat */}
             <ChatHistorySidebar 
@@ -350,41 +566,39 @@ function TalkRoom() {
             )}
             
             {/* 2. Area Chat Utama */}
-            {/* Hapus kelas ml-*, biarkan static sidebar menangani layout desktop */}
             <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out`}>
                 
-                {/* Header Utama - Sekarang memiliki tombol Menu untuk mobile */}
-                 <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white border-b sticky top-0 z-20 shadow-sm`}>
-                    <div className="flex items-center space-x-3">
-                        
-                        {/* Tombol Hamburger HANYA di Mobile DAN saat Sidebar Tertutup */}
-                        {!isSidebarOpen && (
-                            <button 
-                                onClick={() => setIsSidebarOpen(true)}
-                                // Hanya tampil di bawah lg
-                                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg lg:hidden" 
-                                aria-label="Buka Riwayat"
-                            >
-                                <Menu className="w-6 h-6" />
-                            </button>
-                        )}
-                        
-                        {/* Ikon dan Judul Chat Utama */}
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
-                            <MessageCircleHeart className="w-6 h-6 text-white" />
+                {/* Header Utama */}
+                    <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white border-b sticky top-0 z-20 shadow-sm`}>
+                        <div className="flex items-center space-x-3">
+                            
+                            {/* Tombol Hamburger */}
+                            {!isSidebarOpen && (
+                                <button 
+                                    onClick={() => setIsSidebarOpen(true)}
+                                    className="p-2 text-gray-600 hover:text-gray-900 rounded-lg lg:hidden" 
+                                    aria-label="Buka Riwayat"
+                                >
+                                    <Menu className="w-6 h-6" />
+                                </button>
+                            )}
+                            
+                            {/* Ikon dan Judul Chat Utama */}
+                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
+                                <MessageCircleHeart className="w-6 h-6 text-white" />
+                            </div>
+                            <h1 className="text-2xl font-bold text-gray-900">Talk Room</h1>
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900">Talk Room</h1>
-                    </div>
-                </header>
+                    </header>
 
                 <div className="flex-grow flex flex-col max-w-5xl mx-auto w-full">
-                    <div className="px-4 sm:px-6 lg:px-8 py-6 md:py-8  flex-grow flex flex-col">
+                    <div className="px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex-grow flex flex-col">
                         
                         {/* Judul & Deskripsi */}
                         <div className="mb-6 flex-shrink-0">
                              <h2 className="text-xl font-semibold text-gray-900">Ruang Curhat</h2>
                              <p className="text-gray-600">
-                                Ruang aman untuk berbagi perasaan dengan AI
+                                 Ruang aman untuk berbagi perasaan dengan AI
                              </p>
                         </div>
 
