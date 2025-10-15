@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import ChatWindow from '../components/ChatWindow';
-import ChatHistorySidebar from '../components/ChatHistorySidebar'; 
-// Import Shield untuk ikon keamanan/perlindungan
-import { MessageCircleHeart, AlertCircle, Menu, X, Shield } from 'lucide-react'; 
-
-// Import Gemini SDK dan UUID
+import ChatHistorySidebar from '../components/ChatHistorySidebar';
+import { MessageCircleHeart, AlertCircle, Menu, X, Shield } from 'lucide-react';
 import { GoogleGenAI, Content, Chat, GenerateContentResponse } from '@google/genai';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,10 +26,6 @@ interface HistorySummary {
     fullConversation: Message[];
 }
 
-// =======================================================
-// KONSTANTA BARU: SUMBER DAYA KRISIS INDONESIA
-// =======================================================
-
 const INDONESIA_CRISIS_RESOURCES = [
     { title: "Hotline Bunuh Diri (Kemenkes)", number: "119", description: "Layanan Kesehatan Jiwa Darurat.", type: "danger" },
     { title: "Ambulans", number: "118 / 119", description: "Layanan Gawat Darurat Medis Umum.", type: "danger" },
@@ -42,38 +35,48 @@ const INDONESIA_CRISIS_RESOURCES = [
     { title: "Pemadam Kebakaran", number: "113", description: "Layanan Pemadam Kebakaran.", type: "emergency" },
 ];
 
-
 // =======================================================
-// FUNGSI PEMBANTU GLOBAL DIPINDAHKAN KE LUAR KOMPONEN
+// ✅ FUNGSI GLOBAL BARU: MEMBUAT KONTEKS DENGAN DETAIL PERCAKAPAN
 // =======================================================
-
-// FUNGSI GLOBAL 1: MEMBUAT KONTEKS JANGKA PANJANG (Memori AI)
 const generateGlobalContext = (history: HistorySummary[]): string => {
     if (history.length === 0) {
         return 'Belum ada riwayat percakapan yang tersimpan.';
     }
 
-    const maxEntries = 5; 
+    const maxEntries = 3; // Kurangi jumlah riwayat untuk menjaga efisiensi
+    const maxMessagesPerSummary = 5; // Batasi jumlah pesan per ringkasan
     const recentHistory = history.slice(0, maxEntries);
 
     const contextText = recentHistory.map((h, index) => {
         const dateObj = h.date instanceof Date ? h.date : new Date(h.date);
         const dateString = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-        return `[Sesi ${history.length - index}] - ${dateString}. Mood: ${h.mood}. Topik: ${h.summary}`;
+        
+        // Ambil beberapa pesan terakhir dari percakapan penuh
+        const conversationSnippet = h.fullConversation
+            .slice(-maxMessagesPerSummary) // Ambil 5 pesan terakhir
+            .map(msg => `[${msg.role === 'ai' ? 'Jiwamu' : 'Pengguna'}]: ${msg.text}`)
+            .join('\n');
+
+        return `
+[Sesi ${history.length - index}] - ${dateString}. Mood: ${h.mood}. Ringkasan: ${h.summary}
+Sniper Percakapan Penting:
+${conversationSnippet}
+---
+`;
     }).join('\n');
 
     return `
-    --- PENTING: MEMORI JANGKA PANJANG AI ---
-    Ini adalah ringkasan dari ${recentHistory.length} sesi curhat terakhir pengguna. 
-    Gunakan informasi ini (misalnya nama pengguna, masalah yang sering dihadapi) untuk merespon dengan lebih personal, TAPI JANGAN ULANGKAN DAFTAR INI.
-    
-    Riwayat Ringkas Terbaru:
-    ${contextText}
-    ------------------------------------------
-    `;
+--- PENTING: MEMORI JANGKA PANJANG AI ---
+Ini adalah ringkasan dan kutipan dari ${recentHistory.length} sesi curhat terakhir pengguna. 
+Gunakan informasi ini (misalnya nama pengguna, masalah yang sering dihadapi, detail curhatan spesifik) untuk merespon dengan lebih personal dan empati. JANGAN PERNAH ULANGKAN DAFTAR INI.
+
+Riwayat Detail Terbaru:
+${contextText}
+------------------------------------------
+`;
 };
 
-// JIWA_SYSTEM_INSTRUCTION (Tetap sama, sudah hangat dan ber-emoji)
+// JIWA_SYSTEM_INSTRUCTION (Tetap sama)
 const JIWA_SYSTEM_INSTRUCTION = (globalContext = '') => `
 Anda adalah psikolog virtual pribadi dalam aplikasi Jaga Jiwa.
 Peran Anda adalah menjadi tempat aman bagi remaja dan pelajar Indonesia (usia 15–20 tahun) untuk berbagi perasaan tanpa takut dihakimi.
@@ -81,6 +84,8 @@ Peran Anda adalah menjadi tempat aman bagi remaja dan pelajar Indonesia (usia 15
 
 Gunakan informasi berikut untuk menjaga konsistensi. Misalnya, jika pengguna pernah menyebut nama mereka atau topik penting, gunakanlah.
 ${globalContext}
+
+
 // --------------------------------------------------------
 
 NILAI UTAMA:
@@ -114,7 +119,6 @@ Menjadi pengingat bahwa mereka masih pantas dicintai, bahkan saat sedang rapuh.
 Menjadi tempat mereka bisa bernafas, beristirahat, dan perlahan sembuh.
 `;
 
-
 const INITIAL_AI_MESSAGE: Message = {
     role: 'ai',
     text: 'Hai! Aku Jiwamu. Aku di sini untuk mendengarkan curhatanmu. Ceritakan apa yang sedang kamu rasakan, aku siap mendengar tanpa menghakimi. 💙',
@@ -141,12 +145,7 @@ const createNewChatSession = (history?: Content[], globalContext: string = ''): 
     });
 };
 
-// =======================================================
-// KOMPONEN TALK ROOM
-// =======================================================
-
 function TalkRoom() {
-    // 1. STATE INITIATION
     const [conversation, setConversation] = useState<Message[]>(() => {
         const saved = localStorage.getItem('chatConversation');
         if (saved) {
@@ -179,16 +178,14 @@ function TalkRoom() {
 
     const [currentChatId, setCurrentChatId] = useState<string | null>(uuidv4());
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
-    
-    // State untuk intervensi
+
     const [isCrisisPopupVisible, setIsCrisisPopupVisible] = useState(false);
-    const [miniInterventionSuggestion, setMiniInterventionSuggestion] = useState<string | null>(null); 
-    
-    // 2. INISIALISASI useRef
+    const [miniInterventionSuggestion, setMiniInterventionSuggestion] = useState<string | null>(null);
+
+    // ✅ Perbarui useRef dengan globalContext yang baru
     const initialGlobalContext = useRef(generateGlobalContext(historySummaries)).current;
     const chatRef = useRef<Chat>(createNewChatSession([], initialGlobalContext));
 
-    // 3. EFFECT HOOKS
     useEffect(() => {
         localStorage.setItem('chatConversation', JSON.stringify(conversation));
     }, [conversation]);
@@ -197,27 +194,20 @@ function TalkRoom() {
         localStorage.setItem('chatHistorySummaries', JSON.stringify(historySummaries));
     }, [historySummaries]);
 
-
     useEffect(() => {
         const handleResize = () => {
-             if (window.innerWidth >= 1024) {
-                 setIsSidebarOpen(true);
-             } 
+            if (window.innerWidth >= 1024) {
+                setIsSidebarOpen(true);
+            }
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    
-    // 4. FUNGSI-FUNGSI UTAMA
 
-    // =======================================================
-    // FUNGSI BARU: TRIGGER INTERVENSI (Tidak Berubah)
-    // =======================================================
     const triggerMiniIntervention = async (lastUserMessage: string) => {
         const negativeKeywords = ["aku ingin mati", "mau mati", "capek hidup", "ingin menyakiti diri sendiri", "bunuh diri", "ingin akhiri hidup", "udah gak kuat"];
         const crisisDetected = negativeKeywords.some(keyword => lastUserMessage.toLowerCase().includes(keyword));
-        
-        // 1. Logika Krisis (Pop-up)
+
         if (crisisDetected) {
             console.warn("KRISIS TERDETEKSI: Menampilkan pop-up hotline.");
             setIsCrisisPopupVisible(true);
@@ -225,16 +215,14 @@ function TalkRoom() {
             return;
         }
 
-        // 2. Logika Mini Intervensi (Setelah curhatan emosi negatif)
         const emotionalKeywords = ["marah", "sedih", "kecewa", "frustrasi", "tertekan", "hancur", "stres", "lelah", "capek"];
         const emotionalCurhatDetected = emotionalKeywords.some(keyword => lastUserMessage.toLowerCase().includes(keyword));
 
         if (emotionalCurhatDetected) {
             console.log("Emosi negatif terdeteksi. Meminta saran CBT singkat.");
-            
-            // Internal Prompt Kedua ke Gemini
+
             const internalCbtPrompt = `Berdasarkan curhatan terakhir ini: "${lastUserMessage}", berikan satu saran latihan singkat Cognitive Behavioral Therapy (CBT), Grounding, atau Gratitude Journaling yang relevan, maks. 20 kata, gunakan emoji yang lembut. Contoh: "Ambil 3 napas dalam, lalu sebut 5 benda biru di sekitarmu. 💙".`;
-            
+
             try {
                 const cbtResponse: GenerateContentResponse = await ai.models.generateContent({
                     model: MODEL,
@@ -243,7 +231,6 @@ function TalkRoom() {
 
                 const suggestionText = cbtResponse.text.trim();
                 setMiniInterventionSuggestion(suggestionText);
-
             } catch (error) {
                 console.error("Internal CBT AI Error:", error);
                 setMiniInterventionSuggestion("Yuk, coba tarik napas dalam 5 kali. Rasakan udara masuk dan keluar dari tubuhmu. 🌬️");
@@ -252,29 +239,28 @@ function TalkRoom() {
             setMiniInterventionSuggestion(null);
         }
     };
-    
-    // ... (Fungsi summarizeMoodAndChat tetap sama)
+
     const summarizeMoodAndChat = useCallback(async (convToSummarize: Message[], id: string) => {
         const chatMessages = convToSummarize.filter(msg => msg.role !== 'system' && msg.text !== 'Jiwamu sedang mengetik...');
 
-        if (chatMessages.length <= 2) { 
-              return; 
+        if (chatMessages.length <= 2) {
+            return;
         }
 
         const fullText = chatMessages.map(msg => `${msg.role}: ${msg.text}`).join('\n');
-        
+
         const MOOD_SUMMARY_PROMPT = `
-              Anda adalah penganalisis sentimen profesional. Berdasarkan percakapan berikut, lakukan dua hal:
-              1. Tentukan MOOD keseluruhan pengguna (hanya pilih satu dari opsi ini: 😄, 😊, 😐, 😔, 😢).
-              2. Buat rangkuman singkat (Maks. 15 kata) tentang topik utama percakapan, menggunakan bahasa yang hangat.
+            Anda adalah penganalisis sentimen profesional. Berdasarkan percakapan berikut, lakukan dua hal:
+            1. Tentukan MOOD keseluruhan pengguna (hanya pilih satu dari opsi ini: 😄, 😊, 😐, 😔, 😢).
+            2. Buat rangkuman singkat (Maks. 15 kata) tentang topik utama percakapan, menggunakan bahasa yang hangat.
 
-              Format output WAJIB: [MOOD_EMOJI] | [RINGKASAN_SINGKAT_TOPIK]
-              Contoh: 😔 | Merasa tertekan karena tugas sekolah yang menumpuk.
+            Format output WAJIB: [MOOD_EMOJI] | [RINGKASAN_SINGKAT_TOPIK]
+            Contoh: 😔 | Merasa tertekan karena tugas sekolah yang menumpuk.
 
-              Percakapan:
-              ---
-              ${fullText}
-              ---
+            Percakapan:
+            ---
+            ${fullText}
+            ---
         `;
 
         try {
@@ -284,23 +270,23 @@ function TalkRoom() {
             });
 
             const rawSummary = response.text.trim();
-            
+
             let moodEmoji = '😐';
             let summaryText = "Sesi curhat yang intens.";
-            
+
             if (rawSummary.includes('|')) {
                 const [moodPart, ...summaryParts] = rawSummary.split('|').map(s => s.trim());
                 const validMoods: HistorySummary['mood'][] = ['😄', '😊', '😐', '😔', '😢'];
-                moodEmoji = validMoods.includes(moodPart as HistorySummary['mood']) ? moodPart : '😐'; 
+                moodEmoji = validMoods.includes(moodPart as HistorySummary['mood']) ? moodPart : '😐';
                 summaryText = summaryParts.join(' | ').substring(0, 50) + (summaryParts.join(' | ').length > 50 ? '...' : '');
             } else {
                 summaryText = rawSummary.substring(0, 50) + (rawSummary.length > 50 ? '...' : '');
             }
-            
+
             const newSummary: HistorySummary = {
                 id: id,
                 date: new Date(),
-                mood: (moodEmoji as HistorySummary['mood']) || '😐', 
+                mood: (moodEmoji as HistorySummary['mood']) || '😐',
                 summary: summaryText,
                 fullConversation: convToSummarize,
             };
@@ -321,7 +307,7 @@ function TalkRoom() {
             const defaultSummary: HistorySummary = {
                 id: id,
                 date: new Date(),
-                mood: '😐', 
+                mood: '😐',
                 summary: "Sesi terhenti karena masalah koneksi AI.",
                 fullConversation: convToSummarize,
             };
@@ -329,13 +315,12 @@ function TalkRoom() {
         }
     }, []);
 
-    // FUNGSI PANGGILAN GEMINI (Chat Utama)
     const generateAIResponse = async (userMessage: string) => {
         setIsLoading(true);
-        setMiniInterventionSuggestion(null); 
-        
+        setMiniInterventionSuggestion(null);
+
         let aiText = 'Maaf, aku sedang tidak bisa merespon saat ini. Coba lagi sebentar ya. 🙏';
-        
+
         try {
             const chat = chatRef.current;
             const response = await chat.sendMessage({
@@ -343,7 +328,7 @@ function TalkRoom() {
             });
 
             aiText = response.text || aiText;
-            
+
             const aiResponse: Message = {
                 role: 'ai',
                 text: aiText,
@@ -351,7 +336,7 @@ function TalkRoom() {
             };
 
             setConversation((prev) => [...prev, aiResponse]);
-            
+
             await triggerMiniIntervention(userMessage);
 
         } catch (error) {
@@ -368,8 +353,8 @@ function TalkRoom() {
     };
 
     const handleSendMessage = (message: string) => {
-        if (!message.trim()) return; 
-        
+        if (!message.trim()) return;
+
         const userMessage: Message = {
             role: 'user',
             text: message,
@@ -398,11 +383,11 @@ function TalkRoom() {
                 text: 'Hai! Ini ruangan curhat baru. Ceritakan apa yang sedang kamu rasakan saat ini. 💖',
             },
         ]);
-        
-        chatRef.current = createNewChatSession([], globalContext); 
-        
-        if(window.innerWidth < 1024) {
-             setIsSidebarOpen(false); 
+
+        chatRef.current = createNewChatSession([], globalContext);
+
+        if (window.innerWidth < 1024) {
+            setIsSidebarOpen(false);
         }
         setIsCrisisPopupVisible(false);
         setMiniInterventionSuggestion(null);
@@ -410,32 +395,55 @@ function TalkRoom() {
 
     const handleSelectHistory = async (id: string) => {
         if (id === currentChatId) {
-            if(window.innerWidth < 1024) {
-                setIsSidebarOpen(false); 
+            if (window.innerWidth < 1024) {
+                setIsSidebarOpen(false);
             }
-              return; 
+            return;
         }
-        
+
         if (currentChatId && !historySummaries.some(h => h.id === currentChatId) && conversation.length > 1) {
-              summarizeMoodAndChat(conversation, currentChatId);
+            summarizeMoodAndChat(conversation, currentChatId);
         }
-        
+
         const selectedHistory = historySummaries.find(h => h.id === id);
         if (selectedHistory) {
             setConversation(selectedHistory.fullConversation);
             setCurrentChatId(id);
-            
+
             const globalContext = generateGlobalContext(historySummaries);
             const geminiHistory = convertToGeminiHistory(selectedHistory.fullConversation);
             chatRef.current = createNewChatSession(geminiHistory, globalContext);
         }
-          if(window.innerWidth < 1024) {
-             setIsSidebarOpen(false); 
-          }
+        if (window.innerWidth < 1024) {
+            setIsSidebarOpen(false);
+        }
         setIsCrisisPopupVisible(false);
         setMiniInterventionSuggestion(null);
     };
 
+    const handleDeleteHistory = (id: string | 'all') => {
+        if (id === 'all') {
+            if (window.confirm("Yakin ingin menghapus SEMUA riwayat curhatmu? Tindakan ini tidak bisa dibatalkan.")) {
+                setHistorySummaries([]);
+                localStorage.removeItem('chatHistorySummaries');
+                localStorage.removeItem('chatConversation');
+                startNewSession();
+                alert('Semua riwayat curhatmu telah dihapus. Ruangan baru telah dibuat.');
+            }
+        } else {
+            if (window.confirm("Yakin ingin menghapus sesi ini? Riwayat sesi ini akan hilang permanen.")) {
+                setHistorySummaries(prev => {
+                    const updatedHistory = prev.filter(h => h.id !== id);
+                    return updatedHistory;
+                });
+
+                if (currentChatId === id) {
+                    startNewSession();
+                }
+                alert('Sesi curhat telah berhasil dihapus.');
+            }
+        }
+    };
 
     const typingMessage: Message | null = isLoading ? {
         role: 'ai',
@@ -445,10 +453,6 @@ function TalkRoom() {
 
     const currentConversation = typingMessage ? [...conversation, typingMessage] : conversation;
 
-
-    // =======================================================
-    // KOMPONEN: CRISIS POPUP (Diperbarui)
-    // =======================================================
     const CrisisPopup = () => (
         <div className={`fixed inset-0 z-50 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 ${isCrisisPopupVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
@@ -457,30 +461,28 @@ function TalkRoom() {
                 <p className="text-xl text-gray-800 mb-6">
                     Kami sangat mengkhawatirkan keselamatanmu. Jika kamu merasa ingin menyakiti diri sendiri, segera ambil langkah berikut. Kamu tidak sendirian.
                 </p>
-                
+
                 <div className="space-y-4 mb-8 text-left">
                     <h3 className="text-2xl font-bold text-gray-900 border-b pb-2 mb-4 flex items-center">
                         <Shield className="w-6 h-6 mr-2 text-red-600" /> Kontak Bantuan Darurat
                     </h3>
-                    
+
                     {INDONESIA_CRISIS_RESOURCES.map((resource, index) => (
-                        <div 
-                            key={index} 
-                            className={`p-4 rounded-xl border-l-4 ${
-                                resource.type === 'danger' ? 'bg-red-50 border-red-500' : 
-                                resource.type === 'support' ? 'bg-indigo-50 border-indigo-500' : 
-                                'bg-yellow-50 border-yellow-500'
-                            }`}
+                        <div
+                            key={index}
+                            className={`p-4 rounded-xl border-l-4 ${resource.type === 'danger' ? 'bg-red-50 border-red-500' :
+                                resource.type === 'support' ? 'bg-indigo-50 border-indigo-500' :
+                                    'bg-yellow-50 border-yellow-500'
+                                }`}
                         >
                             <div className="flex justify-between items-center">
                                 <p className="text-lg font-semibold text-gray-800">{resource.title}</p>
-                                <a 
-                                    href={`tel:${resource.number.split('/')[0].trim()}`} 
-                                    className={`text-xl font-bold ${
-                                        resource.type === 'danger' ? 'text-red-700' : 
-                                        resource.type === 'support' ? 'text-indigo-700' : 
-                                        'text-yellow-700'
-                                    } hover:underline`}
+                                <a
+                                    href={`tel:${resource.number.split('/')[0].trim()}`}
+                                    className={`text-xl font-bold ${resource.type === 'danger' ? 'text-red-700' :
+                                        resource.type === 'support' ? 'text-indigo-700' :
+                                            'text-yellow-700'
+                                        } hover:underline`}
                                 >
                                     {resource.number}
                                 </a>
@@ -488,7 +490,7 @@ function TalkRoom() {
                             <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
                         </div>
                     ))}
-                    
+
                     <div className="mt-6 p-4 bg-gray-100 border border-gray-300 rounded-xl">
                         <p className="text-lg font-medium text-gray-800">
                             Langkah Terpenting: Segera hubungi orang yang kamu percaya (orang tua, teman, guru) dan beritahu apa yang kamu rasakan. Jangan lalui ini sendirian.
@@ -505,10 +507,7 @@ function TalkRoom() {
             </div>
         </div>
     );
-    
-    // =======================================================
-    // KOMPONEN: MINI INTERVENTION CARD (Tidak Berubah)
-    // =======================================================
+
     const MiniInterventionCard = () => {
         if (!miniInterventionSuggestion) return null;
 
@@ -536,101 +535,74 @@ function TalkRoom() {
         );
     };
 
-    // 5. RENDER (JSX)
     return (
-        <div className="min-h-screen bg-gray-50 flex"> 
-             
-            {/* RENDER POPUP KRISIS */}
+        <div className="min-h-screen bg-gray-50 flex">
             <CrisisPopup />
-
-            {/* RENDER MINI INTERVENTION CARD */}
             <MiniInterventionCard />
-            
-            {/* 1. Sidebar Riwayat */}
-            <ChatHistorySidebar 
-                history={historySummaries} 
-                onSelectHistory={handleSelectHistory} 
-                onStartNewSession={startNewSession} 
+            <ChatHistorySidebar
+                history={historySummaries}
+                onSelectHistory={handleSelectHistory}
+                onStartNewSession={startNewSession}
+                onDeleteHistory={handleDeleteHistory}
                 currentChatId={currentChatId}
-                onClose={() => setIsSidebarOpen(false)} 
-                onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
-                isOpen={isSidebarOpen} 
+                onClose={() => setIsSidebarOpen(false)}
+                onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+                isOpen={isSidebarOpen}
             />
-
-            {/* Overlay untuk Mobile ketika sidebar terbuka */}
             {isSidebarOpen && window.innerWidth < 1024 && (
-                <div 
+                <div
                     className="fixed inset-0 bg-black/50 z-30"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
-            
-            {/* 2. Area Chat Utama */}
             <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out`}>
-                
-                {/* Header Utama */}
-                    <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white border-b sticky top-0 z-20 shadow-sm`}>
-                        <div className="flex items-center space-x-3">
-                            
-                            {/* Tombol Hamburger */}
-                            {!isSidebarOpen && (
-                                <button 
-                                    onClick={() => setIsSidebarOpen(true)}
-                                    className="p-2 text-gray-600 hover:text-gray-900 rounded-lg lg:hidden" 
-                                    aria-label="Buka Riwayat"
-                                >
-                                    <Menu className="w-6 h-6" />
-                                </button>
-                            )}
-                            
-                            {/* Ikon dan Judul Chat Utama */}
-                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
-                                <MessageCircleHeart className="w-6 h-6 text-white" />
-                            </div>
-                            <h1 className="text-2xl font-bold text-gray-900">Talk Room</h1>
+                <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white border-b sticky top-0 z-20 shadow-sm flex-shrink-0`}>
+                    <div className="flex items-center space-x-3">
+                        {!isSidebarOpen && (
+                            <button
+                                onClick={() => setIsSidebarOpen(true)}
+                                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg lg:hidden"
+                                aria-label="Buka Riwayat"
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                        )}
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
+                            <MessageCircleHeart className="w-6 h-6 text-white" />
                         </div>
-                    </header>
-
-                <div className="flex-grow flex flex-col max-w-5xl mx-auto w-full">
-                    <div className="px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex-grow flex flex-col">
-                        
-                        {/* Judul & Deskripsi */}
-                        <div className="mb-6 flex-shrink-0">
-                             <h2 className="text-xl font-semibold text-gray-900">Ruang Curhat</h2>
-                             <p className="text-gray-600">
-                                 Ruang aman untuk berbagi perasaan dengan AI
-                             </p>
-                        </div>
-
-
-                        {/* Chat Window */}
-                        <div className="flex-grow min-h-[40vh] mb-6">
-                            <ChatWindow 
-                                conversation={currentConversation} 
-                                onSendMessage={handleSendMessage} 
-                                isDisabled={isLoading} 
-                            />
-                        </div>
-                        
-                        {/* Tips Berbicara */}
-                        <div className="mt-auto bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 md:p-8 flex-shrink-0">
-                            <h3 className="text-lg font-bold text-gray-900 mb-3">Tips Berbicara</h3>
-                            <ul className="space-y-2 text-sm md:text-base text-gray-700">
-                                <li className="flex items-start space-x-2">
-                                    <span className="text-emerald-600 font-bold">•</span>
-                                    <span>Jujur dengan perasaanmu, tidak ada yang salah atau benar</span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <span className="text-emerald-600 font-bold">•</span>
-                                    <span>Gunakan ruang ini untuk melepaskan beban pikiran</span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <span className="text-emerald-600 font-bold">•</span>
-                                    <span>Semua percakapan bersifat privat dan tersimpan lokal</span>
-                                </li>
-                            </ul>
-                        </div>
-
+                        <h1 className="text-2xl font-bold text-gray-900">Talk Room</h1>
+                    </div>
+                </header>
+                <div className="flex-grow max-w-5xl mx-auto w-full flex flex-col min-h-0 px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+                    <div className="mb-6 flex-shrink-0">
+                        <h2 className="text-xl font-semibold text-gray-900">Ruang Curhat</h2>
+                        <p className="text-gray-600">
+                            Ruang aman untuk berbagi perasaan dengan AI
+                        </p>
+                    </div>
+                    <div className="flex-grow min-h-0 mb-6">
+                        <ChatWindow
+                            conversation={currentConversation}
+                            onSendMessage={handleSendMessage}
+                            isDisabled={isLoading}
+                        />
+                    </div>
+                    <div className="mt-auto bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 md:p-8 flex-shrink-0">
+                        <h3 className="text-lg font-bold text-gray-900 mb-3">Tips Berbicara</h3>
+                        <ul className="space-y-2 text-sm md:text-base text-gray-700">
+                            <li className="flex items-start space-x-2">
+                                <span className="text-emerald-600 font-bold">•</span>
+                                <span>Jujur dengan perasaanmu, tidak ada yang salah atau benar</span>
+                            </li>
+                            <li className="flex items-start space-x-2">
+                                <span className="text-emerald-600 font-bold">•</span>
+                                <span>Gunakan ruang ini untuk melepaskan beban pikiran</span>
+                            </li>
+                            <li className="flex items-start space-x-2">
+                                <span className="text-emerald-600 font-bold">•</span>
+                                <span>Semua percakapan bersifat privat dan tersimpan lokal</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
