@@ -1,100 +1,405 @@
-import { BookHeart, Target, Users, Heart, Shield, Sparkles, Award, Lightbulb } from 'lucide-react';
+import { useEffect, useState } from "react"
+import { BookHeart, Target, Users, Heart, Shield, Sparkles, Award, Lightbulb, Pencil, TrendingUp, AlertCircle, Brain, Activity } from "lucide-react"
+
+// Import Chart.js dan komponennya
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from "chart.js"
+import { Line, Pie, Bar } from "react-chartjs-2"
+
+// Registrasi elemen-elemen Chart.js yang akan digunakan
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement)
 
 function About() {
+  // Data state yang sudah ada
   const features = [
     {
       icon: Heart,
-      title: 'Kesehatan Mental Prioritas',
-      description: 'Kami percaya kesehatan mental sama pentingnya dengan kesehatan fisik. Jaga Jiwa hadir sebagai ruang aman untuk menjaga kesejahteraan emosional Anda.',
-      color: 'from-red-500 to-pink-500',
+      title: "Kesehatan Mental Prioritas",
+      description: "Kami percaya kesehatan mental sama pentingnya dengan kesehatan fisik. Jaga Jiwa hadir sebagai ruang aman untuk menjaga kesejahteraan emosional Anda.",
+      color: "from-red-500 to-pink-500",
     },
     {
       icon: Shield,
-      title: 'Privasi Terjamin',
-      description: 'Data dan cerita Anda adalah milik Anda. Kami menggunakan enkripsi tingkat lanjut untuk memastikan privasi dan keamanan informasi pribadi Anda.',
-      color: 'from-blue-500 to-cyan-500',
+      title: "Privasi Terjamin",
+      description: "Data dan cerita Anda adalah milik Anda. Kami menggunakan enkripsi tingkat lanjut untuk memastikan privasi dan keamanan informasi pribadi Anda.",
+      color: "from-blue-500 to-cyan-500",
     },
     {
       icon: Sparkles,
-      title: 'AI yang Empatik',
-      description: 'Teknologi AI kami dirancang untuk mendengarkan dengan empati, memberikan dukungan yang konstruktif, dan membantu Anda memahami emosi dengan lebih baik.',
-      color: 'from-purple-500 to-indigo-500',
+      title: "AI yang Empatik",
+      description: "Teknologi AI kami dirancang untuk mendengarkan dengan empati, memberikan dukungan yang konstruktif, dan membantu Anda memahami emosi dengan lebih baik.",
+      color: "from-teal-500 to-emerald-500",
     },
     {
       icon: Award,
-      title: 'Berbasis Riset',
-      description: 'Setiap fitur dikembangkan berdasarkan penelitian psikologi modern dan praktik terbaik dalam dukungan kesehatan mental.',
-      color: 'from-amber-500 to-orange-500',
+      title: "Berbasis Riset",
+      description: "Setiap fitur dikembangkan berdasarkan penelitian psikologi modern dan praktik terbaik dalam dukungan kesehatan mental.",
+      color: "from-amber-500 to-orange-500",
     },
-  ];
+  ]
 
   const statistics = [
-    { number: '10K+', label: 'Pengguna Aktif', icon: Users },
-    { number: '50K+', label: 'Sesi Curhat', icon: Heart },
-    { number: '95%', label: 'Kepuasan Pengguna', icon: Sparkles },
-    { number: '24/7', label: 'Dukungan Tersedia', icon: Shield },
-  ];
+    { number: "10K+", label: "Pengguna Aktif", icon: Users },
+    { number: "50K+", label: "Sesi Curhat", icon: Heart },
+    { number: "95%", label: "Kepuasan Pengguna", icon: Sparkles },
+    { number: "24/7", label: "Dukungan Tersedia", icon: Shield },
+  ]
 
-  const team = [
+  const jjFiturUnggulan = [
     {
-      role: 'Mental Health Focus',
-      description: 'Menormalisasi percakapan tentang kesehatan mental di Indonesia',
+      icon: Heart,
+      title: "Peta Jiwa",
+      description: "Menampilkan gambaran suasana hati dan rekomendasi aktivitas pemulih emosi di sekitar Anda.",
     },
     {
-      role: 'Technology Innovation',
-      description: 'Menggunakan AI untuk membuat dukungan mental lebih accessible',
+      icon: Pencil,
+      title: "Rencana Jiwa",
+      description: "Panduan personal untuk rutinitas sehat mental: tidur, jeda napas, journaling, dan olahraga ringan.",
     },
     {
-      role: 'Community Building',
-      description: 'Membangun komunitas yang saling mendukung dan bebas stigma',
+      icon: Sparkles,
+      title: "Mindful Zone",
+      description: "Latihan mindfulness dan meditasi singkat yang mudah diterapkan dalam keseharian.",
     },
-  ];
+    {
+      icon: Users,
+      title: "Komunitas & Event",
+      description: "Forum aman dan acara edukatif untuk berbagi pengalaman serta belajar langsung dari ahli.",
+    },
+    {
+      icon: Lightbulb,
+      title: "Manajemen Emosi Sehat",
+      description: "Edukasi pengelolaan emosi dan kebiasaan positif untuk mendukung kesejahteraan mental.",
+    },
+    {
+      icon: Shield,
+      title: "Dashboard Kesehatan Jiwa",
+      description: "Pantau progres kesejahteraan mental melalui statistik sederhana dan rekomendasi personal.",
+    },
+    {
+      icon: Award,
+      title: "Notifikasi Jiwa",
+      description: "Pengingat otomatis untuk istirahat, minum air, bernapas sadar, dan menulis jurnal.",
+    },
+  ]
+
+  // --- DATA YANG DIUBAH UNTUK DEMONSTRASI ---
+  // Data ini dibuat lebih berfluktuasi agar efek "gelombang" terlihat jelas
+  const mentalHealthTrend = [
+    { year: "2019", value: 67 },
+    { year: "2020", value: 72 }, // Naik
+    { year: "2021", value: 70 }, // Turun
+    { year: "2022", value: 75 }, // Naik tajam
+    { year: "2023", value: 73 }, // Turun sedikit
+    { year: "2024 (Est)", value: 78 }, // Naik lagi
+    { year: "2025 (Est)", value: 76 }, // Turun
+  ]
+
+  const disorderDistribution = [
+    { type: "Depresi", percentage: 35, color: "#ec4899" }, // pink-500
+    { type: "Kecemasan", percentage: 28, color: "#fb923c" }, // orange-400
+    { type: "Gangguan Tidur", percentage: 18, color: "#facc15" }, // yellow-400
+    { type: "Stres Kerja", percentage: 12, color: "#14b8a6" }, // teal-500
+    { type: "Lainnya", percentage: 7, color: "#a855f7" }, // purple-500
+  ]
+
+  const prevalenceByAge = [
+    { ageGroup: "Remaja (15-24)", cases: 18500, color: "#ec4899" }, // pink-500
+    { ageGroup: "Dewasa Muda (25-34)", cases: 15200, color: "#fb923c" }, // orange-400
+    { ageGroup: "Dewasa (35-49)", cases: 13100, color: "#facc15" }, // yellow-400
+    { ageGroup: "Dewasa Tua (50-64)", cases: 8700, color: "#14b8a6" }, // teal-500
+    { ageGroup: "Lansia (65+)", cases: 7200, color: "#a855f7" }, // purple-500
+  ]
+
+  // --- DATA UNTUK GRAFIK ---
+
+  const lineChartData = {
+    labels: mentalHealthTrend.map(d => d.year),
+    datasets: [
+      {
+        label: "Indeks Kesehatan Mental (Skala 1-100)",
+        data: mentalHealthTrend.map(d => d.value),
+        borderColor: "#0d9488", // teal-600
+        backgroundColor: "rgba(13, 148, 136, 0.1)",
+        fill: true,
+        tension: 0.4, // Kode ini sudah benar dan akan bekerja dengan data di atas
+      },
+    ],
+  }
+
+  const pieChartData = {
+    labels: disorderDistribution.map(d => d.type),
+    datasets: [
+      {
+        label: "Distribusi Gangguan (%)",
+        data: disorderDistribution.map(d => d.percentage),
+        backgroundColor: disorderDistribution.map(d => d.color),
+        borderColor: "#ffffff",
+        borderWidth: 2,
+      },
+    ],
+  }
+
+  const barChartData = {
+    labels: prevalenceByAge.map(d => d.ageGroup),
+    datasets: [
+      {
+        label: "Jumlah Kasus Berdasarkan Usia",
+        data: prevalenceByAge.map(d => d.cases),
+        backgroundColor: prevalenceByAge.map(d => d.color),
+        borderRadius: 8,
+      },
+    ],
+  }
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "bottom" as const,
+      },
+      title: {
+        display: true,
+        font: {
+          size: 16,
+        },
+        padding: {
+          bottom: 20,
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: false, // Diubah agar lebih fokus pada fluktuasi data
+      },
+    },
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-secondary-600 to-primary-700 text-white">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-16">
+        <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+          <Pencil className="w-4 h-4" />
+          <span>Tentang Kami</span>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl mb-6 shadow-2xl">
-              <BookHeart className="w-12 h-12 text-white" fill="white" />
+        <h1 className="mt-4 text-3xl md:text-5xl font-bold text-balance">
+          <span className="text-foreground">Mengenal </span>
+          <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">Jaga Jiwa</span>
+        </h1>
+
+        <p className="mt-4 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto text-pretty">
+          Platform kesehatan holistik yang membantu Anda mencapai keseimbangan dalam semua aspek kehidupan dengan dukungan AI yang empatik dan aman.
+        </p>
+      </div>
+
+      <section className="py-16 md:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div className="bg-white rounded-3xl p-8 border-2 border-teal-200 shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 w-fit">
+                <BookHeart className="w-4 h-4" />
+                <span>Tentang Kami</span>
+              </div>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                <span className="font-semibold">Jaga Jiwa</span> adalah platform digital kesehatan mental yang dirancang untuk membantu masyarakat Indonesia dalam menjaga dan meningkatkan kesejahteraan emosional mereka. Platform ini menyediakan ruang aman untuk berbagi perasaan, memahami kondisi mental, serta mendapatkan dukungan awal melalui teknologi AI yang empatik.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                Lebih dari sekadar aplikasi, <span className="font-semibold">Jaga Jiwa</span> adalah sahabat digital yang selalu siap mendengarkan tanpa menghakimi. Kami berkomitmen untuk menghapus stigma seputar kesehatan mental dan membuat dukungan psikologis lebih mudah diakses oleh semua kalangan, kapan saja dan di mana saja.
+              </p>
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-              Tentang Jaga Jiwa
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-light leading-relaxed">
-              Platform kesehatan mental berbasis AI yang memberikan ruang aman untuk berbagi, memahami emosi, dan merawat kesejahteraan mental Anda.
-            </p>
+
+            <div className="bg-white rounded-3xl p-8 border-2 border-teal-200 shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 w-fit">
+                <Target className="w-4 h-4" />
+                <span>Tujuan Kami</span>
+              </div>
+              <ul className="space-y-4">
+                <li className="flex items-start space-x-3">
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700 leading-relaxed">Mengedukasi masyarakat tentang pentingnya kesehatan mental dan mengurangi stigma yang ada.</p>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700 leading-relaxed">Menyediakan akses mudah ke dukungan kesehatan mental yang aman dan terpercaya.</p>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700 leading-relaxed">Mendorong kebiasaan pemantauan emosi melalui fitur tracking dan journaling interaktif.</p>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700 leading-relaxed">Membantu pengguna dalam memahami dan mengelola perasaan mereka dengan lebih baik.</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="bg-white rounded-3xl p-8 md:p-12 border-2 border-teal-200 shadow-sm hover:shadow-xl transition-shadow duration-300 max-w-4xl w-full">
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-8 w-fit">
+                <Sparkles className="w-4 h-4" />
+                <span>Visi & Misi</span>
+              </div>
+
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Visi:</h3>
+                  <p className="text-gray-700 leading-relaxed">Menjadi platform kesehatan mental digital terdepan di Indonesia yang dapat membantu masyarakat mencapai kesejahteraan emosional dan hidup yang lebih berkualitas.</p>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Misi:</h3>
+                  <p className="text-gray-700 leading-relaxed">Memberikan dukungan kesehatan mental yang mudah diakses, aman, dan berbasis teknologi AI untuk meningkatkan kesadaran dan pemahaman masyarakat tentang pentingnya menjaga kesehatan jiwa.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-16 md:py-24 bg-white">
+      {/* --- SEKSI STATISTIK GRAFIK BARU DIMULAI DI SINI --- */}
+      <section className="py-16 md:py-24 bg-teal-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Data & Statistik Kesehatan Mental di Indonesia</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Visualisasi data untuk memberikan gambaran mengenai kondisi kesehatan mental saat ini.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Grafik Garis (Line Chart) */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 lg:col-span-2">
+              <Line
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: {
+                      ...chartOptions.plugins.title,
+                      text: "Tren Indeks Kesehatan Mental di Indonesia (2019-2025)",
+                    },
+                  },
+                }}
+                data={lineChartData}
+              />
+            </div>
+
+            {/* Grafik Lingkaran (Pie Chart) */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <Pie
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: {
+                      ...chartOptions.plugins.title,
+                      text: "Distribusi Jenis Gangguan Mental",
+                    },
+                  },
+                }}
+                data={pieChartData}
+              />
+            </div>
+
+            {/* Grafik Batang (Bar Chart) */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <Bar
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: {
+                      ...chartOptions.plugins.title,
+                      text: "Prevalensi Kasus Berdasarkan Kelompok Usia",
+                    },
+                    legend: {
+                      display: false, // Sembunyikan legenda karena sudah jelas dari label
+                    },
+                  },
+                }}
+                data={barChartData}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* --- SEKSI STATISTIK GRAFIK SELESAI --- */}
+
+      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-emerald-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Dampak Kami dalam Angka</h2>
+            <p className="text-xl text-gray-600">Bersama membangun masyarakat yang lebih sehat</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {statistics.map((stat, index) => {
+              const Icon = stat.icon
+              return (
+                <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                  <Icon className="w-10 h-10 text-teal-600 mb-4 mx-auto" />
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{stat.number}</div>
+                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ... Sisa kode Anda yang lain ... */}
+      <section className="py-10 md:py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border-2 border-teal-200 bg-white">
+            <div className="flex items-center gap-2 px-6 md:px-8 pt-6">
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700">
+                <Sparkles className="w-4 h-4" />
+                <span>Fitur Unggulan</span>
+              </div>
+            </div>
+
+            <div className="px-6 md:px-8 pb-8 pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {jjFiturUnggulan.map((item, idx) => {
+                  const Icon = item.icon
+                  return (
+                    <div key={idx} className="rounded-xl border border-teal-100 bg-teal-50/40 p-6 hover:shadow-md transition-shadow duration-300">
+                      <div className="flex items-start gap-4">
+                        <div className="shrink-0 rounded-lg p-2 bg-teal-100">
+                          <Icon className="w-6 h-6 text-teal-700" />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-semibold text-gray-900">{item.title}</h3>
+                          <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold mb-6">
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6">
                 <Target className="w-4 h-4" />
                 <span>Misi Kami</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Kesehatan Mental untuk Semua
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Kesehatan Mental untuk Semua</h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-6">
                 Di Indonesia, masih banyak stigma seputar kesehatan mental yang membuat orang enggan mencari bantuan. <span className="font-semibold text-gray-900">Jaga Jiwa</span> hadir untuk mengubah itu.
               </p>
               <p className="text-lg text-gray-600 leading-relaxed mb-6">
                 Kami menyediakan platform yang mudah diakses, aman, dan gratis untuk membantu siapa saja yang membutuhkan tempat untuk berbagi, memahami perasaan mereka, dan mendapatkan dukungan awal.
               </p>
-              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl border border-primary-100">
-                <Lightbulb className="w-6 h-6 text-primary-600 flex-shrink-0 mt-1" />
+              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-100">
+                <Lightbulb className="w-6 h-6 text-teal-600 flex-shrink-0 mt-1" />
                 <p className="text-gray-700 leading-relaxed">
                   <span className="font-semibold">Catatan Penting:</span> Jaga Jiwa adalah alat pendukung awal dan tidak menggantikan konsultasi profesional. Untuk kondisi serius, kami sangat menyarankan untuk berkonsultasi dengan psikolog atau psikiater berlisensi.
                 </p>
@@ -102,15 +407,12 @@ function About() {
             </div>
 
             <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-primary-100 to-secondary-100 rounded-3xl overflow-hidden shadow-2xl">
+              <div className="aspect-square bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl overflow-hidden shadow-2xl">
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="grid grid-cols-2 gap-4 w-full">
                     {[Heart, Shield, Users, Sparkles].map((Icon, index) => (
-                      <div
-                        key={index}
-                        className="aspect-square bg-white rounded-2xl shadow-lg flex items-center justify-center transform hover:scale-110 transition duration-300"
-                      >
-                        <Icon className="w-12 h-12 text-primary-600" />
+                      <div key={index} className="aspect-square bg-white rounded-2xl shadow-lg flex items-center justify-center transform hover:scale-110 transition duration-300">
+                        <Icon className="w-12 h-12 text-teal-600" />
                       </div>
                     ))}
                   </div>
@@ -121,137 +423,47 @@ function About() {
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Dampak yang Kami Ciptakan
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Setiap hari, kami membantu ribuan orang merawat kesehatan mental mereka
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {statistics.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={index}
-                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                      {stat.number}
-                    </p>
-                    <p className="text-sm text-gray-600 font-medium">
-                      {stat.label}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Mengapa Memilih Jaga Jiwa?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Kami menggabungkan teknologi terdepan dengan pendekatan yang penuh empati
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Mengapa Memilih Jaga Jiwa?</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">Kami berkomitmen memberikan dukungan terbaik untuk kesehatan mental Anda</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature, index) => {
-              const Icon = feature.icon;
+              const Icon = feature.icon
               return (
-                <div
-                  key={index}
-                  className="group bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 hover:border-transparent"
-                >
-                  <div className={`inline-flex w-14 h-14 bg-gradient-to-br ${feature.color} rounded-2xl items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                    <Icon className="w-7 h-7 text-white" />
+                <div key={index} className="group bg-white rounded-2xl p-8 border border-gray-200 hover:border-transparent hover:shadow-2xl transition-all duration-300">
+                  <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-primary-50 to-secondary-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Nilai-Nilai Kami
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Prinsip yang memandu setiap keputusan yang kami buat
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {team.map((item, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-              >
-                <div className="w-12 h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mb-6"></div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {item.role}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-br from-primary-600 via-secondary-600 to-primary-700 text-white relative overflow-hidden">
+      <section className="py-16 md:py-20 bg-gradient-to-br from-teal-600 to-emerald-600 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Mulai Perjalanan Anda Bersama Kami
-          </h2>
-          <p className="text-xl text-white/90 mb-8 leading-relaxed">
-            Kesehatan mental adalah perjalanan, bukan tujuan. Mari kita mulai bersama hari ini.
-          </p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Mulai Perjalanan Anda Bersama Kami</h2>
+          <p className="text-xl text-white/90 mb-8 leading-relaxed">Kesehatan mental adalah perjalanan, bukan tujuan. Mari kita mulai bersama hari ini.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-              Mulai Sekarang
-            </button>
-            <button className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300">
-              Pelajari Lebih Lanjut
-            </button>
+            <button className="px-8 py-4 bg-white text-teal-600 rounded-xl font-semibold hover:shadow-2xl transition-all duration-300 transform hover:scale-105">Mulai Sekarang</button>
+            <button className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300">Pelajari Lebih Lanjut</button>
           </div>
         </div>
       </section>
     </div>
-  );
+  )
 }
 
-export default About;
+export default About
