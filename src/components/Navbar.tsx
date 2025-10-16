@@ -1,5 +1,5 @@
 // File: Navbar.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -9,11 +9,13 @@ import {
   MessageCircleHeart,
   Sun,
   Moon,
+  Menu, // Import ikon Menu (Hamburger)
+  X, // Import ikon Close (X)
 } from 'lucide-react';
 
 // === Brand Component ===
 const Brand = () => (
-  <div className="flex items-center space-x-2 pl-0 lg:pl-4 mr-4">
+  <div className="flex items-center space-x-2">
     <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl shadow-lg flex items-center justify-center transform hover:scale-105 transition duration-300 ease-in-out">
       <BookHeart className="w-6 h-6 text-white" fill="white" />
     </div>
@@ -23,12 +25,15 @@ const Brand = () => (
   </div>
 );
 
+// ---
+
 // === Navbar Component ===
 function Navbar() {
   const location = useLocation();
 
   // === State ===
   const [scrolled, setScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State untuk menu mobile
   const [isDarkMode, setIsDarkMode] = useState(
     localStorage.getItem('theme') === 'dark'
   );
@@ -57,6 +62,13 @@ function Navbar() {
   }, [isDarkMode]);
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const closeMenu = () => setIsMenuOpen(false); // Fungsi untuk menutup menu
+
+  // Close menu when route changes
+  useEffect(() => {
+    closeMenu();
+  }, [location.pathname]);
 
   // === Navigation Items ===
   const navItems = [
@@ -67,16 +79,24 @@ function Navbar() {
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path;
 
-  const activeClass =
-    'text-white bg-gradient-to-r from-primary-500 to-secondary-500 shadow-md shadow-primary-200/50';
-  const inactiveClass =
-    'text-gray-600 hover:bg-gray-100/70 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700/70 dark:hover:text-primary-400';
+  // Classes untuk Desktop
+  const activeClassDesktop =
+    'text-[#50b7f7] dark:text-[#1ff498]';
+  const inactiveClassDesktop =
+    'text-gray-600 hover:text-[#50b7f7] dark:text-gray-300 dark:hover:text-[#50b7f7]';
+
+  // Classes untuk Mobile
+  const activeClassMobile =
+    'bg-primary-100/50 dark:bg-gray-700 text-primary-600 dark:text-primary-400 font-bold';
+  const inactiveClassMobile =
+    'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800';
+
 
   const navBackgroundClass = scrolled
-    ? 'bg-white/35 backdrop-blur-xl dark:bg-gray-900/40 dark:shadow-lg'
-    : 'bg-white/85 dark:bg-gray-900/90 dark:shadow-lg';
+    ? 'bg-white/50 backdrop-blur-xl dark:bg-gray-900/50'
+    : 'bg-white/75 dark:bg-gray-900';
 
   return (
     <>
@@ -101,7 +121,7 @@ function Navbar() {
                   key={path}
                   to={path}
                   className={`flex-shrink-0 px-4 py-2 rounded-full flex items-center justify-center space-x-2 transition-all duration-200 ease-in-out ${
-                    active ? activeClass : inactiveClass
+                    active ? activeClassDesktop : inactiveClassDesktop
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -118,7 +138,7 @@ function Navbar() {
               aria-label={
                 isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'
               }
-              className="p-2 rounded-full transition-colors duration-200 ease-in-out text-gray-600 hover:bg-gray-100/70 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="p-2 rounded-full transition-colors duration-200 ease-in-out text-gray-600 hover:bg-gray-100/70 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-primary-400 dark:outline-none dark:ring-2 dark:ring-primary-500"
             >
               {isDarkMode ? (
                 <Sun className="w-6 h-6" />
@@ -130,40 +150,83 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* === Mobile Navigation === */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-xl shadow-gray-200/50 border-t border-gray-100 z-50 transition-all duration-300 dark:bg-gray-900 dark:border-gray-700 dark:shadow-none">
-        <div className="flex items-center justify-around h-16">
-          {navItems.map(({ path, icon: Icon, label }) => {
-            const active = isActive(path);
-            return (
-              <Link
-                key={path}
-                to={path}
-                className={`flex flex-col items-center justify-center flex-1 h-full py-1 group transition-colors duration-200 ease-in-out relative ${
-                  active
-                    ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-gray-500 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-500'
-                }`}
-              >
-                {/* Active Indicator */}
-                {active && (
-                  <div className="absolute top-0 w-1.5 h-1.5 rounded-full bg-primary-600 dark:bg-primary-400 transform -translate-y-1 animate-pulse" />
-                )}
-                <Icon
-                  className={`w-6 h-6 transform transition-transform duration-200 ${
-                    active
-                      ? 'scale-105 stroke-2 text-primary-600 dark:text-primary-400'
-                      : 'group-hover:scale-110'
-                  }`}
-                />
-                <span className="text-xs mt-1 font-medium leading-none">
-                  {label}
-                </span>
-              </Link>
-            );
-          })}
+      {/* --- */}
+
+      {/* === Mobile Header & Navigation === */}
+      <header
+        className={`md:hidden fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 ${navBackgroundClass} shadow-lg`}
+      >
+        <div className="flex items-center justify-between h-full px-4">
+          {/* Brand (Left) */}
+          <Brand />
+
+          {/* Menu Button (Right) */}
+          <button
+            onClick={toggleMenu}
+            aria-label="Toggle Menu"
+            className="p-2 rounded-full transition-colors duration-200 ease-in-out text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 focus:outline-none"
+          >
+            {isMenuOpen ? (
+              <X className="w-7 h-7" />
+            ) : (
+              <Menu className="w-7 h-7" />
+            )}
+          </button>
         </div>
-      </nav>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`md:hidden fixed inset-0 z-40 transition-opacity duration-300 ${
+          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        } bg-black/50 dark:bg-black/70`}
+        onClick={closeMenu} // Tutup menu saat klik di luar area menu
+      >
+        {/* Actual Menu Content */}
+        <nav
+          className={`fixed top-16 right-0 w-64 h-full bg-white dark:bg-gray-800 shadow-2xl transform transition-transform duration-300 ease-out ${
+            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+          onClick={(e) => e.stopPropagation()} // Mencegah klik di dalam menu menutup overlay
+        >
+          <div className="flex flex-col p-4 space-y-2">
+            {navItems.map(({ path, icon: Icon, label }) => {
+              const active = isActive(path);
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  onClick={closeMenu} // Tutup menu setelah navigasi
+                  className={`flex items-center space-x-3 p-3 rounded-xl transition-colors duration-200 text-base ${
+                    active ? activeClassMobile : inactiveClassMobile
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
+
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-700 mt-2">
+                 {/* Dark Mode Toggle di dalam menu mobile */}
+                <button
+                    onClick={() => {
+                        toggleDarkMode();
+                        closeMenu(); // Tutup menu setelah toggle
+                    }}
+                    className={`flex items-center space-x-3 p-3 w-full rounded-xl transition-colors duration-200 text-base ${inactiveClassMobile}`}
+                >
+                    {isDarkMode ? (
+                        <Sun className="w-5 h-5 text-yellow-500" />
+                    ) : (
+                        <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                    )}
+                    <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
+            </div>
+          </div>
+        </nav>
+      </div>
     </>
   );
 }
