@@ -380,7 +380,7 @@ function TalkRoom() {
         setConversation([
             {
                 ...INITIAL_AI_MESSAGE,
-                text: 'Hai! Ini ruangan curhat baru. Ceritakan apa yang sedang kamu rasakan saat ini. 💖',
+                text: 'Hai! Ini ruangan curhat baru. Ceritakan apa yang sedang kamu rasakan saat ini. ',
             },
         ]);
 
@@ -455,44 +455,44 @@ function TalkRoom() {
 
     const CrisisPopup = () => (
         <div className={`fixed inset-0 z-50 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 ${isCrisisPopupVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
                 <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4 animate-pulse" />
-                <h2 className="text-3xl font-extrabold text-red-700 mb-3">Ini Mendesak.</h2>
-                <p className="text-xl text-gray-800 mb-6">
+                <h2 className="text-3xl font-extrabold text-red-700 dark:text-red-500 mb-3">Ini Mendesak.</h2>
+                <p className="text-xl text-gray-800 dark:text-gray-200 mb-6">
                     Kami sangat mengkhawatirkan keselamatanmu. Jika kamu merasa ingin menyakiti diri sendiri, segera ambil langkah berikut. Kamu tidak sendirian.
                 </p>
 
                 <div className="space-y-4 mb-8 text-left">
-                    <h3 className="text-2xl font-bold text-gray-900 border-b pb-2 mb-4 flex items-center">
-                        <Shield className="w-6 h-6 mr-2 text-red-600" /> Kontak Bantuan Darurat
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white border-b pb-2 mb-4 flex items-center">
+                        <Shield className="w-6 h-6 mr-2 text-red-600 dark:text-red-500" /> Kontak Bantuan Darurat
                     </h3>
 
                     {INDONESIA_CRISIS_RESOURCES.map((resource, index) => (
                         <div
                             key={index}
-                            className={`p-4 rounded-xl border-l-4 ${resource.type === 'danger' ? 'bg-red-50 border-red-500' :
-                                resource.type === 'support' ? 'bg-indigo-50 border-indigo-500' :
-                                    'bg-yellow-50 border-yellow-500'
+                            className={`p-4 rounded-xl border-l-4 ${resource.type === 'danger' ? 'bg-red-50 dark:bg-red-950 border-red-500' :
+                                resource.type === 'support' ? 'bg-indigo-50 dark:bg-indigo-950 border-indigo-500' :
+                                    'bg-yellow-50 dark:bg-yellow-950 border-yellow-500'
                                 }`}
                         >
                             <div className="flex justify-between items-center">
-                                <p className="text-lg font-semibold text-gray-800">{resource.title}</p>
+                                <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">{resource.title}</p>
                                 <a
                                     href={`tel:${resource.number.split('/')[0].trim()}`}
-                                    className={`text-xl font-bold ${resource.type === 'danger' ? 'text-red-700' :
-                                        resource.type === 'support' ? 'text-indigo-700' :
-                                            'text-yellow-700'
+                                    className={`text-xl font-bold ${resource.type === 'danger' ? 'text-red-700 dark:text-red-400' :
+                                        resource.type === 'support' ? 'text-indigo-700 dark:text-indigo-400' :
+                                            'text-yellow-700 dark:text-yellow-400'
                                         } hover:underline`}
                                 >
                                     {resource.number}
                                 </a>
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{resource.description}</p>
                         </div>
                     ))}
 
-                    <div className="mt-6 p-4 bg-gray-100 border border-gray-300 rounded-xl">
-                        <p className="text-lg font-medium text-gray-800">
+                    <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl">
+                        <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
                             Langkah Terpenting: Segera hubungi orang yang kamu percaya (orang tua, teman, guru) dan beritahu apa yang kamu rasakan. Jangan lalui ini sendirian.
                         </p>
                     </div>
@@ -500,7 +500,7 @@ function TalkRoom() {
 
                 <button
                     onClick={() => setIsCrisisPopupVisible(false)}
-                    className="w-full py-3 px-6 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition duration-150 shadow-md mt-4"
+                    className="w-full py-3 px-6 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800 transition duration-150 shadow-md mt-4"
                 >
                     Aku Sudah Melihat Ini dan Akan Mencari Bantuan
                 </button>
@@ -513,19 +513,19 @@ function TalkRoom() {
 
         return (
             <div className="fixed bottom-24 right-4 md:right-8 z-40 max-w-xs transition-transform duration-300 ease-out transform translate-y-0">
-                <div className="bg-teal-100 border-2 border-teal-400 rounded-xl shadow-lg p-4 relative">
+                <div className="bg-teal-100 dark:bg-teal-900 border-2 border-teal-400 dark:border-teal-600 rounded-xl shadow-lg p-4 relative">
                     <button
                         onClick={() => setMiniInterventionSuggestion(null)}
-                        className="absolute top-2 right-2 p-1 text-teal-600 hover:text-teal-800 rounded-full"
+                        className="absolute top-2 right-2 p-1 text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-200 rounded-full"
                         aria-label="Tutup Saran Latihan"
                     >
                         <X className="w-4 h-4" />
                     </button>
                     <div className="flex items-start space-x-3">
-                        <MessageCircleHeart className="w-6 h-6 text-teal-600 flex-shrink-0 mt-0.5" />
+                        <MessageCircleHeart className="w-6 h-6 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
                         <div>
-                            <p className="text-sm font-semibold text-teal-700 mb-1">Coba Latihan Singkat Ini! ✨</p>
-                            <p className="text-md text-gray-800 font-medium">
+                            <p className="text-sm font-semibold text-teal-700 dark:text-teal-300 mb-1">Coba Latihan Singkat Ini! ✨</p>
+                            <p className="text-md text-gray-800 dark:text-gray-100 font-medium">
                                 {miniInterventionSuggestion}
                             </p>
                         </div>
@@ -536,7 +536,7 @@ function TalkRoom() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
             <CrisisPopup />
             <MiniInterventionCard />
             <ChatHistorySidebar
@@ -556,12 +556,12 @@ function TalkRoom() {
                 />
             )}
             <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out`}>
-                <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white border-b sticky top-0 z-20 shadow-sm flex-shrink-0`}>
+                <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-0 z-20 shadow-sm flex-shrink-0`}>
                     <div className="flex items-center space-x-3">
                         {!isSidebarOpen && (
                             <button
                                 onClick={() => setIsSidebarOpen(true)}
-                                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg lg:hidden"
+                                className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white rounded-lg lg:hidden"
                                 aria-label="Buka Riwayat"
                             >
                                 <Menu className="w-6 h-6" />
@@ -570,13 +570,13 @@ function TalkRoom() {
                         <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
                             <MessageCircleHeart className="w-6 h-6 text-white" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900">Talk Room</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Talk Room</h1>
                     </div>
                 </header>
                 <div className="flex-grow max-w-5xl mx-auto w-full flex flex-col min-h-0 px-4 sm:px-6 lg:px-8 py-6 md:py-8">
                     <div className="mb-6 flex-shrink-0">
-                        <h2 className="text-xl font-semibold text-gray-900">Ruang Curhat</h2>
-                        <p className="text-gray-600">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Ruang Curhat</h2>
+                        <p className="text-gray-600 dark:text-gray-400">
                             Ruang aman untuk berbagi perasaan dengan AI
                         </p>
                     </div>
@@ -587,19 +587,19 @@ function TalkRoom() {
                             isDisabled={isLoading}
                         />
                     </div>
-                    <div className="mt-auto bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 md:p-8 flex-shrink-0">
-                        <h3 className="text-lg font-bold text-gray-900 mb-3">Tips Berbicara</h3>
-                        <ul className="space-y-2 text-sm md:text-base text-gray-700">
+                    <div className="mt-auto bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 rounded-2xl p-6 md:p-8 flex-shrink-0">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Tips Berbicara</h3>
+                        <ul className="space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
                             <li className="flex items-start space-x-2">
-                                <span className="text-emerald-600 font-bold">•</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
                                 <span>Jujur dengan perasaanmu, tidak ada yang salah atau benar</span>
                             </li>
                             <li className="flex items-start space-x-2">
-                                <span className="text-emerald-600 font-bold">•</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
                                 <span>Gunakan ruang ini untuk melepaskan beban pikiran</span>
                             </li>
                             <li className="flex items-start space-x-2">
-                                <span className="text-emerald-600 font-bold">•</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
                                 <span>Semua percakapan bersifat privat dan tersimpan lokal</span>
                             </li>
                         </ul>
