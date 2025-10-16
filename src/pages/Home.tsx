@@ -138,8 +138,8 @@ function Home() {
 
           <div className="flex flex-wrap justify-center gap-6 text-lg font-semibold">
             {[
-              { text: '100% Anonim & Aman', color: 'rose' },
-              { text: 'Teknologi AI Canggih', color: 'purple' },
+              { text: '100% Anonim & Aman', color: 'red' },
+              { text: 'Teknologi AI Canggih', color: 'yellow' },
               { text: 'Mendukung Kesejahteraan Pelajar', color: 'emerald' },
             ].map((item, i) => (
               <div
@@ -197,8 +197,8 @@ function Home() {
 
         {/* === Wawasan Terbaru === */}
         <div className="mb-24 pt-10 border-t border-[#72e4f8]">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-10">
-            <h2 className="text-4xl font-extrabold text-center sm:text-left mb-6 sm:mb-0 text-gray-900 dark:text-gray-100">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-10 ">
+            <h2 className="text-4xl font-extrabold text-center sm:text-left mb-6 sm:mb-0 text-gray-900  dark:text-gray-100">
               <BookOpen className="inline-block w-9 h-9 mr-3 text-emerald-600 dark:text-emerald-400" />
               Wawasan Terbaru
             </h2>
@@ -215,10 +215,10 @@ function Home() {
               <a
                 key={article.id}
                 href={article.link}
-                className="block rounded-3xl shadow-xl overflow-hidden border hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-2 bg-white border-gray-100 dark:bg-gray-800 dark:border-gray-700"
+                className="block rounded-3xl shadow-xl overflow-hidden border hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-2 bg-white border-gray-100 dark:bg-gray-800 dark:border-gray-700 ring-2 ring-[#72e4f8]"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="w-full h-52 bg-gray-100 overflow-hidden">
+                <div className="w-full h-52 bg-gray-100 overflow-hidden ">
                   <img
                     src={`https://source.unsplash.com/random/600x400?mental-health,wellness,nature&sig=${article.id}`}
                     alt={article.title}
