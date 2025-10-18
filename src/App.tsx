@@ -6,25 +6,27 @@ import JournalMood from './pages/JournalMood';
 import TalkRoom from './pages/TalkRoom';
 import About from './pages/About';
 import Insight from './pages/Insight';
+import ArticleDetail from './pages/ArticleDetail'; // BARU: Impor komponen detail
 import Footer from './components/Footer';
 
 function App() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <main className="pt-16 md:pt-16">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/tracker" element={<MoodTracker />} />
-          <Route path="/journal" element={<JournalMood />} />
-          <Route path="/talkroom" element={<TalkRoom />} />
-          <Route path="/insight" element={<Insight />} />
-        </Routes>
-        <Footer/>
-      </main>
-    </div>
-  );
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="pt-16 md:pt-16">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/tracker" element={<MoodTracker />} />
+          <Route path="/journal" element={<JournalMood />} />
+          <Route path="/talkroom" element={<TalkRoom />} />
+          <Route path="/insight" element={<Insight />} />
+          <Route path="/insight/artikel/:articleId" element={<ArticleDetail />} />
+        </Routes>
+        <Footer />
+      </main>
+    </div>
+  );
 }
 
 export default App;

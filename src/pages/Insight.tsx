@@ -209,7 +209,7 @@ const ARTICLES = [
 
 const CRISIS_RESOURCES = [
   { title: 'Hotline Bunuh Diri (Kemenkes)', number: '119', type: 'danger' },
-  { title: 'Ambulans', number: '118 / 119', type: 'emergency' },
+  {  title: 'Ambulans', number: '118 / 119', type: 'emergency' },
   { title: 'Polisi', number: '110', type: 'emergency' },
   { title: 'Komnas Perempuan', number: '021-3903963', type: 'support' },
 ];
