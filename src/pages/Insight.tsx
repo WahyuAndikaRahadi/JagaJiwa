@@ -690,14 +690,14 @@ const Insight = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white shadow-2xl p-4 md:p-6 border-t-4 border-teal-500"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 shadow-2xl p-4 md:p-6 border-t-4 border-teal-500"
         >
             <div className="max-w-4xl mx-auto flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <span className="text-3xl">{currentAudio.icon}</span>
                     <div>
-                        <p className="font-bold text-gray-900 text-sm sm:text-lg">Sedang Memutar:</p>
-                        <p className="text-teal-600 font-semibold text-base sm:text-xl">{currentAudio.title}</p>
+                        <p className="font-bold text-gray-900 dark:text-white text-sm sm:text-lg">Sedang Memutar:</p>
+                        <p className="text-teal-600 dark:text-teal-400 font-semibold text-base sm:text-xl">{currentAudio.title}</p>
                     </div>
                 </div>
                 <div className="flex space-x-4">
@@ -726,14 +726,14 @@ const Insight = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
       {/* Audio Element (Hidden) */}
       <audio ref={audioRef} preload="auto" />
 
       {/* Decorative blobs, dibuat lebih kecil di mobile */}
-      <div className="absolute top-0 left-0 w-64 h-64 md:w-96 md:h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob" />
-      <div className="absolute bottom-1/4 right-0 w-64 h-64 md:w-1/3 md:h-1/3 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000" />
-      <div className="absolute top-1/2 left-1/4 w-48 h-48 md:w-72 md:h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
+      <div className="absolute top-0 left-0 w-64 h-64 md:w-96 md:h-96 bg-indigo-300 dark:bg-indigo-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-40 dark:opacity-20 animate-blob" />
+      <div className="absolute bottom-1/4 right-0 w-64 h-64 md:w-1/3 md:h-1/3 bg-rose-300 dark:bg-rose-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-40 dark:opacity-20 animate-blob animation-delay-4000" />
+      <div className="absolute top-1/2 left-1/4 w-48 h-48 md:w-72 md:h-72 bg-emerald-300 dark:bg-emerald-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 dark:opacity-20 animate-blob animation-delay-2000" />
 
       {/* Padding utama diubah untuk mobile */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 relative z-10">
@@ -754,7 +754,7 @@ const Insight = () => {
               Insight
             </h1>
           </div>
-          <p className="text-gray-600 text-base sm:text-lg">Wawasan mendalam untuk kesehatan mentalmu</p>
+          <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg">Wawasan mendalam untuk kesehatan mentalmu</p>
         </motion.div>
 
         {/* Tombol tab diubah dari space-x ke gap agar wrapping lebih baik */}
@@ -779,7 +779,7 @@ const Insight = () => {
                 className={`flex items-center space-x-2 px-5 py-3 sm:px-6 rounded-2xl font-semibold transition-all transform ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-[#1ff498] to-[#50b7f7] text-white shadow-lg'
-                    : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white border-2 border-[#72e4f8]'
+                    : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 dark:text-gray-200 hover:bg-white dark:bg-gray-900 dark:hover:bg-gray-700 border-2 border-[#72e4f8] dark:border-teal-500'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -802,31 +802,31 @@ const Insight = () => {
           >
             {/* Padding kartu diubah */}
             <motion.div 
-                initial={{ scale: 0.95 }} 
-                animate={{ scale: 1 }} 
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-[#72e4f8] hover:border-[#1ff498] transition-all"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-[#72e4f8] dark:border-gray-600 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
             >
               <div className="flex items-center space-x-3 mb-6">
                 <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-[#1ff498]" />
                 {/* Ukuran Teks header kartu diresponsifkan */}
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Pola Mood 7 Hari Terakhir</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Pola Mood 7 Hari Terakhir</h2>
               </div>
               {moodAnalysis ? (
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
                     {/* Kartu internal dianimasikan */}
-                    <motion.div whileHover={{ translateY: -5 }} className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-5 sm:p-6 border-2 border-indigo-200">
-                      <p className="text-sm text-gray-600 mb-2 font-medium">Rata-rata Mood</p>
+                    <motion.div whileHover={{ translateY: -5 }} className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl p-5 sm:p-6 border-2 border-indigo-200 dark:border-indigo-700">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-medium">Rata-rata Mood</p>
                       {/* Ukuran Teks metriks diresponsifkan */}
                       <p className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">{moodAnalysis.avgMood}/5</p>
                     </motion.div>
-                    <motion.div whileHover={{ translateY: -5 }} className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 sm:p-6 border-2 border-emerald-200">
-                      <p className="text-sm text-gray-600 mb-2 font-medium">Hari Dicatat</p>
+                    <motion.div whileHover={{ translateY: -5 }} className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-2xl p-5 sm:p-6 border-2 border-emerald-200 dark:border-emerald-700">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-medium">Hari Dicatat</p>
                       <p className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">{moodAnalysis.totalDays}</p>
                     </motion.div>
-                    <motion.div whileHover={{ translateY: -5 }} className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-5 sm:p-6 border-2 border-rose-200">
-                      <p className="text-sm text-gray-600 mb-2 font-medium">Tren Mood Kamu</p>
+                    <motion.div whileHover={{ translateY: -5 }} className="bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/30 dark:to-pink-900/30 rounded-2xl p-5 sm:p-6 border-2 border-rose-200 dark:border-rose-700">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-medium">Tren Mood Kamu</p>
                       <p className={`text-2xl sm:text-3xl font-bold ${
                         moodAnalysis.trend === 'positive' ? 'text-green-600' :
                         moodAnalysis.trend === 'negative' ? 'text-red-600' : 'text-yellow-600'
@@ -836,8 +836,8 @@ const Insight = () => {
                       </p>
                     </motion.div>
                   </div>
-                  <div className="bg-gray-50 rounded-2xl p-5 sm:p-6 border-2 border-gray-200">
-                    <p className="text-sm font-semibold text-gray-700 mb-4">Distribusi Mood:</p>
+                  <div className="bg-gray-50 dark:bg-gray-900/50 dark:bg-gray-900/50 rounded-2xl p-5 sm:p-6 border-2 border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Distribusi Mood:</p>
                     <div className="space-y-3">
                       {Object.entries(moodAnalysis.moodCounts).map(([mood, count]) => (
                         <motion.div 
@@ -851,7 +851,7 @@ const Insight = () => {
                             {mood === 'very-happy' ? '😄' : mood === 'happy' ? '😊' : 
                              mood === 'neutral' ? '😐' : mood === 'sad' ? '😔' : '😢'}
                           </span>
-                          <div className="flex-grow h-4 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="flex-grow h-4 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700 rounded-full overflow-hidden">
                             <motion.div 
                               initial={{ width: 0 }}
                               animate={{ width: `${(count / moodAnalysis.totalDays) * 100}%` }}
@@ -859,28 +859,28 @@ const Insight = () => {
                               className="h-full bg-gradient-to-r from-[#1ff498] to-[#50b7f7] transition-all duration-500"
                             />
                           </div>
-                          <span className="text-sm font-bold text-gray-700 min-w-[40px]">{count}x</span>
+                          <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[40px]">{count}x</span>
                         </motion.div>
                       ))}
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-2xl border-2 border-dashed border-gray-300">
-                  <p className="text-gray-500 text-base sm:text-lg">Belum ada data mood. Mulai tracking di halaman Mood Tracker! 📊</p>
+                <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-indigo-50 dark:from-gray-900/50 dark:to-indigo-900/30 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                  <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">Belum ada data mood. Mulai tracking di halaman Mood Tracker! 📊</p>
                 </div>
               )}
             </motion.div>
 
             <motion.div 
-                initial={{ scale: 0.95 }} 
-                animate={{ scale: 1 }} 
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-[#72e4f8] hover:border-[#1ff498] transition-all"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-[#72e4f8] dark:border-gray-600 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
             >
               <div className="flex items-center space-x-3 mb-6">
                 <AlertCircle className="w-6 h-6 sm:w-7 sm:h-7 text-rose-500" />
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Pemicu Emosi Utama</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Pemicu Emosi Utama</h2>
               </div>
               {topTriggers.length > 0 ? (
                 <div className="space-y-4">
@@ -891,26 +891,26 @@ const Insight = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                         whileHover={{ scale: 1.01 }}
-                        className="flex items-center space-x-4 sm:space-x-5 bg-gradient-to-r from-rose-50 to-pink-50 rounded-2xl p-4 sm:p-5 border-2 border-rose-200 hover:border-rose-300 transition-all"
+                        className="flex items-center space-x-4 sm:space-x-5 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/30 dark:to-pink-900/30 rounded-2xl p-4 sm:p-5 border-2 border-rose-200 dark:border-rose-700 hover:border-rose-300 dark:hover:border-rose-600 transition-all"
                     >
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-rose-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg flex-shrink-0">
                         {index + 1}
                       </div>
                       <div className="flex-grow">
-                        <p className="font-bold text-gray-900 capitalize text-base sm:text-lg">{trigger.word}</p>
-                        <p className="text-sm text-gray-600">Muncul {trigger.count}x dalam jurnal mood rendah</p>
+                        <p className="font-bold text-gray-900 dark:text-white capitalize text-base sm:text-lg">{trigger.word}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Muncul {trigger.count}x dalam jurnal mood rendah</p>
                       </div>
                     </motion.div>
                   ))}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 mt-6">
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      💡 <strong className="text-blue-700">Insight:</strong> Kata-kata ini sering muncul saat mood-mu rendah. Coba refleksikan pola ini.
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 dark:border-blue-700 mt-6">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                      💡 <strong className="text-blue-700 dark:text-blue-400">Insight:</strong> Kata-kata ini sering muncul saat mood-mu rendah. Coba refleksikan pola ini.
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-rose-50 rounded-2xl border-2 border-dashed border-gray-300">
-                  <p className="text-gray-500 text-base sm:text-lg">Belum cukup data jurnal untuk analisis. Tulis lebih banyak di Journal Mood! ✍️</p>
+                <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-rose-50 dark:from-gray-900/50 dark:to-rose-900/30 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                  <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">Belum cukup data jurnal untuk analisis. Tulis lebih banyak di Journal Mood! ✍️</p>
                 </div>
               )}
             </motion.div>
@@ -932,28 +932,28 @@ const Insight = () => {
                 initial={{ scale: 0.95 }} 
                 animate={{ scale: 1 }} 
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-emerald-300 hover:border-[#1ff498] transition-all"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-emerald-300 dark:border-emerald-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
                 <div className="flex items-center space-x-3">
                   <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">The Gratitude Garden 🌸</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">The Gratitude Garden 🌸</h2>
                 </div>
                 <div className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                   {gardenSeeds} Benih Ditanam
                 </div>
               </div>
               
-              <p className="text-gray-600 mb-6 leading-relaxed text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
                 Tumbuhkan taman syukurmu! Setiap kali kamu menuliskan hal yang kamu syukuri, sebuah bunga indah akan mekar di tamanmu. Maksimal satu benih per hari. 🌺
               </p>
 
-              <div className="bg-gradient-to-b from-teal-50 to-emerald-100 rounded-3xl p-4 sm:p-8 mb-6 min-h-[200px] sm:min-h-[250px] border-4 border-emerald-300 relative overflow-hidden flex flex-col justify-end">
+              <div className="bg-gradient-to-b from-teal-50 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30 rounded-3xl p-4 sm:p-8 mb-6 min-h-[200px] sm:min-h-[250px] border-4 border-emerald-300 dark:border-emerald-700 relative overflow-hidden flex flex-col justify-end">
                 <div className="flex-grow w-full grid grid-cols-6 md:grid-cols-10 gap-2 items-end justify-center">
                     {gardenFlowers.length === 0 ? (
                         <div className="col-span-10 text-center py-10 sm:py-12">
-                            <p className="text-gray-500 text-base sm:text-lg mb-2">Tamanmu masih kosong 🌱</p>
-                            <p className="text-gray-400 text-sm sm:text-base">Mulai tanam benih syukur pertamamu!</p>
+                            <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2">Tamanmu masih kosong 🌱</p>
+                            <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm sm:text-base">Mulai tanam benih syukur pertamamu!</p>
                         </div>
                     ) : (
                         gardenFlowers.map((flower, index) => (
@@ -972,7 +972,7 @@ const Insight = () => {
                         ))
                     )}
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-10 bg-green-800/50 rounded-b-3xl"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-10 bg-green-800/50 dark:bg-green-900/70 rounded-b-3xl"></div>
               </div>
 
               <div className="space-y-4">
@@ -982,7 +982,7 @@ const Insight = () => {
                     setGratitudeText(e.target.value);
                     setAiGratitudeAnalysis(null);
                   }}
-                  className="w-full h-24 px-5 py-4 bg-white border-2 border-emerald-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none text-gray-800 placeholder-gray-400 text-sm sm:text-base"
+                  className="w-full h-24 px-5 py-4 bg-white dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base"
                   placeholder="Apa yang kamu syukuri hari ini?"
                   disabled={isGratitudeLoading}
                 />
@@ -1011,10 +1011,10 @@ const Insight = () => {
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-5 border-2 border-blue-200"
+                    className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 dark:border-blue-700"
                 >
-                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-                        <strong className="text-blue-700">Wawasan AI:</strong> {aiGratitudeAnalysis}
+                    <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                        <strong className="text-blue-700 dark:text-blue-400">Wawasan AI:</strong> {aiGratitudeAnalysis}
                     </p>
                 </motion.div>
               )}
@@ -1026,19 +1026,19 @@ const Insight = () => {
                 initial={{ scale: 0.95 }} 
                 animate={{ scale: 1 }} 
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-amber-300 hover:border-[#1ff498] transition-all"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-amber-300 dark:border-amber-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
                 <div className="flex items-center space-x-3">
                   <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Worry Vault 🔒</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Worry Vault 🔒</h2>
                 </div>
                 <div className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                   {lockedWorries.length} Kekhawatiran Terkunci
                 </div>
               </div>
 
-              <p className="text-gray-600 mb-6 leading-relaxed text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
                 Tulis kekhawatiranmu dan kunci di brankas mental. Pisahkan mana yang bisa kamu kontrol dan mana yang harus kamu lepaskan. 🧘
               </p>
 
@@ -1070,7 +1070,7 @@ const Insight = () => {
                     <textarea
                       value={worryText}
                       onChange={(e) => setWorryText(e.target.value)}
-                      className="w-full h-24 px-5 py-4 bg-white border-2 border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none text-gray-800 placeholder-gray-400 text-sm sm:text-base"
+                      className="w-full h-24 px-5 py-4 bg-white dark:bg-gray-900 border-2 border-amber-200 dark:border-amber-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 dark:focus:ring-amber-500 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base"
                       placeholder="Apa yang membuatmu khawatir? Tuliskan..."
                       disabled={isWorryLoading}
                     />
@@ -1084,7 +1084,7 @@ const Insight = () => {
                         className={`p-5 rounded-2xl border-2 transition-all ${
                           worryType === 'controllable'
                             ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-400 shadow-lg scale-105'
-                            : 'bg-white border-gray-200 hover:border-blue-300'
+                            : 'bg-white dark:bg-gray-900 border-gray-200 hover:border-blue-300'
                         } disabled:opacity-50 text-left sm:text-center`}
                       >
                         <Target className="w-6 h-6 text-blue-600 mb-2 sm:mx-auto" />
@@ -1100,7 +1100,7 @@ const Insight = () => {
                         className={`p-5 rounded-2xl border-2 transition-all ${
                           worryType === 'uncontrollable'
                             ? 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-400 shadow-lg scale-105'
-                            : 'bg-white border-gray-200 hover:border-purple-300'
+                            : 'bg-white dark:bg-gray-900 border-gray-200 hover:border-purple-300'
                         } disabled:opacity-50 text-left sm:text-center`}
                       >
                         <Heart className="w-6 h-6 text-purple-600 mb-2 sm:mx-auto" />
@@ -1118,14 +1118,14 @@ const Insight = () => {
                         transition={{ duration: 0.3 }}
                         className="bg-blue-50 rounded-2xl p-4 sm:p-5 border-2 border-blue-200"
                       >
-                        <label className="block text-sm font-bold text-gray-700 mb-2">
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                           Rencana aksi 5 menit:
                         </label>
                         <input
                           type="text"
                           value={actionPlan}
                           onChange={(e) => setActionPlan(e.target.value)}
-                          className="w-full px-4 py-3 bg-white border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                          className="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
                           placeholder="contoh: Bicara dengan guru, buat jadwal..."
                           disabled={isWorryLoading}
                         />
@@ -1157,7 +1157,7 @@ const Insight = () => {
                         }}
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-2xl hover:bg-gray-300 font-semibold"
+                        className="w-full sm:w-auto px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-300 font-semibold"
                         disabled={isWorryLoading}
                       >
                         Batal
@@ -1193,7 +1193,7 @@ const Insight = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
-                        className="bg-gray-50 rounded-2xl p-4 border-2 border-gray-200"
+                        className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 border-2 border-gray-200 dark:border-gray-700"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 gap-2">
                         <p className="font-medium text-gray-900 flex-grow mr-4 text-sm sm:text-base">{worry.text}</p>
@@ -1206,13 +1206,13 @@ const Insight = () => {
                         </span>
                       </div>
                       {worry.aiAnalysis && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                              <p className="text-sm text-gray-700 font-medium">
-                                  <strong className="text-gray-900">AI Insight:</strong> {worry.aiAnalysis}
+                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                              <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                                  <strong className="text-gray-900 dark:text-white">AI Insight:</strong> {worry.aiAnalysis}
                               </p>
                           </div>
                       )}
-                      <p className="text-xs sm:text-sm text-gray-500 mt-2">🗓️ {worry.date}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">🗓️ {worry.date}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -1220,17 +1220,17 @@ const Insight = () => {
             </motion.div>
 
             {/* Buku Latihan CBT */}
-            <motion.div 
-                initial={{ scale: 0.95 }} 
-                animate={{ scale: 1 }} 
+            <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-purple-300 hover:border-[#1ff498] transition-all"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-purple-300 dark:border-purple-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
             >
               <div className="flex items-center space-x-3 mb-6">
                 <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600" />
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Buku Latihan CBT 📝</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Buku Latihan CBT 📝</h2>
               </div>
-              <p className="text-gray-600 mb-6 leading-relaxed text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
                 Latihan singkat untuk menganalisis dan mengubah pola pikirmu dengan metode Cognitive Behavioral Therapy (CBT).
               </p>
 
@@ -1262,7 +1262,7 @@ const Insight = () => {
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
                       Langkah {worksheetStep + 1}: {worksheetSteps[worksheetStep].title}
                     </h3>
-                    <p className="text-gray-700 text-sm sm:text-base">{worksheetSteps[worksheetStep].question}</p>
+                    <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">{worksheetSteps[worksheetStep].question}</p>
                   </div>
                   <textarea
                     value={worksheetData[worksheetSteps[worksheetStep].field as keyof typeof worksheetData]}
@@ -1272,7 +1272,7 @@ const Insight = () => {
                         [worksheetSteps[worksheetStep].field]: e.target.value,
                       }))
                     }
-                    className="w-full h-32 px-5 py-4 bg-white border-2 border-purple-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none text-gray-800 placeholder-gray-400 text-sm sm:text-base"
+                    className="w-full h-32 px-5 py-4 bg-white dark:bg-gray-900 border-2 border-purple-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base"
                     placeholder="Tulis jawabanmu di sini..."
                     disabled={isCBTLoading}
                   />
@@ -1283,7 +1283,7 @@ const Insight = () => {
                         onClick={() => setWorksheetStep((prev) => prev - 1)}
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-2xl hover:bg-gray-300 font-semibold"
+                        className="w-full sm:w-auto px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-300 font-semibold"
                         disabled={isCBTLoading}
                       >
                         ← Kembali
@@ -1319,17 +1319,17 @@ const Insight = () => {
                   <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-5 sm:p-6 border-2 border-purple-200">
                     <h3 className="text-lg sm:text-xl font-bold text-purple-900 mb-4">📝 Rangkuman & Analisis CBT</h3>
                     <div className="space-y-4 text-sm">
-                      <div className="bg-white rounded-xl p-4">
-                        <p className="font-semibold text-gray-700 mb-1">Situasi:</p>
+                      <div className="bg-white dark:bg-gray-900 rounded-xl p-4">
+                        <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">Situasi:</p>
                         <p className="text-gray-600">{worksheetData.situation}</p>
                       </div>
-                      <div className="bg-white rounded-xl p-4">
-                        <p className="font-semibold text-gray-700 mb-1">Pikiran Otomatis:</p>
+                      <div className="bg-white dark:bg-gray-900 rounded-xl p-4">
+                        <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">Pikiran Otomatis:</p>
                         <p className="text-gray-600">{worksheetData.thought}</p>
                       </div>
-                      <div className="bg-white rounded-xl p-4">
-                        <p className="font-semibold text-gray-700 mb-1">Perspektif Alternatif:</p>
-                        <p className="text-gray-600 font-medium">{worksheetData.alternative}</p>
+                      <div className="bg-white dark:bg-gray-900 rounded-xl p-4">
+                        <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">Perspektif Alternatif:</p>
+                        <p className="text-gray-600 dark:text-gray-400 font-medium">{worksheetData.alternative}</p>
                       </div>
                       <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
                         <p className="font-semibold text-yellow-800 mb-1">Analisis AI (Gemini):</p>
@@ -1346,7 +1346,7 @@ const Insight = () => {
                       }}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
-                      className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-2xl hover:bg-gray-300 font-semibold"
+                      className="w-full sm:w-auto px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-300 font-semibold"
                     >
                       🔄 Mulai Ulang
                     </motion.button>
@@ -1365,17 +1365,17 @@ const Insight = () => {
             </motion.div>
 
             {/* Panduan Audio Fokus */}
-            <motion.div 
-                initial={{ scale: 0.95 }} 
-                animate={{ scale: 1 }} 
+            <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-teal-300 hover:border-[#1ff498] transition-all"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-teal-300 dark:border-teal-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
             >
               <div className="flex items-center space-x-3 mb-6">
                 <PlayCircle className="w-6 h-6 sm:w-7 sm:h-7 text-teal-600" />
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Panduan Audio Fokus 🎧</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Panduan Audio Fokus 🎧</h2>
               </div>
-              <p className="text-gray-600 mb-6 leading-relaxed text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
                 Latihan audio singkat untuk menenangkan pikiran dan tubuhmu. Gunakan headphone untuk pengalaman terbaik.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1459,109 +1459,6 @@ const Insight = () => {
               </div>
             </motion.div>
 
-            <motion.div 
-                initial={{ scale: 0.95 }} 
-                animate={{ scale: 1 }} 
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-gradient-to-r from-[#1ff498] to-[#50b7f7] rounded-3xl p-6 md:p-8 text-white shadow-xl border-2 border-white/30"
-            >
-              <div className="flex items-center space-x-3 mb-6">
-                <Sparkles className="w-7 h-7 sm:w-8 sm:h-8" />
-                <h2 className="text-2xl sm:text-3xl font-bold">Rekomendasi Aksi Hari Ini</h2>
-              </div>
-              {moodAnalysis && moodAnalysis.trend === 'negative' ? (
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border-2 border-white/30">
-                  <p className="text-lg sm:text-xl mb-6 leading-relaxed">
-                    Moodmu sedang menurun. Yuk, coba aktivitas ini! 💙
-                  </p>
-                  <div className="space-y-4">
-                    <motion.a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveTab('interactive');
-                      }}
-                      whileHover={{ x: 5 }}
-                      className="flex items-center justify-between bg-white/30 rounded-2xl p-4 sm:p-5 hover:bg-white/40 transition-all group"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <Heart className="w-6 h-6 sm:w-7 sm:h-7" />
-                        <span className="font-semibold text-sm sm:text-lg">Tanam Benih di Gratitude Garden</span>
-                      </div>
-                      <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </motion.a>
-                    <motion.a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveTab('interactive');
-                      }}
-                      whileHover={{ x: 5 }}
-                      className="flex items-center justify-between bg-white/30 rounded-2xl p-4 sm:p-5 hover:bg-white/40 transition-all group"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <Zap className="w-6 h-6 sm:w-7 sm:h-7" />
-                        <span className="font-semibold text-sm sm:text-lg">Kunci Kekhawatiranmu</span>
-                      </div>
-                      <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </motion.a>
-                    <motion.a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveTab('interactive');
-                      }}
-                      whileHover={{ x: 5 }}
-                      className="flex items-center justify-between bg-white/30 rounded-2xl p-4 sm:p-5 hover:bg-white/40 transition-all group"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <PlayCircle className="w-6 h-6 sm:w-7 sm:h-7" />
-                        <span className="font-semibold text-sm sm:text-lg">Dengarkan Audio Grounding</span>
-                      </div>
-                      <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </motion.a>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border-2 border-white/30">
-                  <p className="text-lg sm:text-xl mb-6 leading-relaxed">
-                    Pertahankan mood positifmu dengan aktivitas ini! ✨
-                  </p>
-                  <div className="space-y-4">
-                    <motion.a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveTab('interactive');
-                      }}
-                      whileHover={{ x: 5 }}
-                      className="flex items-center justify-between bg-white/30 rounded-2xl p-4 sm:p-5 hover:bg-white/40 transition-all group"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <Heart className="w-6 h-6 sm:w-7 sm:h-7" />
-                        <span className="font-semibold text-sm sm:text-lg">Tambah Bunga di Tamanmu</span>
-                      </div>
-                      <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </motion.a>
-                    <motion.a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveTab('personal');
-                      }}
-                      whileHover={{ x: 5 }}
-                      className="flex items-center justify-between bg-white/30 rounded-2xl p-4 sm:p-5 hover:bg-white/40 transition-all group"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <Calendar className="w-6 h-6 sm:w-7 sm:h-7" />
-                        <span className="font-semibold text-sm sm:text-lg">Lihat Pola Moodmu</span>
-                      </div>
-                      <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </motion.a>
-                  </div>
-                </div>
-              )}
-            </motion.div>
 
             <motion.div 
                 initial={{ scale: 0.95 }} 
@@ -1571,7 +1468,7 @@ const Insight = () => {
             >
               <div className="flex items-center space-x-3 mb-8">
                 <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Pusat Artikel & Wawasan</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Pusat Artikel & Wawasan</h2>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {ARTICLES.map((article, index) => (
@@ -1582,18 +1479,18 @@ const Insight = () => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
                     whileHover={{ translateY: -3 }}
-                    className="block bg-white rounded-2xl p-5 sm:p-6 hover:shadow-xl border-2 border-gray-100 hover:border-emerald-300 transition-all group"
+                    className="block bg-white dark:bg-gray-900 rounded-2xl p-5 sm:p-6 hover:shadow-xl border-2 border-gray-100 hover:border-emerald-300 transition-all group"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <span className="text-xs font-semibold px-3 py-1 sm:px-4 sm:py-2 bg-emerald-100 text-emerald-700 rounded-full">
                         {article.category}
                       </span>
-                      <span className="text-xs text-gray-500 font-medium">{article.readTime}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{article.readTime}</span>
                     </div>
                     <h3 className="font-bold text-gray-900 mb-3 group-hover:text-emerald-700 transition-colors text-base sm:text-lg">
                       {article.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">{article.summary}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">{article.summary}</p>
                     <div className="flex items-center text-emerald-600 font-semibold text-sm">
                       <span>Baca Selengkapnya</span>
                       <ChevronRight className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" />
@@ -1631,10 +1528,10 @@ const Insight = () => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.3, delay: 0.5 + index * 0.05 }}
                     whileHover={{ translateX: 5 }}
-                    className="flex items-start space-x-4 bg-white rounded-2xl p-4 sm:p-5 border-2 border-emerald-200 hover:border-emerald-400 transition-all"
+                    className="flex items-start space-x-4 bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border-2 border-emerald-200 hover:border-emerald-400 transition-all"
                   >
                     <CheckCircle className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 font-medium text-sm sm:text-base">{tip}</span>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium text-sm sm:text-base">{tip}</span>
                   </motion.div>
                 ))}
               </div>
@@ -1648,9 +1545,9 @@ const Insight = () => {
             >
               <div className="flex items-center space-x-3 mb-6">
                 <Phone className="w-6 h-6 sm:w-7 sm:h-7 text-red-600" />
-                <h2 className="text-xl sm:text-2xl font-bold text-red-900">Pusat Bantuan Krisis</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-red-900 dark:text-red-200">Pusat Bantuan Krisis</h2>
               </div>
-              <p className="text-gray-700 mb-8 text-base sm:text-lg leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 mb-8 text-base sm:text-lg leading-relaxed">
                 Jika kamu atau seseorang yang kamu kenal dalam keadaan darurat, segera hubungi layanan berikut:
               </p>
               <div className="space-y-4">
@@ -1671,7 +1568,7 @@ const Insight = () => {
                   >
                     <div className="sm:flex-grow">
                       <p className="font-bold text-gray-900 text-base sm:text-lg">{resource.title}</p>
-                      <p className="text-sm text-gray-600 mt-1">Tersedia 24/7</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Tersedia 24/7</p>
                     </div>
                     <motion.a
                       href={`tel:${resource.number.split('/')[0].trim()}`}
@@ -1691,9 +1588,9 @@ const Insight = () => {
                   </motion.div>
                 ))}
               </div>
-              <div className="mt-8 bg-white rounded-2xl p-5 sm:p-6 border-2 border-red-200">
-                <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                  ⚠️ <strong className="text-red-700">Penting:</strong> Jika kamu merasa dalam bahaya,
+              <div className="mt-8 bg-white dark:bg-gray-900 rounded-2xl p-5 sm:p-6 border-2 border-red-200">
+                <p className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
+                  ⚠️ <strong className="text-red-700 dark:text-red-400">Penting:</strong> Jika kamu merasa dalam bahaya,
                   segera hubungi nomor darurat di atas atau cari bantuan dari orang terdekat. Kamu tidak sendirian. 💙
                 </p>
               </div>
