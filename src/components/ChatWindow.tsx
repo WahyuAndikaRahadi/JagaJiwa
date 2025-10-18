@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { Send, Bot, User, Loader2, Mic, AlertTriangle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+// import remarkGfm from 'remark-gfm'; // Dihapus untuk memperbaiki error kompilasi
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 // =======================================================
@@ -31,8 +31,10 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
   const isUser = message.role === 'user';
   const isTyping = message.text === 'Jiwamu sedang mengetik...';
 
-  const typingBg = 'bg-gray-200 text-gray-500';
-  const aiBg = 'bg-white text-gray-800';
+  // Dark Mode Adjustments for AI/Typing Bubbles
+  const typingBg = 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
+  const aiBg = 'bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-100';
+  // User bubble remains bright for maximum contrast in both modes
   const userBg = 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white';
 
   const AiMarkdownComponents = {
@@ -44,12 +46,13 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
     ),
     code: ({ inline, children, ...props }: any) =>
       inline ? (
-        <code className="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm" {...props}>
+        <code className="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm dark:bg-gray-900 dark:text-red-400" {...props}>
           {children}
         </code>
       ) : (
-        <pre className="bg-gray-100 p-2 rounded-lg my-2 overflow-x-auto text-xs">
-          <code className="text-gray-800" {...props}>{children}</code>
+        // Code Block Dark Mode
+        <pre className="bg-gray-100 p-2 rounded-lg my-2 overflow-x-auto text-xs dark:bg-gray-900">
+          <code className="text-gray-800 dark:text-gray-200" {...props}>{children}</code>
         </pre>
       ),
   };
@@ -75,11 +78,12 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
               <p className="text-sm italic">{message.text}</p>
             </div>
           ) : (
-            <div className={`${isUser ? 'text-white' : 'text-gray-800'} text-sm leading-relaxed whitespace-pre-wrap`}>
+            <div className={`text-sm leading-relaxed whitespace-pre-wrap ${isUser ? 'text-white' : 'text-gray-800 dark:text-gray-100'}`}>
               {isUser ? (
                 <p>{message.text}</p>
               ) : (
-                <ReactMarkdown components={AiMarkdownComponents} remarkPlugins={[remarkGfm]}>
+                // Menghapus remarkPlugins={[remarkGfm]} untuk memperbaiki masalah resolusi paket
+                <ReactMarkdown components={AiMarkdownComponents}>
                   {message.text}
                 </ReactMarkdown>
               )}
@@ -88,7 +92,8 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
         </div>
 
         {!isTyping && (
-          <span className="text-xs text-gray-500 mt-1 px-1">{formatTime(message.timestamp)}</span>
+          // Timestamp Dark Mode
+          <span className="text-xs text-gray-500 mt-1 px-1 dark:text-gray-400">{formatTime(message.timestamp)}</span>
         )}
       </div>
     </div>
@@ -153,10 +158,11 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
 
   if (!browserSupportsSpeechRecognition) {
     return (
-      <div className="flex flex-col h-full bg-white rounded-2xl shadow-lg overflow-hidden items-center justify-center p-8 text-center">
+      // Disabled Browser Warning Dark Mode
+      <div className="flex flex-col h-full bg-white rounded-2xl shadow-lg overflow-hidden items-center justify-center p-8 text-center dark:bg-gray-800">
         <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-xl font-bold text-gray-800 mb-2">Browser Tidak Didukung</h2>
-        <p className="text-gray-600">
+        <h2 className="text-xl font-bold text-gray-800 mb-2 dark:text-gray-100">Browser Tidak Didukung</h2>
+        <p className="text-gray-600 dark:text-gray-300">
           Fitur voice input tidak didukung oleh browser ini. Gunakan Google Chrome atau Microsoft Edge di desktop atau Android.
         </p>
       </div>
@@ -164,8 +170,9 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
   }
 
   return (
-    <div className="flex flex-col h-full max-h-[85vh] bg-white rounded-2xl shadow-lg overflow-hidden">
-      {/* Header */}
+    // Main Container Dark Mode
+    <div className="flex flex-col h-full max-h-[85vh] bg-white rounded-2xl shadow-lg overflow-hidden dark:bg-gray-800">
+      {/* Header (Kept bright for branding) */}
       <header className="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-white flex-shrink-0">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -173,22 +180,22 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
           </div>
           <div>
             <h3 className="font-semibold">Jiwamu - Teman Curhat AI</h3>
-            <p className="text-xs text-white/80">Selalu siap mendengarkan tanpa menghakimi 💖</p>
+            <p className="text-xs text-white/80">Selalu siap mendengarkan tanpa menghakimi</p>
           </div>
         </div>
       </header>
 
-      {/* Area Pesan */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+      {/* Area Pesan Dark Mode */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900">
         {conversation.map((message, index) => (
           <MessageBubble key={index} message={message} formatTime={formatTime} />
         ))}
       </div>
 
-      {/* Input Area */}
-      <form onSubmit={handleSubmit} className="border-t border-gray-200 p-4 bg-white flex-shrink-0">
+      {/* Input Area Dark Mode */}
+      <form onSubmit={handleSubmit} className="border-t border-gray-200 p-4 bg-white flex-shrink-0 dark:bg-gray-800 dark:border-gray-700">
         <div className="flex items-center space-x-2">
-          {/* Tombol Mikrofon */}
+          {/* Tombol Mikrofon (colors kept consistent for listening state) */}
           <button
             type="button"
             onClick={toggleListening}
@@ -196,7 +203,7 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
             className={`relative p-3 rounded-full border-2 transition-colors duration-200
               ${listening
                 ? 'bg-red-600 text-white border-red-700 shadow-xl ring-4 ring-red-300/50'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200'}
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:border-gray-700'}
               disabled:opacity-50 disabled:cursor-not-allowed`}
             aria-label={listening ? 'Stop Recording' : 'Start Recording'}
           >
@@ -204,7 +211,7 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
             <Mic className="w-5 h-5 relative z-10" />
           </button>
 
-          {/* Input */}
+          {/* Input Field Dark Mode */}
           <input
             type="text"
             value={inputValue}
@@ -222,10 +229,12 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
             }
             disabled={isDisabled || listening}
             className={`flex-1 px-4 py-3 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm
-              ${isDisabled || listening ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-gray-100 text-gray-800'}`}
+              ${isDisabled || listening 
+                ? 'bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-600 dark:text-gray-400' 
+                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400'}`}
           />
 
-          {/* Tombol Kirim */}
+          {/* Tombol Kirim (colors kept consistent for function) */}
           <button
             type="submit"
             disabled={!inputValue.trim() || isDisabled || listening}

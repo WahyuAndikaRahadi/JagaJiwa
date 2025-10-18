@@ -8,51 +8,52 @@ import {
   Zap,
   Smile,
   Sparkles,
-} from 'lucide-react';
+} from "lucide-react";
+
 
 function Home() {
   const features = [
     {
       icon: TrendingUp,
-      title: 'Mood Tracker',
-      description: 'Pantau perubahan suasana hatimu setiap hari',
-      color: 'from-purple-500 to-indigo-600',
+      title: "Mood Tracker",
+      description: "Pantau perubahan suasana hatimu setiap hari",
+      color: "from-purple-500 to-indigo-600",
     },
     {
       icon: Brain,
-      title: 'Journal Mood',
-      description: 'Tulis dan analisis perasaanmu dengan AI',
-      color: 'from-rose-500 to-pink-600',
+      title: "Journal Mood",
+      description: "Tulis dan analisis perasaanmu dengan AI",
+      color: "from-rose-500 to-pink-600",
     },
     {
       icon: MessageCircle,
-      title: 'Talk Room',
-      description: 'Curhat dengan AI yang siap mendengarkan',
-      color: 'from-emerald-500 to-teal-600',
+      title: "Talk Room",
+      description: "Curhat dengan AI yang siap mendengarkan",
+      color: "from-emerald-500 to-teal-600",
     },
   ];
 
   const articles = [
     {
       id: 1,
-      title: 'Mengatasi Burnout Akademik: Tips dan Strategi',
+      title: "Mengatasi Burnout Akademik: Tips dan Strategi",
       summary:
-        'Pelajari cara mengenali tanda-tanda burnout dan strategi efektif untuk mengatasinya agar tetap produktif.',
-      link: '/artikel/burnout-akademik',
+        "Pelajari cara mengenali tanda-tanda burnout dan strategi efektif untuk mengatasinya agar tetap produktif.",
+      link: "/artikel/burnout-akademik",
     },
     {
       id: 2,
-      title: 'Pentingnya Mindfulness dalam Rutinitas Harian',
+      title: "Pentingnya Mindfulness dalam Rutinitas Harian",
       summary:
-        'Integrasikan praktik mindfulness ke dalam keseharianmu untuk meningkatkan fokus dan mengurangi stres.',
-      link: '/artikel/mindfulness',
+        "Integrasikan praktik mindfulness ke dalam keseharianmu untuk meningkatkan fokus dan mengurangi stres.",
+      link: "/artikel/mindfulness",
     },
     {
       id: 3,
-      title: 'Membangun Resiliensi Mental di Era Digital',
+      title: "Membangun Resiliensi Mental di Era Digital",
       summary:
-        'Kembangkan ketahanan mental untuk menghadapi tantangan di dunia digital yang serba cepat dan penuh tekanan.',
-      link: '/artikel/resiliensi-digital',
+        "Kembangkan ketahanan mental untuk menghadapi tantangan di dunia digital yang serba cepat dan penuh tekanan.",
+      link: "/artikel/resiliensi-digital",
     },
   ];
 
@@ -84,18 +85,16 @@ function Home() {
 
             <div className="space-y-6 animate-slide-up">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight">
-                <span className="bg-gradient-to-r from-[#1ff498] to-[#50b7f7] bg-clip-text text-transparent animate-gradient-slow z-10">
-                  Ketenangan,
-                </span>
+                
                 <span className="block text-gray-900 mt-2 dark:text-gray-100">
                   Jaga Jiwa.
                 </span>
               </h1>
 
               <p className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-gray-600 dark:text-gray-400">
-                Alat kesehatan mental berbasis AI yang dirancang untuk membantumu
-                mengelola emosi, meningkatkan kesejahteraan, dan mencapai
-                keseimbangan hidup yang optimal.
+                Alat kesehatan mental berbasis AI yang dirancang untuk
+                membantumu mengelola emosi, meningkatkan kesejahteraan, dan
+                mencapai keseimbangan hidup yang optimal.
               </p>
 
               <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
@@ -138,9 +137,9 @@ function Home() {
 
           <div className="flex flex-wrap justify-center gap-6 text-lg font-semibold">
             {[
-              { text: '100% Anonim & Aman', color: 'red' },
-              { text: 'Teknologi AI Canggih', color: 'yellow' },
-              { text: 'Mendukung Kesejahteraan Pelajar', color: 'emerald' },
+              { text: "100% Anonim & Aman", color: "red" },
+              { text: "Teknologi AI Canggih", color: "yellow" },
+              { text: "Mendukung Kesejahteraan Pelajar", color: "emerald" },
             ].map((item, i) => (
               <div
                 key={i}
@@ -173,9 +172,7 @@ function Home() {
                 border-[#72e4f8] hover:border-[#1ff498] dark:bg-gray-900/50"
                 style={{ animationDelay: `${index * 200}ms` }}
               >
-                <div
-                  className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 dark:bg-indigo-500/20"
-                >
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 dark:bg-indigo-500/20">
                   <Icon className="w-10 h-10 text-[#1ff498] transition-transform group-hover:scale-110" />
                 </div>
                 <h3 className="text-2xl font-extrabold mb-3 text-gray-900 dark:text-gray-100">
