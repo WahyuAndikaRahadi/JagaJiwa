@@ -9,7 +9,7 @@ import {
   Smile,
   Sparkles,
 } from "lucide-react";
-
+import GradientText from "../components/GradientText";
 
 function Home() {
   const features = [
@@ -85,7 +85,20 @@ function Home() {
 
             <div className="space-y-6 animate-slide-up">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight">
-                
+                <GradientText
+                  colors={[
+                    "#40ffaa",
+                    "#4079ff",
+                    "#40ffaa",
+                    "#4079ff",
+                    "#40ffaa",
+                  ]}
+                  animationSpeed={8}
+                  showBorder={false}
+                  className="custom-class"
+                >
+                  Hai Apa Kabarmu ?
+                </GradientText>
                 <span className="block text-gray-900 mt-2 dark:text-gray-100">
                   Jaga Jiwa.
                 </span>
