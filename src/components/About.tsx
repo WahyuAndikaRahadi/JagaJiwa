@@ -1,45 +1,31 @@
-import { BookHeart, Target, Users, Heart, Shield, Sparkles, Award, Lightbulb, Pencil, TrendingUp, AlertCircle, Brain, Activity } from "lucide-react"
+import { BookHeart, Target, Users, Heart, Shield, Sparkles, Award, Lightbulb, Pencil, TrendingUp, Activity } from "lucide-react"
 import type { ChartOptions, ChartData } from 'chart.js';
-
-// Import Chart.js dan komponennya
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from "chart.js"
-import { Line, Pie, Bar } from "react-chartjs-2"
+import { Line } from "react-chartjs-2"
 
-// Registrasi elemen-elemen Chart.js yang akan digunakan
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
-// Definisikan tipe untuk Data Statistik
 interface StatItem {
   number: string;
   label: string;
-  icon: React.ElementType; // Menggunakan React.ElementType untuk komponen Lucide
+  icon: React.ElementType;
 }
 
-// Definisikan tipe untuk Fitur Unggulan
 interface FeatureItem {
   icon: React.ElementType;
   title: string;
   description: string;
 }
 
-// Definisikan tipe untuk Anggota Tim
 interface TeamMember {
-    name: string;
-    role: string;
-    bio: string;
-    avatar: string;
+  name: string;
+  role: string;
+  bio: string;
+  avatar: string;
 }
-
-// Komponen SVG untuk Daun
-const LeafSVG = ({ className }: { className?: string }) => (
-    <svg className={`absolute w-16 h-16 text-emerald-100 ${className}`} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.61,6.39C17.61,3.39,12,2.33,12,2.33s-5.61,1.06-5.61,4.06c0,2.7,3.69,4.36,4.69,5.14a.5.5,0,0,0,.64,0C13.7,10.75,17.61,9.09,17.61,6.39Z"></path>
-    </svg>
-);
 
 
 const About: React.FC = () => {
-  // Data state yang sudah ada
   const features: (FeatureItem & { color: string })[] = [
     {
       icon: Heart,
@@ -112,69 +98,36 @@ const About: React.FC = () => {
     },
   ];
 
-  // --- DATA TIM KAMI ---
   const teamMembers: TeamMember[] = [
     {
-        name: "Dr. Bintang S.",
-        role: "Founder & Lead Psychologist",
-        bio: "Seorang psikolog klinis dengan pengalaman lebih dari 10 tahun dalam terapi kognitif-perilaku dan kesehatan mental digital.",
-        avatar: "https://i.pravatar.cc/150?u=bintang"
+      name: "Dr. Bintang S.",
+      role: "Founder & Lead Psychologist",
+      bio: "Seorang psikolog klinis dengan pengalaman lebih dari 10 tahun dalam terapi kognitif-perilaku dan kesehatan mental digital.",
+      avatar: "https://i.pravatar.cc/150?u=bintang"
     },
     {
-        name: "Andi P.",
-        role: "Lead AI Engineer",
-        bio: "Ahli dalam machine learning dan NLP yang bersemangat membangun teknologi AI yang empatik dan bertanggung jawab.",
-        avatar: "https://i.pravatar.cc/150?u=andi"
+      name: "Andi P.",
+      role: "Lead AI Engineer",
+      bio: "Ahli dalam machine learning dan NLP yang bersemangat membangun teknologi AI yang empatik dan bertanggung jawab.",
+      avatar: "https://i.pravatar.cc/150?u=andi"
     },
     {
-        name: "Citra L.",
-        role: "Head of Community & Content",
-        bio: "Mengelola konten edukatif dan membangun komunitas yang aman dan suportif untuk semua pengguna Jaga Jiwa.",
-        avatar: "https://i.pravatar.cc/150?u=citra"
+      name: "Citra L.",
+      role: "Head of Community & Content",
+      bio: "Mengelola konten edukatif dan membangun komunitas yang aman dan suportif untuk semua pengguna Jaga Jiwa.",
+      avatar: "https://i.pravatar.cc/150?u=citra"
     }
   ];
 
-  // --- DATA YANG DIMODIFIKASI BERDASARKAN INPUT PENGGUNA ---
- 
-  // 1. Tren Estimasi Prevalensi Gangguan Mental
   const mentalHealthTrend = [
-    { year: "2019", value: 9.5 }, 
-    { year: "2020", value: 10.0 }, 
-    { year: "2021", value: 11.0 }, 
-    { year: "2022", value: 13.0 }, 
-    { year: "2023", value: 17.0 }, 
-    { year: "2024 (Est)", value: 19.0 }, 
-    { year: "2025 (Est)", value: 20.0 }, 
+    { year: "2019", value: 9.5 },
+    { year: "2020", value: 10.0 },
+    { year: "2021", value: 11.0 },
+    { year: "2022", value: 13.0 },
+    { year: "2023", value: 17.0 },
+    { year: "2024 (Est)", value: 19.0 },
+    { year: "2025 (Est)", value: 20.0 },
   ];
-
-  // 2. Distribusi Jenis Gangguan (Menggunakan 5 data prevalensi tertinggi yang Anda berikan untuk Pie Chart)
-  const disorderDistribution = [
-    { type: "Gangguan Tidur (Pekerja)", percentage: 57.6, color: "#14b8a6" }, // teal-500
-    { type: "Stres Kerja (Ringan-Berat)", percentage: 35.0, color: "#fb923c" }, // orange-400
-    { type: "Gangguan Mental Emosional", percentage: 9.8, color: "#ec4899" }, // pink-500
-    { type: "Kecemasan (Remaja)", percentage: 3.7, color: "#facc15" }, // yellow-400
-    { type: "Depresi (Nasional)", percentage: 1.4, color: "#a855f7" }, // purple-500
-  ];
-         
-  // Menghitung persentase relatif untuk Pie Chart
-  const totalRelativePrevalence = disorderDistribution.reduce((sum, item) => sum + item.percentage, 0);
-  const pieDataRelative = disorderDistribution.map(d => (d.percentage / totalRelativePrevalence) * 100);
- 
- 
-
-  // 3. Prevalensi Berdasarkan Usia (Estimasi Jumlah Kasus Depresi)
-  const prevalenceByAge = [
-    { ageGroup: "15-24 tahun", cases: 5688780, color: "#ec4899" }, // pink-500
-    { ageGroup: "Lansia (>75)", cases: 5404341, color: "#fb923c" }, // orange-400
-    { ageGroup: "65-74 tahun", cases: 4551024, color: "#facc15" }, // yellow-400
-    { ageGroup: "25-34 tahun", cases: 3697707, color: "#14b8a6" }, // teal-500
-    { ageGroup: "55-64 tahun", cases: 3413268, color: "#a855f7" }, // purple-500
-  ];
-  // Memastikan data Bar Chart hanya mencakup 5 kelompok usia teratas yang ada di data
-  const topFiveAgeGroups = prevalenceByAge.slice(0, 5).sort((a, b) => b.cases - a.cases);
-
-
-  // --- DATA UNTUK GRAFIK (MENGGUNAKAN DATA BARU) ---
 
   const lineChartData: ChartData<'line'> = {
     labels: mentalHealthTrend.map(d => d.year),
@@ -182,51 +135,21 @@ const About: React.FC = () => {
       {
         label: "Prevalensi Estimasi Populasi Terkena Kasus (%)",
         data: mentalHealthTrend.map(d => d.value),
-        borderColor: "#0d9488", // teal-600
+        borderColor: "#0d9488",
         backgroundColor: "rgba(13, 148, 136, 0.1)",
         fill: true,
-        tension: 0.4, 
+        tension: 0.4,
         pointRadius: 5,
         pointHoverRadius: 8,
       },
     ],
   };
 
-  const pieChartData: ChartData<'pie'> = {
-    labels: disorderDistribution.map(d => `${d.type} (${d.percentage}%)`),
-    datasets: [
-      {
-        label: "Prevalensi Relatif (%)",
-        data: pieDataRelative, // Menggunakan persentase relatif
-        backgroundColor: disorderDistribution.map(d => d.color),
-        borderColor: "#ffffff",
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  const barChartData: ChartData<'bar'> = {
-    labels: topFiveAgeGroups.map(d => d.ageGroup),
-    datasets: [
-      {
-        label: "Estimasi Jumlah Kasus Depresi",
-        data: topFiveAgeGroups.map(d => d.cases),
-        backgroundColor: topFiveAgeGroups.map(d => d.color),
-        borderRadius: 8,
-        categoryPercentage: 1.0, // Batang menggunakan 100% lebar kategori
-        barPercentage: 0.95,      // Menyisakan celah sangat kecil antar batang (95%)
-       
-
-      },
-    ],
-  };
-
-  // Menggunakan tipe ChartOptions dari Chart.js
-  const chartOptions: ChartOptions<'line' | 'pie' | 'bar'> = {
+  const chartOptions: ChartOptions<'line'> = {
     responsive: true,
     plugins: {
       legend: {
-        position: "bottom" as const, // Penegasan tipe untuk enum
+        position: "bottom" as const,
         labels: {
           padding: 15,
         },
@@ -249,14 +172,13 @@ const About: React.FC = () => {
     },
     scales: {
       y: {
-        beginAtZero: true, 
+        beginAtZero: true,
       },
     },
   };
 
-  // Opsi spesifik untuk Line Chart
   const lineChartOptions: ChartOptions<'line'> = {
-    ...chartOptions as ChartOptions<'line'>, // Casting untuk memastikan tipe benar
+    ...chartOptions,
     plugins: {
       ...chartOptions.plugins,
       title: {
@@ -281,94 +203,11 @@ const About: React.FC = () => {
     }
   };
 
-  // Opsi spesifik untuk Pie Chart
-  const pieChartOptions: ChartOptions<'pie'> = {
-    ...chartOptions as ChartOptions<'pie'>,
-    plugins: {
-      ...chartOptions.plugins,
-      title: {
-        ...chartOptions.plugins!.title,
-        text: "Distribusi Prevalensi Relatif Jenis Gangguan Terpilih",
-      },
-      tooltip: {
-        ...chartOptions.plugins!.tooltip,
-        callbacks: {
-          label: (context) => {
-            const label = context.label || ''
-            const value = context.parsed.toFixed(2) 
-            return `${label}: ${value}%`
-          }
-        }
-      }
-    },
-  };
-
-  // Opsi spesifik untuk Bar Chart
-  const barChartOptions: ChartOptions<'bar'> = {
-    ...chartOptions as ChartOptions<'bar'>,
-    plugins: {
-      ...chartOptions.plugins,
-      title: {
-        ...chartOptions.plugins!.title,
-        text: "Estimasi Jumlah Kasus Depresi Berdasarkan Kelompok Usia (Populasi 284,4 Juta)",
-      },
-      legend: {
-        display: false, 
-        position: "bottom" as const,
-      },
-      tooltip: {
-        ...chartOptions.plugins!.tooltip,
-        callbacks: {
-          label: (context) => ` Kasus: ${context.parsed.y!.toLocaleString('id-ID')} orang`,
-        },
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Jumlah Kasus (orang)'
-        },
-        ticks: {
-          // Untuk format angka jutaan
-          callback: function(value: any) {
-            return (value / 1000000).toLocaleString('id-ID') + ' Juta'
-          }
-        }
-      }
-    }
-
-  };
-
-
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-16 relative">
-        <LeafSVG className="-top-4 -left-12 transform -rotate-45" />
-        <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200">
-          <Pencil className="w-4 h-4" />
-          <span>Tentang Kami</span>
-        </div>
-
-        <h1 className="mt-4 text-3xl md:text-5xl font-bold text-balance">
-          <span className="text-foreground">Mengenal </span>
-          <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">Jaga Jiwa</span>
-        </h1>
-
-        <p className="mt-4 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto text-pretty">
-          Platform kesehatan holistik yang membantu Anda mencapai keseimbangan dalam semua aspek kehidupan dengan dukungan AI yang empatik dan aman.
-        </p>
-        <LeafSVG className="-bottom-4 -right-12 transform rotate-[120deg]" />
-      </div>
-<section className="py-16 md:py-24 bg-gray-50 relative">
-        <LeafSVG className="top-8 left-4 transform rotate-[20deg] opacity-50" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white">
+    
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4"> {/* Menambah padding atas di sini */}
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6">
@@ -406,9 +245,10 @@ const About: React.FC = () => {
             </div>
           </div>
         </div>
-        <LeafSVG className="bottom-8 right-4 transform -rotate-[160deg] opacity-50" />
       </section>
- <section className="py-16 md:py-20 bg-gray-50">
+
+      {/* Bagian Tentang Kami, Tujuan, Visi Misi */}
+      <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             <div className="bg-white rounded-3xl p-8 border-2 border-teal-200 shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
@@ -473,8 +313,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-  <section className="py-16 md:py-24 bg-white relative">
-        <LeafSVG className="top-12 right-12 transform rotate-[75deg]" />
+      <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Mengapa Memilih Jaga Jiwa?</h2>
@@ -485,7 +324,7 @@ const About: React.FC = () => {
             {features.map((feature, index) => {
               const Icon = feature.icon
               return (
-                <div key={index} className="group bg-white rounded-2xl p-8 border border-gray-200 hover:border-transparent hover:shadow-2xl transition-all duration-300 z-10">
+                <div key={index} className="group bg-white rounded-2xl p-8 border border-gray-200 hover:border-transparent hover:shadow-2xl transition-all duration-300">
                   <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-8 h-8 text-white" />
                   </div>
@@ -496,88 +335,89 @@ const About: React.FC = () => {
             })}
           </div>
         </div>
-        <LeafSVG className="bottom-12 left-12 transform -rotate-[105deg]" />
       </section>
 
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+          <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4">
-                <Users className="w-4 h-4" />
-                <span>Tim Kami</span>
+              <Users className="w-4 h-4" />
+              <span>Tim Kami</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Orang-Orang di Balik Jaga Jiwa</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">Kami adalah tim profesional yang bersemangat untuk membuat perbedaan dalam dunia kesehatan mental.</p>
-            </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {teamMembers.map((member, index) => (
-                <div key={index} className="group flex flex-col items-center text-center bg-white rounded-2xl p-8 border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                
+              <div key={index} className="group flex flex-col items-center text-center bg-white rounded-2xl p-8 border-2 border-teal-100 hover:border-teal-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                 <div className="relative mb-6">
-                    <svg className="absolute -top-4 -left-4 w-12 h-12 text-green-200 transform -rotate-[45deg] opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.61,6.39C17.61,3.39,12,2.33,12,2.33s-5.61,1.06-5.61,4.06c0,2.7,3.69,4.36,4.69,5.14a.5.5,0,0,0,.64,0C13.7,10.75,17.61,9.09,17.61,6.39Z"></path>
-                    </svg>
-                    <svg className="absolute -top-2 -right-5 w-12 h-12 text-teal-200 transform rotate-[60deg] opacity-0 group-hover:opacity-100 transition-all duration-300 delay-200" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.61,6.39C17.61,3.39,12,2.33,12,2.33s-5.61,1.06-5.61,4.06c0,2.7,3.69,4.36,4.69,5.14a.5.5,0,0,0,.64,0C13.7,10.75,17.61,9.09,17.61,6.39Z"></path>
-                    </svg>
-                    <svg className="absolute -bottom-4 -right-3 w-12 h-12 text-emerald-200 transform rotate-[150deg] opacity-0 group-hover:opacity-100 transition-all duration-300 delay-300" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.61,6.39C17.61,3.39,12,2.33,12,2.33s-5.61,1.06-5.61,4.06c0,2.7,3.69,4.36,4.69,5.14a.5.5,0,0,0,.64,0C13.7,10.75,17.61,9.09,17.61,6.39Z"></path>
-                    </svg>
-
-                    <img
-                        className="w-32 h-32 rounded-full object-cover shadow-lg mx-auto ring-4 ring-white group-hover:ring-teal-200 transition-all duration-300 relative z-10"
-                        src={member.avatar}
-                        alt={`Foto ${member.name}`}
-                    />
-                    
-                    <div className="absolute bottom-1 right-1 bg-teal-500 rounded-full p-2 border-4 border-white z-20">
-                        <Sparkles className="w-4 h-4 text-white" />
-                    </div>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-teal-100 to-emerald-200 transform scale-100 blur-lg transition-all duration-300 group-hover:scale-110"></div>
+                  <img
+                    className="relative w-32 h-32 rounded-full object-cover shadow-lg mx-auto ring-4 ring-white group-hover:ring-teal-300 transition-all duration-300"
+                    src={member.avatar}
+                    alt={`Foto ${member.name}`}
+                  />
+                  <div className="absolute bottom-1 right-1 bg-teal-500 rounded-full p-2 border-4 border-white">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
                 </div>
-
                 <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
                 <p className="text-teal-600 font-semibold mb-4">{member.role}</p>
                 <p className="text-gray-600 leading-relaxed text-sm">{member.bio}</p>
-                </div>
+              </div>
             ))}
-            </div>
+          </div>
         </div>
       </section>
-      
-      <section className="py-16 md:py-24 bg-teal-50/50 relative">
-        <LeafSVG className="top-16 left-8 transform rotate-[45deg] opacity-75" />
+
+      <section className="py-16 md:py-24 bg-teal-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Data & Statistik Kesehatan Mental di Indonesia</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Visualisasi data dari berbagai sumber mengenai kondisi kesehatan mental saat ini.</p>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4">
+              <TrendingUp className="w-4 h-4" />
+              <span>Data & Wawasan</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Memahami Lanskap Kesehatan Mental di Indonesia</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Visualisasi data dari berbagai sumber ini menyoroti urgensi dan skala tantangan kesehatan mental yang kita hadapi bersama.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 lg:col-span-2">
+          <div className="grid grid-cols-1 gap-8">
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="mb-4">
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <Activity className="text-teal-600" />
+                  Tren yang Perlu Diwaspadai
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Grafik ini menunjukkan adanya peningkatan prevalensi gangguan mental yang konsisten dari tahun ke tahun di Indonesia. Angka ini menekankan pentingnya kesadaran dan intervensi dini.
+                </p>
+              </div>
               <Line
                 options={lineChartOptions}
                 data={lineChartData}
               />
             </div>
           </div>
-         
+
           <div className="mt-12 max-w-7xl mx-auto bg-white border border-teal-200 rounded-2xl p-10 shadow-sm">
-             <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200">
-                <Lightbulb className="w-5 h-4" />
-                <span>Insight Utama dari Data</span>
-             </div>
-             <div className="mt-6 space-y-4 text-gray-700 leading-relaxed">
-                <p>
-                    Grafik di atas menunjukkan adanya <span className="font-semibold text-gray-900">tren kenaikan prevalensi gangguan mental yang signifikan</span> di Indonesia dari tahun 2019 hingga estimasi 2025. Peningkatan ini mencerminkan tantangan kesehatan mental yang semakin besar, yang mungkin dipercepat oleh faktor-faktor seperti dampak pandemi, tekanan ekonomi, dan perubahan gaya hidup digital.
-                </p>
-                <p>
-                    Angka ini bukan sekadar statistik, tetapi representasi dari jutaan individu yang berjuang dalam diam. Hal ini menggarisbawahi <span className="font-semibold text-gray-900">pentingnya intervensi dini dan akses yang lebih mudah</span> terhadap layanan dukungan kesehatan mental. Misi Jaga Jiwa adalah menjawab kebutuhan ini dengan menyediakan platform yang aman, mudah diakses, dan tanpa stigma bagi siapa saja yang membutuhkan.
-                </p>
-             </div>
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+              <Lightbulb className="w-5 h-4" />
+              <span>Insight Utama dari Data</span>
+            </div>
+            <div className="mt-6 space-y-4 text-gray-700 leading-relaxed">
+              <p>
+                Grafik di atas menunjukkan adanya <span className="font-semibold text-gray-900">tren kenaikan prevalensi gangguan mental yang signifikan</span> di Indonesia dari tahun 2019 hingga estimasi 2025. Peningkatan ini mencerminkan tantangan kesehatan mental yang semakin besar, yang mungkin dipercepat oleh faktor-faktor seperti dampak pandemi, tekanan ekonomi, dan perubahan gaya hidup digital.
+              </p>
+              <p>
+                Angka ini bukan sekadar statistik, tetapi representasi dari jutaan individu yang berjuang dalam diam. Hal ini menggarisbawahi <span className="font-semibold text-gray-900">pentingnya intervensi dini dan akses yang lebih mudah</span> terhadap layanan dukungan kesehatan mental. Misi Jaga Jiwa adalah menjawab kebutuhan ini dengan menyediakan platform yang aman, mudah diakses, dan tanpa stigma bagi siapa saja yang membutuhkan.
+              </p>
+            </div>
           </div>
+
         </div>
-        <LeafSVG className="bottom-16 right-8 transform -rotate-[135deg] opacity-75" />
       </section>
 
       <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-emerald-50">
@@ -604,8 +444,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-10 md:py-12 bg-white relative">
-        <LeafSVG className="top-4 right-24 transform rotate-[90deg] opacity-80" />
+      <section className="py-10 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl border-2 border-teal-200 bg-white">
             <div className="flex items-center gap-2 px-6 md:px-8 pt-6">
@@ -637,9 +476,8 @@ const About: React.FC = () => {
             </div>
           </div>
         </div>
-        <LeafSVG className="bottom-4 left-24 transform -rotate-[90deg] opacity-80" />
       </section>
-      
+
       <section className="py-16 md:py-20 bg-gradient-to-br from-teal-600 to-emerald-600 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
