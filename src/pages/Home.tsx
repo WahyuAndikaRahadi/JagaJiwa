@@ -10,7 +10,9 @@ import {
   ChevronDown,
   Quote,
 } from "lucide-react";
-import React, { useState, useEffect, useRef } from "react"; // Import useRef
+import React, { useState, useEffect, useRef } from "react";
+// 1. Import Framer Motion
+import { motion, useInView } from "framer-motion"; 
 import GradientText from "../components/GradientText";
 
 // === Komponen FAQ Item (Tidak Berubah) ===
@@ -81,20 +83,41 @@ const TESTIMONIALS = [
 ];
 // --- Akhir Data Testimoni ---
 
+// --- Variasi Animasi Framer Motion ---
+
+// Animasi Fade In Up (untuk Hero, Filosofi)
+const fadeInUp: any = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+// Animasi Kontainer Stagger (untuk Fitur Grid, Artikel)
+const containerVariants: any = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1, // Jeda antar elemen anak
+      delayChildren: 0.2, // Jeda sebelum anak mulai bergerak
+    },
+  },
+};
+
+// Animasi Item (untuk anak di Grid)
+const itemVariants: any = {
+  initial: { opacity: 0, y: 50, scale: 0.8 },
+  animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5 } },
+};
+// --- Akhir Variasi Animasi ---
+
 
 // === Komponen Utama: Home ===
 function Home() {
-  // === State untuk Testimonial Slider ===
+  // ... (State dan Fungsi Testimonial Slider tidak berubah)
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const totalTestimonials = TESTIMONIALS.length;
-  
-  // State untuk gesture (swipe)
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isSwiping, setIsSwiping] = useState(false);
-  const minSwipeDistance = 50; // Minimal pixel pergeseran untuk dianggap swipe
-  
-  // Ref untuk mengontrol apakah transisi harus diaktifkan (dimatikan saat swiping)
+  const minSwipeDistance = 50; 
   const sliderRef = useRef<HTMLDivElement>(null); 
   
   // Fungsi untuk pindah ke slide berikutnya
@@ -115,47 +138,37 @@ function Home() {
   // Auto-slide effect
   useEffect(() => {
     const slideInterval = setInterval(nextSlide, 5000);
-
-    // Membersihkan interval saat komponen di-unmount
     return () => clearInterval(slideInterval);
   }, [totalTestimonials]); 
 
   // === Fungsi untuk Swipe/Drag Gesture ===
-
-  // 1. Mengambil posisi awal saat sentuhan/klik dimulai
   const onTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     setTouchStart(clientX);
-    setTouchEnd(null); // Reset touchEnd saat mulai
-    setIsSwiping(true); // Mulai mode swiping
+    setTouchEnd(null);
+    setIsSwiping(true);
 
-    // Opsional: Matikan transisi CSS saat memulai swipe untuk gerakan yang lebih mulus
     if (sliderRef.current) {
       sliderRef.current.style.transition = 'none';
     }
   };
 
-  // 2. Mengambil posisi saat sentuhan/klik bergerak
   const onTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
     if (touchStart === null) return;
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     setTouchEnd(clientX);
 
-    // Hitung offset dan terapkan pergeseran real-time
-    const currentSlideOffset = activeTestimonial * 100; // Persen offset slide saat ini
+    const currentSlideOffset = activeTestimonial * 100;
     const containerWidth = e.currentTarget.clientWidth;
     const dragDistance = (clientX - touchStart) / containerWidth * 100;
     
     if (sliderRef.current) {
-      // Pergeseran real-time:
       sliderRef.current.style.transform = `translateX(-${currentSlideOffset - dragDistance}%)`;
     }
   };
 
-  // 3. Menghitung dan menerapkan pergeseran slide saat sentuhan/klik berakhir
   const onTouchEnd = () => {
     if (touchStart === null || touchEnd === null) {
-      // Pastikan transisi kembali diaktifkan jika tidak ada pergeseran
       if (sliderRef.current) {
         sliderRef.current.style.transition = 'transform 0.7s ease-in-out';
       }
@@ -172,38 +185,49 @@ function Home() {
     } else if (isRightSwipe) {
       prevSlide();
     } else {
-       // Kembali ke posisi aktif jika jarak swipe tidak cukup
       if (sliderRef.current) {
         sliderRef.current.style.transition = 'transform 0.7s ease-in-out';
         sliderRef.current.style.transform = `translateX(-${activeTestimonial * 100}%)`;
       }
     }
 
-    // Reset state
     setTouchStart(null);
     setTouchEnd(null);
     setIsSwiping(false);
   };
 
-  // Efek untuk mengaktifkan kembali transisi setelah swipe selesai
   useEffect(() => {
     if (!isSwiping && sliderRef.current) {
-      // Aktifkan kembali transisi setelah state activeTestimonial diperbarui
       const timeout = setTimeout(() => {
           if (sliderRef.current) {
             sliderRef.current.style.transition = 'transform 0.7s ease-in-out';
-            // Paksa apply transform ke posisi akhir untuk mengaktifkan transisi
             sliderRef.current.style.transform = `translateX(-${activeTestimonial * 100}%)`;
           }
-      }, 50); // Tunggu sebentar agar state `isSwiping` benar-benar false
+      }, 50);
       return () => clearTimeout(timeout);
     }
   }, [activeTestimonial, isSwiping]);
+  // --- Akhir State dan Fungsi Testimonial Slider ---
+
+  // === Ref untuk Mengamati Visibilitas (In View) ===
+  const philosophyRef = useRef(null);
+  const isPhilosophyInView = useInView(philosophyRef, { once: true, amount: 0.3 }); // Animasi sekali, ketika 30% elemen terlihat
+
+  const featuresRef = useRef(null);
+  const isFeaturesInView = useInView(featuresRef, { once: true, amount: 0.2 });
+
+  const articlesRef = useRef(null);
+  const isArticlesInView = useInView(articlesRef, { once: true, amount: 0.2 });
+
+  const faqRef = useRef(null);
+  const isFaqInView = useInView(faqRef, { once: true, amount: 0.2 });
+
+  const testimonialsRef = useRef(null);
+  const isTestimonialsInView = useInView(testimonialsRef, { once: true, amount: 0.2 });
 
 
   // Data yang tidak berubah...
   const FEATURES = [
-    // ... (Data FEATURES)
     {
       icon: TrendingUp,
       title: "Mood Tracker",
@@ -225,7 +249,6 @@ function Home() {
   ];
 
   const ARTICLES = [
-    // ... (Data ARTICLES)
     {
       id: 1,
       title: "Mengatasi Burnout Akademik: Tips dan Strategi",
@@ -250,7 +273,6 @@ function Home() {
   ];
 
   const FAQ_DATA = [
-    // ... (Data FAQ_DATA)
     {
       question: "Apakah Jaga Jiwa benar-benar gratis?",
       answer:
@@ -274,7 +296,6 @@ function Home() {
   ];
   
   const PHILOSOPHY_TAGS = [
-    // ... (Data PHILOSOPHY_TAGS)
     { text: "100% Anonim & Aman", color: "red" },
     { text: "Teknologi AI Canggih", color: "yellow" },
     { text: "Bebas Biaya", color: "emerald" },
@@ -286,19 +307,23 @@ function Home() {
       bg-gradient-to-br from-indigo-50/70 via-white to-rose-50/70 
       dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950"
     >
-      {/* Catatan: Kelas 'animate-blob' dan 'animation-delay-xxxx' memerlukan 
-      definisi keyframes di file CSS global Anda. */}
-      {/* === Background Blobs === */}
+      {/* === Background Blobs (Tidak Berubah) === */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob dark:bg-indigo-700 dark:opacity-30" />
       <div className="absolute bottom-1/4 right-0 w-1/3 h-1/3 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000 dark:bg-rose-700 dark:opacity-30" />
       <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 dark:bg-emerald-700 dark:opacity-20" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-9 lg:mt-14 py-9 md:py-10 relative z-10">
-        {/* === Hero Section (Tidak Berubah) === */}
+        
+        {/* === Hero Section (Diberi Animasi) === */}
         <section className="text-center mb-20 md:mb-36">
           <div className="space-y-8 max-w-4xl mx-auto">
-            <div
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-xl border-2 animate-fade-in-down
+            
+            {/* Tag Line */}
+            <motion.div
+              variants={fadeInUp}
+              initial="initial"
+              animate="animate"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-xl border-2
               bg-white/80 backdrop-blur-sm border-[#1ff498]
               dark:bg-gray-800/80"
             >
@@ -306,10 +331,19 @@ function Home() {
               <span className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300">
                 Platform Kesehatan Mental Terbaikmu
               </span>
-            </div>
+            </motion.div>
 
-            <div className="space-y-6 animate-slide-up">
-              <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
+            <motion.div 
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+                className="space-y-6"
+            >
+              {/* Judul Utama */}
+              <motion.h1 
+                variants={fadeInUp}
+                className="text-5xl md:text-7xl font-extrabold tracking-tight"
+              >
                 <GradientText
                   colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
                   animationSpeed={10}
@@ -321,15 +355,23 @@ function Home() {
                 <span className="block text-gray-900 mt-2 dark:text-gray-100">
                   Jaga Jiwa
                 </span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-gray-600 dark:text-gray-400">
+              {/* Paragraf Deskripsi */}
+              <motion.p 
+                variants={fadeInUp} 
+                className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-gray-600 dark:text-gray-400"
+              >
                 Alat kesehatan mental berbasis AI yang dirancang untuk
                 membantumu mengelola emosi, meningkatkan kesejahteraan, dan
                 mencapai keseimbangan hidup yang optimal.
-              </p>
+              </motion.p>
 
-              <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+              {/* Tombol CTA */}
+              <motion.div 
+                variants={fadeInUp}
+                className="flex flex-col sm:flex-row justify-center gap-4 pt-4"
+              >
                 <a
                   href="/tracker"
                   className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white bg-gradient-to-r from-[#1ff498] to-[#50b7f7] rounded-full transform hover:scale-105 transition-all duration-300 overflow-hidden hover:shadow-md hover:shadow-[#1ff498]/50"
@@ -346,13 +388,19 @@ function Home() {
                 >
                   Pelajari Lebih Lanjut
                 </a>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
-        {/* === Filosofi Kami (Tidak Berubah) === */}
-        <div
+        <hr className="my-10 border-t border-gray-200 dark:border-gray-800" />
+        
+        {/* === Filosofi Kami (Diberi Animasi) === */}
+        <motion.div
+            ref={philosophyRef}
+            variants={fadeInUp}
+            initial="initial"
+            animate={isPhilosophyInView ? "animate" : "initial"}
           className="rounded-3xl mt-20 mb-20 p-8 md:p-14 text-center border-2 
           border-[#50b7f7] hover:border-[#1ff498] transition-all duration-500
           bg-white/50 backdrop-blur-sm dark:bg-gray-900/50"
@@ -369,8 +417,12 @@ function Home() {
 
           <div className="flex flex-wrap justify-center gap-6 text-lg font-semibold">
             {PHILOSOPHY_TAGS.map((item, i) => (
-              <div
+              <motion.div
                 key={i}
+                variants={itemVariants}
+                initial="initial"
+                animate={isPhilosophyInView ? "animate" : "initial"}
+                transition={{ delay: 0.1 * i + 0.5 }} // Tambahkan delay untuk efek staggered
                 className="flex items-center space-x-3 px-6 py-3 shadow-lg rounded-full border transition-all hover:scale-105
                 text-gray-700 bg-white border-gray-100 hover:bg-gray-50
                 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
@@ -380,25 +432,33 @@ function Home() {
                   style={{ animationDelay: `${i * 500}ms`, animationDuration: "1500ms" }}
                 ></div>
                 <span>{item.text}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* === Mengapa Kami Berbeda (Tidak Berubah) === */}
+        <hr className="my-10 border-t border-gray-200 dark:border-gray-800" />
+
+        {/* === Mengapa Kami Berbeda (Diberi Animasi Grid) === */}
         <h2 className="pt-16 text-4xl font-extrabold mb-12 text-center text-gray-900 dark:text-gray-100">
           Mengapa Kami Berbeda?
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-10 mb-24">
+        <motion.div 
+            ref={featuresRef}
+            variants={containerVariants}
+            initial="initial"
+            animate={isFeaturesInView ? "animate" : "initial"}
+            className="grid md:grid-cols-3 gap-10 mb-24"
+        >
           {FEATURES.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <div
+              <motion.div
                 key={index}
+                variants={itemVariants}
                 className="rounded-3xl p-8 border-2 backdrop-blur-sm transition-all duration-500 transform group flex flex-col items-center text-center
                 border-[#72e4f8] hover:border-[#1ff498] dark:bg-gray-900/50"
-                style={{ animationDelay: `${index * 200}ms` }}
               >
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 dark:bg-indigo-500/20">
                   <Icon className="w-10 h-10 text-[#1ff498] transition-transform group-hover:scale-110" />
@@ -415,12 +475,14 @@ function Home() {
                 >
                   Lihat Fitur <span className="ml-2 text-xl">&rarr;</span>
                 </a>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        {/* === Wawasan Terbaru / Artikel (Tidak Berubah) === */}
+        <hr className="my-10 border-t border-gray-200 dark:border-gray-800" />
+
+        {/* === Wawasan Terbaru / Artikel (Diberi Animasi Grid) === */}
         <div className="mb-24 pt-10 border-t border-[#72e4f8] ">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-10">
             <h2 className="text-4xl font-extrabold text-center sm:text-left mb-6 sm:mb-0 text-gray-900 dark:text-gray-100">
@@ -435,13 +497,19 @@ function Home() {
             </a>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-10">
+          <motion.div 
+            ref={articlesRef}
+            variants={containerVariants}
+            initial="initial"
+            animate={isArticlesInView ? "animate" : "initial"}
+            className="grid md:grid-cols-3 gap-10"
+          >
             {ARTICLES.map((article, index) => (
-              <a
+              <motion.a
                 key={article.id}
+                variants={itemVariants}
                 href={article.link}
                 className="block rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-2 bg-white border-2 dark:bg-gray-800 dark:border-gray-700"
-                style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="w-full h-52 bg-gray-100 overflow-hidden">
                   <img
@@ -458,19 +526,33 @@ function Home() {
                     {article.summary}
                   </p>
                 </div>
-              </a>
+              </motion.a>
             ))}
-          </div>
+          </motion.div>
         </div>
+        
+        <hr className="my-10 border-t border-gray-200 dark:border-gray-800" />
 
-        {/* === FAQ Section (Tidak Berubah) === */}
-        <section className="mb-24 pt-10">
-          <h2 className="text-4xl font-extrabold mb-12 text-center text-gray-900 dark:text-gray-100">
+
+        {/* === FAQ Section (Diberi Animasi) === */}
+        <section ref={faqRef} className="mb-24 pt-10">
+          <motion.h2
+            variants={fadeInUp}
+            initial="initial"
+            animate={isFaqInView ? "animate" : "initial"}
+            className="text-4xl font-extrabold mb-12 text-center text-gray-900 dark:text-gray-100"
+          >
             <HelpCircle className="inline-block w-9 h-9 mr-3 text-[#50b7f7] dark:text-[#72e4f8]" />
             Pertanyaan yang Sering Diajukan (FAQ)
-          </h2>
+          </motion.h2>
 
-          <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden border-2 border-gray-800 shadow-xl bg-white dark:bg-gray-800">
+          <motion.div 
+            variants={fadeInUp}
+            initial="initial"
+            animate={isFaqInView ? "animate" : "initial"}
+            transition={{ delay: 0.2 }}
+            className="max-w-4xl mx-auto rounded-3xl overflow-hidden border-2 border-gray-800 shadow-xl bg-white dark:bg-gray-800"
+          >
             {FAQ_DATA.map((item, index) => (
               <FaqItem
                 key={index}
@@ -479,54 +561,60 @@ function Home() {
                 index={index}
               />
             ))}
-          </div>
+          </motion.div>
         </section>
+        
+        <hr className="my-10 border-t border-gray-200 dark:border-gray-800" />
 
-        {/* === Testimoni Section (Diubah dengan Swipe/Drag) === */}
-        <section className="mb-24 pt-10 border-t border-gray-200 dark:border-gray-700">
-          <h2 className="text-4xl font-extrabold mb-12 text-center text-gray-900 dark:text-gray-100">
+
+        {/* === Testimoni Section (Tidak Berubah Animasi In-View) === */}
+        <section ref={testimonialsRef} className="mb-24 pt-10 border-t border-gray-200 dark:border-gray-700">
+          <motion.h2
+            variants={fadeInUp}
+            initial="initial"
+            animate={isTestimonialsInView ? "animate" : "initial"}
+            className="text-4xl font-extrabold mb-12 text-center text-gray-900 dark:text-gray-100"
+          >
             <Smile className="inline-block w-9 h-9 mr-3 text-rose-600 dark:text-rose-400" />
             Dengarkan Kata Mereka
-          </h2>
+          </motion.h2>
 
-          <div className="relative max-w-3xl mx-auto">
-            {/* Carousel Wrapper */}
+          <motion.div 
+            variants={fadeInUp}
+            initial="initial"
+            animate={isTestimonialsInView ? "animate" : "initial"}
+            transition={{ delay: 0.2 }}
+            className="relative max-w-3xl mx-auto"
+          >
+            {/* Carousel Wrapper (Swipe/Drag logic tetap) */}
             <div 
               className="overflow-hidden rounded-3xl shadow-xl cursor-grab"
-              // Event handler untuk Swipe/Drag
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
               onTouchEnd={onTouchEnd}
               onMouseDown={onTouchStart}
               onMouseMove={onTouchMove}
               onMouseUp={onTouchEnd}
-              onMouseLeave={isSwiping ? onTouchEnd : undefined} // Mencegah "tersangkut" jika mouse dilepas di luar area
+              onMouseLeave={isSwiping ? onTouchEnd : undefined}
             >
               <div
-                ref={sliderRef} // Tambahkan ref di sini
+                ref={sliderRef}
                 className="flex"
-                // Hapus kelas transisi di sini (akan dikontrol melalui style)
                 style={{ 
                   transform: `translateX(-${activeTestimonial * 100}%)`,
-                  transition: isSwiping ? 'none' : 'transform 0.7s ease-in-out', // Kontrol transisi dengan state isSwiping
+                  transition: isSwiping ? 'none' : 'transform 0.7s ease-in-out',
                 }}
               >
                 {TESTIMONIALS.map((testimonial, index) => (
                   <div
                     key={index}
-                    // Menggunakan w-full agar setiap item mengambil lebar penuh container
                     className={`flex-shrink-0 w-full p-6 md:p-8 rounded-3xl border-2 
                       bg-white dark:bg-gray-800 ${testimonial.color}`}
                   >
-                    {/* Quote Icon */}
                     <Quote className="w-8 h-8 text-indigo-400 mb-4 opacity-70" />
-
-                    {/* Quote Text */}
                     <p className="text-lg italic leading-relaxed text-gray-700 dark:text-gray-300 mb-6 min-h-[100px] flex items-center">
                       "{testimonial.quote}"
                     </p>
-
-                    {/* User Info */}
                     <div className="flex items-center space-x-4 pt-3 border-t border-gray-100 dark:border-gray-700">
                       <img
                         className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-gray-800"
@@ -562,10 +650,14 @@ function Home() {
                 />
               ))}
             </div>
-          </div>
+          </motion.div>
           
-          {/* CTA Card Tetap Ada di Bawah Grid */}
-          <div
+          {/* CTA Card */}
+          <motion.div
+            variants={fadeInUp}
+            initial="initial"
+            animate={isTestimonialsInView ? "animate" : "initial"}
+            transition={{ delay: 0.4 }}
             className="max-w-4xl mx-auto p-8 rounded-3xl border shadow-lg text-center mt-16 
             bg-gradient-to-br from-emerald-100 to-teal-100 
             border-emerald-300
@@ -585,7 +677,7 @@ function Home() {
             >
               Daftar Gratis <span className="ml-2 text-xl">&rarr;</span>
             </a>
-          </div>
+          </motion.div>
         </section>
       </div>
     </div>
