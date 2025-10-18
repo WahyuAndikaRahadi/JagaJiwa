@@ -6,6 +6,7 @@ import JournalMood from './pages/JournalMood';
 import TalkRoom from './pages/TalkRoom';
 import About from './pages/About';
 import Insight from './pages/Insight';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -19,8 +20,8 @@ function App() {
           <Route path="/journal" element={<JournalMood />} />
           <Route path="/talkroom" element={<TalkRoom />} />
           <Route path="/insight" element={<Insight />} />
-          
         </Routes>
+        <Footer/>
       </main>
     </div>
   );
