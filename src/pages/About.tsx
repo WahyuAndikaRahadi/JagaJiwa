@@ -2,6 +2,7 @@ import { BookHeart, Target, Users, Heart, Shield, Sparkles, Award, Lightbulb, Pe
 import type { ChartOptions, ChartData } from 'chart.js';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from "chart.js"
 import { Line } from "react-chartjs-2"
+import GradientText from "../components/GradientText";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -204,10 +205,62 @@ const About: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen relative overflow-hidden transition-colors duration-500 
+      bg-gradient-to-br from-indigo-50/70 via-white to-rose-50/70 
+      dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950">
     
-      <section className="py-16 md:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4"> {/* Menambah padding atas di sini */}
+      {/* === Background Blobs (Copied from Home.tsx) === */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob dark:bg-indigo-700 dark:opacity-30" />
+      <div className="absolute bottom-1/4 right-0 w-1/3 h-1/3 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000 dark:bg-rose-700 dark:opacity-30" />
+      <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 dark:bg-emerald-700 dark:opacity-20" />
+
+      {/* === HERO SECTION BARU (Bergaya seperti Home.tsx) === */}
+      <section className="text-center py-20 md:py-36 relative z-10">
+        <div className="space-y-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* === BAGIAN PILL YANG KOSONG TELAH DIHAPUS === */}
+
+          {/* === INI BAGIAN YANG DIBUNGKUS BORDER === */}
+          {/* --- PADDING DIKURANGI DI BARIS INI --- */}
+          <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-teal-200 dark:border-teal-700 rounded-3xl p-6 md:p-8"> 
+            <div className="space-y-6 animate-slide-up">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight">
+                <GradientText
+                  colors={[
+                    "#40ffaa",
+                    "#4079ff",
+                    "#40ffaa",
+                    "#4079ff",
+                    "#40ffaa",
+                  ]}
+                  animationSpeed={8}
+                  showBorder={false}
+                  className="custom-class leading-tight" 
+                >
+                  Tentang Kami
+                </GradientText>
+                <span className="block text-gray-900 mt-2 dark:text-gray-100 "> 
+                  Jaga Jiwa.
+                </span>
+              </h1>
+
+              <p className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-gray-600 dark:text-gray-400">
+                Memahami cerita di balik Jaga Jiwa dan komitmen kami untuk
+                menciptakan ruang aman bagi kesehatan mentalmu.
+              </p>
+            </div>
+          </div>
+          {/* === AKHIR BAGIAN YANG DIBUNGKUS BORDER === */}
+
+        </div>
+      </section>
+      {/* === AKHIR HERO SECTION BARU === */}
+
+
+      {/* Konten Asli Halaman About */}
+      {/* Mengurangi padding atas sedikit agar tidak terlalu jauh */}
+      <section className="py-12 md:py-20 bg-gray-50 relative z-10"> 
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1"> 
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6">
@@ -248,7 +301,7 @@ const About: React.FC = () => {
       </section>
 
       {/* Bagian Tentang Kami, Tujuan, Visi Misi */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      <section className="py-16 md:py-20 bg-gray-50 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             <div className="bg-white rounded-3xl p-8 border-2 border-teal-200 shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
@@ -313,7 +366,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Mengapa Memilih Jaga Jiwa?</h2>
@@ -337,7 +390,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-gray-50 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4">
@@ -371,7 +424,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-teal-50/50">
+      <section className="py-16 md:py-24 bg-teal-50/50 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4">
@@ -420,7 +473,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-emerald-50">
+      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-emerald-50 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Dampak Kami dalam Angka</h2>
@@ -444,7 +497,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-10 md:py-12 bg-white">
+      <section className="py-10 md:py-12 bg-white relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl border-2 border-teal-200 bg-white">
             <div className="flex items-center gap-2 px-6 md:px-8 pt-6">
@@ -478,7 +531,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-16 md:py-20 bg-gradient-to-br from-teal-600 to-emerald-600 text-white relative overflow-hidden">
+      <section className="py-16 md:py-20 bg-gradient-to-br from-teal-600 to-emerald-600 text-white relative overflow-hidden z-10">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
