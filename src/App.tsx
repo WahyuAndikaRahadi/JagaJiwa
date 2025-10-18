@@ -5,6 +5,7 @@ import MoodTracker from './pages/MoodTracker';
 import JournalMood from './pages/JournalMood';
 import TalkRoom from './pages/TalkRoom';
 import About from './pages/About';
+import Insight from './pages/Insight';
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
           <Route path="/tracker" element={<MoodTracker />} />
           <Route path="/journal" element={<JournalMood />} />
           <Route path="/talkroom" element={<TalkRoom />} />
+          <Route path="/insight" element={<Insight />} />
+          
         </Routes>
       </main>
     </div>

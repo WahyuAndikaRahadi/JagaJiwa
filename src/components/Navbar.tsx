@@ -10,7 +10,8 @@ import {
   Sun,
   Moon,
   Menu, // Import ikon Menu (Hamburger)
-  X, // Import ikon Close (X)
+  X,
+  Brain, // Import ikon Close (X)
 } from 'lucide-react';
 
 // === Brand Component ===
@@ -74,6 +75,7 @@ function Navbar() {
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/about', icon: BookA, label: 'About' },
+    { path: '/insight', icon: Brain, label: 'Insight' },
     { path: '/tracker', icon: BarChart3, label: 'Tracker' },
     { path: '/journal', icon: BookHeart, label: 'Journal' },
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
