@@ -4,6 +4,8 @@ import ChatHistorySidebar from '../components/ChatHistorySidebar';
 import { MessageCircleHeart, AlertCircle, Menu, X, Shield } from 'lucide-react';
 import { GoogleGenAI, Content, Chat, GenerateContentResponse } from '@google/genai';
 import { v4 as uuidv4 } from 'uuid';
+import { motion } from 'framer-motion';
+import StyledPathWithLeaves from '../components/StyledPathWithLeaves';
 
 // --- INI HANYA SIMULASI KLIEN ---
 const ai = new GoogleGenAI({
@@ -50,7 +52,7 @@ const generateGlobalContext = (history: HistorySummary[]): string => {
     const contextText = recentHistory.map((h, index) => {
         const dateObj = h.date instanceof Date ? h.date : new Date(h.date);
         const dateString = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-        
+
         // Ambil beberapa pesan terakhir dari percakapan penuh
         const conversationSnippet = h.fullConversation
             .slice(-maxMessagesPerSummary) // Ambil 5 pesan terakhir
@@ -229,7 +231,7 @@ function TalkRoom() {
                     contents: internalCbtPrompt,
                 });
 
-                const suggestionText = cbtResponse.text.trim();
+                const suggestionText = cbtResponse.text!.trim();
                 setMiniInterventionSuggestion(suggestionText);
             } catch (error) {
                 console.error("Internal CBT AI Error:", error);
@@ -269,7 +271,7 @@ function TalkRoom() {
                 contents: MOOD_SUMMARY_PROMPT,
             });
 
-            const rawSummary = response.text.trim();
+            const rawSummary = response.text!.trim();
 
             let moodEmoji = '😐';
             let summaryText = "Sesi curhat yang intens.";
@@ -453,6 +455,85 @@ function TalkRoom() {
 
     const currentConversation = typingMessage ? [...conversation, typingMessage] : conversation;
 
+    const pulseSlowVariants: any = {
+  animate: {
+    scale: [1, 1.2, 1],
+    opacity: [0.2, 0.4, 0.2],
+    transition: {
+      duration: 6,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
+const floatVariants: any = {
+  animate: {
+    x: ["-10%", "10%", "-10%"],
+    y: ["-10%", "10%", "-10%"],
+    transition: {
+      duration: 15,
+      repeat: Infinity,
+      ease: "linear",
+    },
+  },
+};
+
+
+const upAndDown: any = {
+  animate: {
+    y: ['0%', '-30%', '0%'],
+    opacity: [0.5, 0.8, 0.5],
+    transition: {
+      duration: 8,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }
+  }
+}
+
+const randomFloat: any = {
+  animate: {
+    x: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
+    y: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
+    scale: () => [1, 0.8 + Math.random() * 0.4, 1], // 0.8 to 1.2
+    opacity: () => [0.1, 0.3 + Math.random() * 0.2, 0.1], // 0.3 to 0.5
+    transition: {
+      duration: () => 10 + Math.random() * 10, // 10 to 20 seconds
+      repeat: Infinity,
+      ease: "easeInOut",
+    }
+  }
+}
+
+const spiralFloat: any = {
+  animate: {
+    x: ['0%', '20%', '0%', '-20%', '0%'],
+    y: ['0%', '10%', '20%', '10%', '0%'],
+    rotate: [0, 90, 180, 270, 360],
+    scale: [1, 0.9, 1.1, 1],
+    transition: {
+      duration: 25,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }
+  }
+}
+
+const floatSlowVariants: any = {
+  animate: {
+    x: ["0%", "20%", "0%"],
+    y: ["0%", "20%", "0%"],
+    scale: [1, 1.05, 1],
+    transition: {
+      duration: 20,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
+
     const CrisisPopup = () => (
         <div className={`fixed inset-0 z-50 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 ${isCrisisPopupVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
@@ -535,79 +616,259 @@ function TalkRoom() {
         );
     };
 
-    return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
-            <CrisisPopup />
-            <MiniInterventionCard />
-            <ChatHistorySidebar
-                history={historySummaries}
-                onSelectHistory={handleSelectHistory}
-                onStartNewSession={startNewSession}
-                onDeleteHistory={handleDeleteHistory}
-                currentChatId={currentChatId}
-                onClose={() => setIsSidebarOpen(false)}
-                onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
-                isOpen={isSidebarOpen}
+ return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex relative overflow-hidden">
+        {/* ======================================================= */}
+        {/* 🚀 PENAMBAHAN BLOB ANIMASI DARI HOME.TSX (z-index: 1) */}
+        {/* ======================================================= */}
+        <div className="absolute inset-0 z-[1] pointer-events-none opacity-50 dark:opacity-30">
+            {/* Blobs statis dengan animasi Tailwind CSS (asumsi 'animate-blob' didefinisikan secara global) */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply opacity-20 animate-blob dark:bg-indigo-700 dark:opacity-10" />
+            <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply opacity-20 animate-blob animation-delay-2000 dark:bg-emerald-700 dark:opacity-10" />
+            <div className="absolute top-1/2 left-1/4 w-52 h-52 bg-teal-300 rounded-full mix-blend-multiply opacity-20 animate-blob animation-delay-4000 dark:bg-teal-700 dark:opacity-10" />
+
+            {/* Ornamen Tambahan dengan Framer Motion */}
+            <motion.div
+                className="absolute top-0 left-0 w-40 h-40 bg-[#72e4f8]/20 dark:bg-[#07798d]/20 rounded-full -translate-x-1/3 -translate-y-1/3"
+                variants={pulseSlowVariants}
+                animate="animate"
+            ></motion.div>
+            <motion.div
+                className="absolute bottom-0 right-0 w-80 h-80 bg-[#1ff498]/10 dark:bg-[#0be084]/10 rounded-full translate-x-1/3 translate-y-1/3"
+                variants={floatVariants}
+                animate="animate"
+            ></motion.div>
+            <motion.div
+                className="absolute top-1/4 right-10 w-20 h-20 bg-[#50b7f7]/30 dark:bg-[#086faf]/30 rounded-full"
+                variants={floatSlowVariants}
+                animate="animate"
+            ></motion.div>
+
+            {/* Ornamen Hero Area Tambahan (Bola-bola lebih banyak dan beragam) */}
+            <motion.div
+                className="absolute top-[10%] left-[10%] w-16 h-16 bg-purple-500/20 dark:bg-purple-700/20 rounded-full"
+                variants={randomFloat}
+                animate="animate"
+            ></motion.div>
+            <motion.div
+                className="absolute top-[20%] right-[25%] w-12 h-12 bg-emerald-500/15 dark:bg-emerald-700/15 rounded-full"
+                variants={pulseSlowVariants}
+                animate="animate"
+                style={{ transitionDelay: '1s' }}
+            ></motion.div>
+            <motion.div
+                className="absolute top-[5%] left-[40%] w-24 h-24 bg-indigo-500/10 dark:bg-indigo-700/10 rounded-full"
+                variants={floatVariants}
+                animate="animate"
+                style={{ transitionDelay: '0.5s' }}
+            ></motion.div>
+            <motion.div
+                className="absolute bottom-[20%] left-[15%] w-14 h-14 bg-teal-500/25 dark:bg-teal-700/25 rounded-full"
+                variants={upAndDown}
+                animate="animate"
+            ></motion.div>
+            <motion.div
+                className="absolute bottom-[5%] right-[20%] w-18 h-18 bg-pink-500/18 dark:bg-pink-700/18 rounded-full"
+                variants={randomFloat}
+                animate="animate"
+                style={{ transitionDelay: '2s' }}
+            ></motion.div>
+            <motion.div
+                className="absolute top-[40%] left-[5%] w-10 h-10 bg-rose-500/20 dark:bg-rose-700/20 rounded-full"
+                variants={spiralFloat}
+                animate="animate"
+                style={{ transitionDelay: '1.5s' }}
+            ></motion.div>
+            <motion.div
+                className="absolute top-[60%] right-[10%] w-20 h-20 bg-cyan-500/15 dark:bg-cyan-700/15 rounded-full"
+                variants={floatSlowVariants}
+                animate="animate"
+                style={{ transitionDelay: '2.5s' }}
+            ></motion.div>
+        </div>
+        {/* ======================================================= */}
+        {/* ✅ AKHIR PENAMBAHAN BLOB ANIMASI */}
+        {/* ======================================================= */}
+        
+        {/* 1. Pop-up Krisis & Intervensi Mini (Posisi Fixed) */}
+        <CrisisPopup />
+        <MiniInterventionCard />
+
+        {/* 2. Chat History Sidebar */}
+        <ChatHistorySidebar
+            history={historySummaries}
+            onSelectHistory={handleSelectHistory}
+            onStartNewSession={startNewSession}
+            onDeleteHistory={handleDeleteHistory}
+            currentChatId={currentChatId}
+            onClose={() => setIsSidebarOpen(false)}
+            onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+            isOpen={isSidebarOpen}
+        />
+
+        {/* 3. Overlay Mobile untuk Sidebar */}
+        {isSidebarOpen && window.innerWidth < 1024 && (
+            <div
+                className="fixed inset-0 bg-black/50 z-30"
+                onClick={() => setIsSidebarOpen(false)}
             />
-            {isSidebarOpen && window.innerWidth < 1024 && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-30"
-                    onClick={() => setIsSidebarOpen(false)}
-                />
-            )}
-            <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out`}>
-                <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-0 z-20 shadow-sm flex-shrink-0`}>
-                    <div className="flex items-center space-x-3">
-                        {!isSidebarOpen && (
-                            <button
-                                onClick={() => setIsSidebarOpen(true)}
-                                className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white rounded-lg lg:hidden"
-                                aria-label="Buka Riwayat"
-                            >
-                                <Menu className="w-6 h-6" />
-                            </button>
-                        )}
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
-                            <MessageCircleHeart className="w-6 h-6 text-white" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Talk Room</h1>
+        )}
+        
+        {/* 4. Konten Utama Chat (Melebar ke Seluruh Sisa Ruang) */}
+        {/* class flex-grow flex flex-col w-full memastikan ini mengambil sisa lebar dan tinggi */}
+        <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out z-10`}>
+
+            {/* Header (tetap fixed di atas) */}
+            <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b dark:border-gray-700 sticky top-0 z-20 shadow-sm flex-shrink-0`}>
+                <div className="flex items-center space-x-3">
+                    {/* Tombol Toggle Sidebar Mobile */}
+                    {!isSidebarOpen && (
+                        <button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white rounded-lg lg:hidden"
+                            aria-label="Buka Riwayat"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                    )}
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
+                        <MessageCircleHeart className="w-6 h-6 text-white" />
                     </div>
-                </header>
-                <div className="flex-grow max-w-5xl mx-auto w-full flex flex-col min-h-0 px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-                    <div className="mb-6 flex-shrink-0">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Ruang Curhat</h2>
-                        <p className="text-gray-600 dark:text-gray-400">
-                            Ruang aman untuk berbagi perasaan dengan AI
-                        </p>
-                    </div>
-                    <div className="flex-grow min-h-0 mb-6">
-                        <ChatWindow
-                            conversation={currentConversation}
-                            onSendMessage={handleSendMessage}
-                            isDisabled={isLoading}
-                        />
-                    </div>
-                    <div className="mt-auto bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 rounded-2xl p-6 md:p-8 flex-shrink-0">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Tips Berbicara</h3>
-                        <ul className="space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
-                            <li className="flex items-start space-x-2">
-                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
-                                <span>Jujur dengan perasaanmu, tidak ada yang salah atau benar</span>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Talk Room</h1>
+                </div>
+            </header>
+
+            {/* Container Konten Chat - Menghilangkan max-w-5xl mx-auto untuk full-width */}
+            <div className="flex-grow w-full flex flex-col min-h-0 px-4 sm:px-6 lg:px-8 py-6 md:py-8 overflow-y-auto z-10">
+
+                {/* Judul Ruang Curhat */}
+                <div className="mb-6 flex-shrink-0 max-w-5xl mx-auto w-full">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Ruang Curhat</h2>
+                    <p className="text-gray-600 dark:text-gray-400">
+                        Ruang aman untuk berbagi perasaan dengan AI
+                    </p>
+                </div>
+
+                {/* Chat Window - Menghabiskan ruang vertikal yang tersisa, dibatasi lebarnya */}
+                <div className="flex-grow min-h-0 mb-6 max-w-5xl mx-auto w-full">
+                    <ChatWindow
+                        conversation={currentConversation}
+                        onSendMessage={handleSendMessage}
+                        isLoading={isLoading}
+                        // Jika Anda memiliki prop `isDisabled` di ChatWindow, ganti `isLoading` dengan nama prop yang benar.
+                        // isDisabled={isLoading} 
+                    />
+                </div>
+
+                {/* Tips Berbicara - Selalu di bawah input, dibatasi lebarnya */}
+                <div className="mt-0 pt-4 flex-shrink-0 max-w-5xl mx-auto w-full">
+                    <StyledPathWithLeaves />
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 rounded-2xl p-6 md:p-8 shadow-inner">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                            {/* Asumsi Anda memiliki ikon Shield dari lucide-react */}
+                            <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400 mr-3" />
+                            Tips Berbicara di Ruang Aman
+                        </h3>
+                        <ul className="space-y-3 text-sm md:text-base text-gray-700 dark:text-gray-300 list-none">
+
+                            {/* Tip 1 */}
+                            <li className="flex items-start">
+                                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-lg leading-none mr-2 mt-[-1px]">•</span>
+                                <span>
+                                    <span className="font-semibold text-gray-800 dark:text-gray-100">Jujur dan Terbuka.</span> Tidak ada yang salah atau benar. Ruang ini adalah milikmu untuk melepaskan beban perasaan.
+                                </span>
                             </li>
-                            <li className="flex items-start space-x-2">
-                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
-                                <span>Gunakan ruang ini untuk melepaskan beban pikiran</span>
+
+                            {/* Tip 2 */}
+                            <li className="flex items-start">
+                                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-lg leading-none mr-2 mt-[-1px]">•</span>
+                                <span>
+                                    <span className="font-semibold text-gray-800 dark:text-gray-100">Fokus pada Dirimu.</span> Gunakan "Saya merasa..." atau "Saya berpikir..." untuk mengekspresikan pengalamanmu.
+                                </span>
                             </li>
-                            <li className="flex items-start space-x-2">
-                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">•</span>
-                                <span>Semua percakapan bersifat privat dan tersimpan lokal</span>
+
+                            {/* Tip 3 */}
+                            <li className="flex items-start">
+                                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-lg leading-none mr-2 mt-[-1px]">•</span>
+                                <span>
+                                    <span className="font-semibold text-gray-800 dark:text-gray-100">Privasi Terjamin.</span> Semua percakapan bersifat privat dan tersimpan secara lokal di perangkatmu.
+                                </span>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
+
+            {/* SVG Wave/Footer */}
+            <div className="relative h-32 w-full overflow-hidden flex-shrink-0 z-10">
+                <motion.svg
+                    viewBox="0 0 1200 120"
+                    preserveAspectRatio="none"
+                    className="absolute top-0 w-full h-full"
+                    initial={{ opacity: 0 }}
+                    animate={{
+                        opacity: 1,
+                        transition: { duration: 1, delay: 0.5 },
+                    }}
+                >
+                    {/* Path 1: Biru terang dengan opacity rendah */}
+                    <motion.path
+                        fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
+                        fillOpacity="0.1"
+                        d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
+                        initial={{ pathLength: 0, pathOffset: 1 }}
+                        animate={{
+                            pathLength: 1,
+                            pathOffset: 0,
+                            transition: {
+                                duration: 3,
+                                ease: "linear",
+                                repeat: Infinity,
+                                repeatType: "loop",
+                            },
+                        }}
+                    />
+                    {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
+                    <motion.path
+                        fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                        fillOpacity="0.2"
+                        d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
+                        initial={{ pathLength: 0, pathOffset: 1 }}
+                        animate={{
+                            pathLength: 1,
+                            pathOffset: 0,
+                            transition: {
+                                duration: 3.5,
+                                ease: "linear",
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                delay: 0.2,
+                            },
+                        }}
+                    />
+                    {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
+                    <motion.path
+                        fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                        fillOpacity="0.3"
+                        d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
+                        initial={{ pathLength: 0, pathOffset: 1 }}
+                        animate={{
+                            pathLength: 1,
+                            pathOffset: 0,
+                            transition: {
+                                duration: 4,
+                                ease: "linear",
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                delay: 0.4,
+                            },
+                        }}
+                    />
+                </motion.svg>
+            </div>
         </div>
-    );
+    </div>
+);
 }
 
 export default TalkRoom;
