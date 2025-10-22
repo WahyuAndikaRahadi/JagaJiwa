@@ -4,9 +4,10 @@ import ChatHistorySidebar from '../components/ChatHistorySidebar';
 import { MessageCircleHeart, AlertCircle, Menu, X, Shield } from 'lucide-react';
 import { GoogleGenAI, Content, Chat, GenerateContentResponse } from '@google/genai';
 import { v4 as uuidv4 } from 'uuid';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // <-- Import AnimatePresence
 import StyledPathWithLeaves from '../components/StyledPathWithLeaves';
 import Swal from 'sweetalert2';
+import GradientText from '../components/GradientText';
 
 // --- INI HANYA SIMULASI KLIEN ---
 const ai = new GoogleGenAI({
@@ -46,17 +47,16 @@ const generateGlobalContext = (history: HistorySummary[]): string => {
         return 'Belum ada riwayat percakapan yang tersimpan.';
     }
 
-    const maxEntries = 3; // Kurangi jumlah riwayat untuk menjaga efisiensi
-    const maxMessagesPerSummary = 5; // Batasi jumlah pesan per ringkasan
+    const maxEntries = 3; 
+    const maxMessagesPerSummary = 5; 
     const recentHistory = history.slice(0, maxEntries);
 
     const contextText = recentHistory.map((h, index) => {
         const dateObj = h.date instanceof Date ? h.date : new Date(h.date);
         const dateString = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 
-        // Ambil beberapa pesan terakhir dari percakapan penuh
         const conversationSnippet = h.fullConversation
-            .slice(-maxMessagesPerSummary) // Ambil 5 pesan terakhir
+            .slice(-maxMessagesPerSummary)
             .map(msg => `[${msg.role === 'ai' ? 'Jiwamu' : 'Pengguna'}]: ${msg.text}`)
             .join('\n');
 
@@ -148,6 +148,104 @@ const createNewChatSession = (history?: Content[], globalContext: string = ''): 
     });
 };
 
+// =======================================================
+// ✅ VARIAN FRAMER MOTION BARU (Sophisticated AOS)
+// =======================================================
+const aosVariants: any = {
+  hidden: { opacity: 0, y: 50, scale: 0.98 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: i * 0.1, 
+      duration: 0.7,
+      ease: [0.2, 0.6, 0.3, 1], // Custom bounce/spring-like ease
+    },
+  }),
+};
+
+// Varian Framer Motion untuk Background Blobs (dari file lama)
+const pulseSlowVariants: any = {
+  animate: {
+    scale: [1, 1.2, 1],
+    opacity: [0.2, 0.4, 0.2],
+    transition: {
+      duration: 6,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
+const floatVariants: any = {
+  animate: {
+    x: ["-10%", "10%", "-10%"],
+    y: ["-10%", "10%", "-10%"],
+    transition: {
+      duration: 15,
+      repeat: Infinity,
+      ease: "linear",
+    },
+  },
+};
+
+const upAndDown: any = {
+  animate: {
+    y: ['0%', '-30%', '0%'],
+    opacity: [0.5, 0.8, 0.5],
+    transition: {
+      duration: 8,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }
+  }
+}
+
+const randomFloat: any = {
+  animate: {
+    x: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
+    y: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
+    scale: () => [1, 0.8 + Math.random() * 0.4, 1], // 0.8 to 1.2
+    opacity: () => [0.1, 0.3 + Math.random() * 0.2, 0.1], // 0.3 to 0.5
+    transition: {
+      duration: () => 10 + Math.random() * 10, // 10 to 20 seconds
+      repeat: Infinity,
+      ease: "easeInOut",
+    }
+  }
+}
+
+const spiralFloat: any = {
+  animate: {
+    x: ['0%', '20%', '0%', '-20%', '0%'],
+    y: ['0%', '10%', '20%', '10%', '0%'],
+    rotate: [0, 90, 180, 270, 360],
+    scale: [1, 0.9, 1.1, 1],
+    transition: {
+      duration: 25,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }
+  }
+}
+
+const floatSlowVariants: any = {
+  animate: {
+    x: ["0%", "20%", "0%"],
+    y: ["0%", "20%", "0%"],
+    scale: [1, 1.05, 1],
+    transition: {
+      duration: 20,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+// =======================================================
+// ✅ AKHIR VARIAN FRAMER MOTION
+// =======================================================
+
 function TalkRoom() {
     const [conversation, setConversation] = useState<Message[]>(() => {
         const saved = localStorage.getItem('chatConversation');
@@ -185,7 +283,6 @@ function TalkRoom() {
     const [isCrisisPopupVisible, setIsCrisisPopupVisible] = useState(false);
     const [miniInterventionSuggestion, setMiniInterventionSuggestion] = useState<string | null>(null);
 
-    // ✅ Perbarui useRef dengan globalContext yang baru
     const initialGlobalContext = useRef(generateGlobalContext(historySummaries)).current;
     const chatRef = useRef<Chat>(createNewChatSession([], initialGlobalContext));
 
@@ -425,26 +522,42 @@ function TalkRoom() {
     };
 
     const handleDeleteHistory = (id: string | 'all') => {
-        if (id === 'all') {
-            if (window.confirm("Yakin ingin menghapus SEMUA riwayat curhatmu? Tindakan ini tidak bisa dibatalkan.")) {
-                setHistorySummaries([]);
-                localStorage.removeItem('chatHistorySummaries');
-                localStorage.removeItem('chatConversation');
-                startNewSession();
-                Swal.fire('Berhasil!', 'Semua riwayat curhat telah dihapus.', 'success');
-            }
-        } else {
-            if (window.confirm("Yakin ingin menghapus sesi ini? Riwayat sesi ini akan hilang permanen.")) {
-                setHistorySummaries(prev => {
-                    const updatedHistory = prev.filter(h => h.id !== id);
-                    return updatedHistory;
-                });
+        const confirmDelete = (text: string) => Swal.fire({
+            title: 'Apakah Anda Yakin?',
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus Saja!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6', 
+            cancelButtonColor: '#d33',
+            buttonsStyling: true,
+        });
 
-                if (currentChatId === id) {
+        if (id === 'all') {
+            confirmDelete("Yakin ingin menghapus SEMUA riwayat curhatmu? Tindakan ini tidak bisa dibatalkan!").then((result) => {
+                if (result.isConfirmed) {
+                    setHistorySummaries([]);
+                    localStorage.removeItem('chatHistorySummaries');
+                    localStorage.removeItem('chatConversation');
                     startNewSession();
+                    Swal.fire('Berhasil!', 'Semua riwayat curhat telah dihapus.', 'success');
                 }
-                Swal.fire('Berhasil!', 'Riwayat sesi curhat telah dihapus.', 'success');
-            }
+            });
+        } else {
+            confirmDelete("Yakin ingin menghapus sesi ini? Riwayat sesi ini akan hilang permanen.").then((result) => {
+                if (result.isConfirmed) {
+                    setHistorySummaries(prev => {
+                        const updatedHistory = prev.filter(h => h.id !== id);
+                        return updatedHistory;
+                    });
+    
+                    if (currentChatId === id) {
+                        startNewSession();
+                    }
+                    Swal.fire('Berhasil!', 'Riwayat sesi curhat telah dihapus.', 'success');
+                }
+            });
         }
     };
 
@@ -456,85 +569,7 @@ function TalkRoom() {
 
     const currentConversation = typingMessage ? [...conversation, typingMessage] : conversation;
 
-    const pulseSlowVariants: any = {
-  animate: {
-    scale: [1, 1.2, 1],
-    opacity: [0.2, 0.4, 0.2],
-    transition: {
-      duration: 6,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
-
-const floatVariants: any = {
-  animate: {
-    x: ["-10%", "10%", "-10%"],
-    y: ["-10%", "10%", "-10%"],
-    transition: {
-      duration: 15,
-      repeat: Infinity,
-      ease: "linear",
-    },
-  },
-};
-
-
-const upAndDown: any = {
-  animate: {
-    y: ['0%', '-30%', '0%'],
-    opacity: [0.5, 0.8, 0.5],
-    transition: {
-      duration: 8,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }
-  }
-}
-
-const randomFloat: any = {
-  animate: {
-    x: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
-    y: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
-    scale: () => [1, 0.8 + Math.random() * 0.4, 1], // 0.8 to 1.2
-    opacity: () => [0.1, 0.3 + Math.random() * 0.2, 0.1], // 0.3 to 0.5
-    transition: {
-      duration: () => 10 + Math.random() * 10, // 10 to 20 seconds
-      repeat: Infinity,
-      ease: "easeInOut",
-    }
-  }
-}
-
-const spiralFloat: any = {
-  animate: {
-    x: ['0%', '20%', '0%', '-20%', '0%'],
-    y: ['0%', '10%', '20%', '10%', '0%'],
-    rotate: [0, 90, 180, 270, 360],
-    scale: [1, 0.9, 1.1, 1],
-    transition: {
-      duration: 25,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }
-  }
-}
-
-const floatSlowVariants: any = {
-  animate: {
-    x: ["0%", "20%", "0%"],
-    y: ["0%", "20%", "0%"],
-    scale: [1, 1.05, 1],
-    transition: {
-      duration: 20,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
-
-
+    // Komponen CrisisPopup tetap sama (tanpa Framer Motion pada CrisisPopup, namun menggunakan SweetAlert bawaan)
     const CrisisPopup = () => (
         <div className={`fixed inset-0 z-50 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 ${isCrisisPopupVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
@@ -590,37 +625,47 @@ const floatSlowVariants: any = {
         </div>
     );
 
+    // ✅ Mini Intervention Card dengan AnimatePresence untuk entry/exit yang halus
     const MiniInterventionCard = () => {
         if (!miniInterventionSuggestion) return null;
 
         return (
-            <div className="fixed bottom-24 right-4 md:right-8 z-40 max-w-xs transition-transform duration-300 ease-out transform translate-y-0">
-                <div className="bg-teal-100 dark:bg-teal-900 border-2 border-teal-400 dark:border-teal-600 rounded-xl shadow-lg p-4 relative">
-                    <button
-                        onClick={() => setMiniInterventionSuggestion(null)}
-                        className="absolute top-2 right-2 p-1 text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-200 rounded-full"
-                        aria-label="Tutup Saran Latihan"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                    <div className="flex items-start space-x-3">
-                        <MessageCircleHeart className="w-6 h-6 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
-                        <div>
-                            <p className="text-sm font-semibold text-teal-700 dark:text-teal-300 mb-1">Coba Latihan Singkat Ini! ✨</p>
-                            <p className="text-md text-gray-800 dark:text-gray-100 font-medium">
-                                {miniInterventionSuggestion}
-                            </p>
+            <AnimatePresence>
+                <motion.div
+                    key="mini-cbt"
+                    initial={{ opacity: 0, y: 100, x: 20 }}
+                    animate={{ opacity: 1, y: 0, x: 0 }}
+                    exit={{ opacity: 0, y: 100, x: 20 }}
+                    transition={{ type: "spring", stiffness: 150, damping: 20 }}
+                    className="fixed bottom-24 right-4 md:right-8 z-40 max-w-xs"
+                >
+                    <div className="bg-teal-100 dark:bg-teal-900 border-2 border-teal-400 dark:border-teal-600 rounded-xl shadow-lg p-4 relative">
+                        <button
+                            onClick={() => setMiniInterventionSuggestion(null)}
+                            className="absolute top-2 right-2 p-1 text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-200 rounded-full"
+                            aria-label="Tutup Saran Latihan"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                        <div className="flex items-start space-x-3">
+                            <MessageCircleHeart className="w-6 h-6 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
+                            <div>
+                                <p className="text-sm font-semibold text-teal-700 dark:text-teal-300 mb-1">Coba Latihan Singkat Ini! ✨</p>
+                                <p className="text-md text-gray-800 dark:text-gray-100 font-medium">
+                                    {miniInterventionSuggestion}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </AnimatePresence>
         );
     };
 
  return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex relative overflow-hidden">
         {/* ======================================================= */}
-        {/* 🚀 PENAMBAHAN BLOB ANIMASI DARI HOME.TSX (z-index: 1) */}
+        {/* 🚀 PENAMBAHAN BLOB ANIMASI DARI FILE LAMA (z-index: 1) */}
         {/* ======================================================= */}
         <div className="absolute inset-0 z-[1] pointer-events-none opacity-50 dark:opacity-30">
             {/* Blobs statis dengan animasi Tailwind CSS (asumsi 'animate-blob' didefinisikan secara global) */}
@@ -715,13 +760,17 @@ const floatSlowVariants: any = {
             />
         )}
         
-        {/* 4. Konten Utama Chat (Melebar ke Seluruh Sisa Ruang) */}
-        {/* class flex-grow flex flex-col w-full memastikan ini mengambil sisa lebar dan tinggi */}
+        {/* 4. Konten Utama Chat */}
         <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out z-10`}>
 
             {/* Header (tetap fixed di atas) */}
             <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b dark:border-gray-700 sticky top-0 z-20 shadow-sm flex-shrink-0`}>
-                <div className="flex items-center space-x-3">
+                <motion.div 
+                    initial={{ y: -30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, delay: 0.1 }}
+                    className="flex items-center space-x-3"
+                >
                     {/* Tombol Toggle Sidebar Mobile */}
                     {!isSidebarOpen && (
                         <button
@@ -732,63 +781,91 @@ const floatSlowVariants: any = {
                             <Menu className="w-6 h-6" />
                         </button>
                     )}
-                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
-                        <MessageCircleHeart className="w-6 h-6 text-white" />
+                    <div
+                        className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
+                        rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/50"
+                    >
+                        <MessageCircleHeart className="w-7 h-7 text-teal-600 dark:text-teal-400" /> 
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Talk Room</h1>
-                </div>
+                    <h1 className="text-4xl rounded-none md:text-5xl font-extrabold tracking-normal text-gray-900 dark:text-gray-100">
+                        <GradientText
+                            colors={[
+                            "#40ffaa",
+                            "#4079ff",
+                            "#40ffaa",
+                            "#4079ff",
+                            "#40ffaa",
+                            ]}
+                            animationSpeed={8}
+                            showBorder={false}
+                        >
+                            Talk Room
+                        </GradientText>
+                    </h1>
+                </motion.div>
             </header>
 
-            {/* Container Konten Chat - Menghilangkan max-w-5xl mx-auto untuk full-width */}
+            {/* Container Konten Chat */}
             <div className="flex-grow w-full flex flex-col min-h-0 px-4 sm:px-6 lg:px-8 py-6 md:py-8 overflow-y-auto z-10">
 
-                {/* Judul Ruang Curhat */}
-                <div className="mb-6 flex-shrink-0 max-w-5xl mx-auto w-full">
+                {/* Judul Ruang Curhat (AOS) */}
+                <motion.div
+                    variants={aosVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.8 }}
+                    className="mb-6 flex-shrink-0 max-w-5xl mx-auto w-full"
+                >
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Ruang Curhat</h2>
                     <p className="text-gray-600 dark:text-gray-400">
                         Ruang aman untuk berbagi perasaan dengan AI
                     </p>
-                </div>
+                </motion.div>
 
-                {/* Chat Window - Menghabiskan ruang vertikal yang tersisa, dibatasi lebarnya */}
-                <div className="flex-grow min-h-0 mb-6 max-w-5xl mx-auto w-full">
+                {/* Chat Window (AOS dengan delay) */}
+                <motion.div
+                    variants={aosVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    custom={0.2}
+                    viewport={{ once: true, amount: 0.5 }}
+                    className="flex-grow min-h-0 mb-6 max-w-5xl mx-auto w-full"
+                >
                     <ChatWindow
                         conversation={currentConversation}
                         onSendMessage={handleSendMessage}
                         isLoading={isLoading}
-                        // Jika Anda memiliki prop `isDisabled` di ChatWindow, ganti `isLoading` dengan nama prop yang benar.
-                        // isDisabled={isLoading} 
                     />
-                </div>
+                </motion.div>
 
-                {/* Tips Berbicara - Selalu di bawah input, dibatasi lebarnya */}
-                <div className="mt-0 pt-4 flex-shrink-0 max-w-5xl mx-auto w-full">
+                {/* Tips Berbicara (AOS dengan delay lebih jauh) */}
+                <motion.div
+                    variants={aosVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    custom={0.4}
+                    viewport={{ once: true, amount: 0.5 }}
+                    className="mt-0 pt-4 flex-shrink-0 max-w-5xl mx-auto w-full"
+                >
                     <StyledPathWithLeaves />
                     <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 rounded-2xl p-6 md:p-8 shadow-inner">
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                            {/* Asumsi Anda memiliki ikon Shield dari lucide-react */}
                             <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400 mr-3" />
                             Tips Berbicara di Ruang Aman
                         </h3>
                         <ul className="space-y-3 text-sm md:text-base text-gray-700 dark:text-gray-300 list-none">
-
-                            {/* Tip 1 */}
                             <li className="flex items-start">
                                 <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-lg leading-none mr-2 mt-[-1px]">•</span>
                                 <span>
                                     <span className="font-semibold text-gray-800 dark:text-gray-100">Jujur dan Terbuka.</span> Tidak ada yang salah atau benar. Ruang ini adalah milikmu untuk melepaskan beban perasaan.
                                 </span>
                             </li>
-
-                            {/* Tip 2 */}
                             <li className="flex items-start">
                                 <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-lg leading-none mr-2 mt-[-1px]">•</span>
                                 <span>
                                     <span className="font-semibold text-gray-800 dark:text-gray-100">Fokus pada Dirimu.</span> Gunakan "Saya merasa..." atau "Saya berpikir..." untuk mengekspresikan pengalamanmu.
                                 </span>
                             </li>
-
-                            {/* Tip 3 */}
                             <li className="flex items-start">
                                 <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-lg leading-none mr-2 mt-[-1px]">•</span>
                                 <span>
@@ -797,7 +874,8 @@ const floatSlowVariants: any = {
                             </li>
                         </ul>
                     </div>
-                </div>
+                </motion.div>
+
             </div>
 
             {/* SVG Wave/Footer */}

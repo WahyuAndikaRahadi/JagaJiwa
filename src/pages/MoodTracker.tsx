@@ -4,6 +4,7 @@ import MoodChart from '../components/MoodChart'; // Pastikan komponen ini sudah 
 import { Smile, Meh, ChevronLeft, ChevronRight, BarChart3, CalendarDays } from 'lucide-react';
 import { motion, useInView } from 'framer-motion'; // Import Framer Motion
 import Swal from 'sweetalert2' // Sudah diimpor dengan benar
+import GradientText from '../components/GradientText';
 
 // --- Variasi Animasi Framer Motion (Diambil dari Home.tsx) ---
 const fadeInUp: any = {
@@ -195,12 +196,27 @@ function MoodTracker() {
                     className="mb-8 md:mb-12 pt-6"
                 >
                     <div className="flex items-center space-x-4 mb-2">
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#1ff498] to-[#50b7f7] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                            <Smile className="w-7 h-7 text-white" />
-                        </div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100">
-                            Mood Tracker
-                        </h1>
+            <div
+              className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
+              rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/50"
+            >
+              <Smile className="w-7 h-7 text-teal-600 dark:text-teal-400" /> 
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
+              <GradientText
+                colors={[
+                  "#40ffaa",
+                  "#4079ff",
+                  "#40ffaa",
+                  "#4079ff",
+                  "#40ffaa",
+                ]}
+                animationSpeed={8}
+                showBorder={false}
+              >
+                Mood Tracker
+              </GradientText>
+            </h1>
                     </div>
                     <p className="text-lg text-gray-600 dark:text-gray-400 ml-16">
                         Pantau, catat, dan analisis pola emosi serta suasana hatimu.

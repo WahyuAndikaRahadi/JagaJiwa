@@ -79,10 +79,9 @@ const Footer = () => {
             <Link to="/" className="flex items-center space-x-3 mb-4">
               {/* Logo icon/container TIDAK perlu motion.div lagi karena sudah di-wrap di atas */}
               <div
-                className="w-12 h-12 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
-                                rounded-xl  shadow-lg border-2 border-white/50"
+                className="w-12 h-12 flex justify-center items-center bg-transparent dark:bg-gradient-to-br dark:from-[#1ff498]/20 dark:to-[#50b7f7]/20 rounded-xl border-2 border-gray-200 dark:border-gray-500"
               >
-               <img src="/img/jaga jiwa.png" alt="Jaga Jiwa Logo"/>
+               <img src="/public/img/jagaJiwa.png" alt="Jaga Jiwa Logo" className="p-2"/>
               </div>
               <span className="font-extrabold text-3xl">
                 <GradientText

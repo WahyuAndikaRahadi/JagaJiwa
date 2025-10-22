@@ -28,6 +28,7 @@ import {
 } from "@google/genai";
 import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
+import GradientText from "../components/GradientText";
 
 // ==================== INITIALISASI AI (Ganti dengan API Key Anda) ====================
 // PENTING: Dalam aplikasi nyata, JANGAN simpan API Key di client-side code seperti ini.
@@ -878,14 +879,29 @@ const Insight = () => {
           className="mb-8 text-center"
         >
           <div className="flex items-center justify-center space-x-3 mb-2">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#1ff498] to-[#50b7f7] rounded-2xl flex items-center justify-center shadow-xl">
-              <Brain className="w-8 h-8 sm:w-9 sm:h-9 text-white" />
+            <div
+              className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
+              rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/50"
+            >
+              <Brain className="w-7 h-7 text-teal-600 dark:text-teal-400" /> 
             </div>
-            {/* Ukuran Teks judul diresponsifkan */}
-            <h1 className="pb-4 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-[#1ff498] to-[#50b7f7] bg-clip-text text-transparent">
-              Insight
+            <h1 className="leading-normal text-4xl md:text-5xl md:leading-relaxed font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
+              <GradientText
+                colors={[
+                  "#40ffaa",
+                  "#4079ff",
+                  "#40ffaa",
+                  "#4079ff",
+                  "#40ffaa",
+                ]}
+                animationSpeed={8}
+                showBorder={false}
+              >
+                Insight
+              </GradientText>
             </h1>
-          </div>
+         </div>
+
           <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg">
             Wawasan mendalam untuk kesehatan mentalmu
           </p>
