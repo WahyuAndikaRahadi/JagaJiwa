@@ -16,23 +16,20 @@ const formatDateKey = (year: number, month: number, day: number) => {
   return `${year}-${monthStr}-${dayStr}`;
 };
 
-const Calendar: React.FC<CalendarProps> = ({ 
-  moodData, 
-  onDateClick, 
-  currentMonth, 
+const Calendar: React.FC<CalendarProps> = ({
+  moodData,
+  onDateClick,
+  currentMonth,
   currentYear,
   onNextMonth,
   onPrevMonth,
 }) => {
   const TODAY = new Date();
   const TODAY_KEY = formatDateKey(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
-  
-  // 1. Hitung jumlah hari dalam bulan
+
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  
-  // 2. Tentukan hari pertama bulan (0=Min, 1=Sen, ...)
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-  
+
   const weekDays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
   const monthNames = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -47,18 +44,19 @@ const Calendar: React.FC<CalendarProps> = ({
     'very-sad': '😢',
   };
 
+  // --- DARK MODE PALETTE UNTUK KALENDER ---
   const moodColors: { [key: string]: string } = {
-    'very-happy': 'bg-green-100 border-green-300',
-    'happy': 'bg-emerald-100 border-emerald-300',
-    'neutral': 'bg-yellow-100 border-yellow-300',
-    'sad': 'bg-orange-100 border-orange-300',
-    'very-sad': 'bg-red-100 border-red-300',
+    // Menggunakan background gelap dan border yang lebih terang dari background utama
+    'very-happy': 'bg-green-900/50 border-green-700',
+    'happy': 'bg-emerald-900/50 border-emerald-700',
+    'neutral': 'bg-yellow-900/50 border-yellow-700',
+    'sad': 'bg-indigo-900/50 border-indigo-700',
+    'very-sad': 'bg-red-900/50 border-red-700',
   };
 
   const renderDays = () => {
     const days = [];
-    
-    // Offset untuk hari pertama (tanggal 1 diletakkan di hari yang benar)
+
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(
         <div key={`empty-${i}`} className="aspect-square"></div>
@@ -69,15 +67,15 @@ const Calendar: React.FC<CalendarProps> = ({
       const dateKey = formatDateKey(currentYear, currentMonth, day);
       const mood = moodData[dateKey];
       const emoji = mood ? moodEmojis[mood] : '';
-      const colorClass = mood ? moodColors[mood] : 'bg-gray-50 border-gray-200';
-      
+      // Default dark mode background/border untuk hari tanpa mood
+      const colorClass = mood ? moodColors[mood] : 'bg-gray-700/50 border-gray-600 dark:bg-gray-800 dark:border-gray-700';
+
       const isToday = dateKey === TODAY_KEY;
       const isPastOrPresent = new Date(currentYear, currentMonth, day) <= TODAY;
 
-      // Gaya untuk hari ini
-      const todayClass = isToday ? 'border-primary-500 ring-2 ring-primary-500' : '';
-      
-      // Gaya untuk tanggal di masa depan (tidak dapat diklik)
+      // Primary color dari MoodTracker: #1ff498 (Emerald/Teal)
+      const todayClass = isToday ? 'border-[#1ff498] ring-2 ring-[#1ff498]' : '';
+
       const futureClass = !isPastOrPresent ? 'opacity-50 cursor-default pointer-events-none' : 'cursor-pointer hover:scale-105';
 
       days.push(
@@ -85,17 +83,17 @@ const Calendar: React.FC<CalendarProps> = ({
           key={day}
           onClick={() => isPastOrPresent && onDateClick(dateKey)}
           className={`
-            aspect-square rounded-lg border-2 
-            ${colorClass} 
-            ${futureClass} 
+            aspect-square rounded-lg border-2
+            ${colorClass}
+            ${futureClass}
             ${todayClass}
-            transition-all duration-200 
-            flex flex-col items-center justify-center 
+            transition-all duration-200
+            flex flex-col items-center justify-center
             shadow-sm hover:shadow-md
           `}
           disabled={!isPastOrPresent}
         >
-          <span className="text-xs md:text-sm font-semibold text-gray-700">
+          <span className="text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200">
             {day}
           </span>
           {emoji && (
@@ -111,30 +109,29 @@ const Calendar: React.FC<CalendarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-4 md:p-6 shadow-lg">
-      
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 shadow-lg dark:shadow-xl dark:shadow-gray-950/50">
       {/* Header Kalender */}
       <div className="flex justify-between items-center mb-4">
-        <button 
+        <button
           onClick={onPrevMonth}
-          className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition"
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition"
           aria-label="Bulan Sebelumnya"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h3 className="text-lg md:text-xl font-bold text-gray-900">
+        <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
           {monthNames[currentMonth]} {currentYear}
         </h3>
-        <button 
+        <button
           onClick={onNextMonth}
-          className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition"
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition"
           aria-label="Bulan Selanjutnya"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
-      
-      <p className="text-sm text-gray-600 text-center mb-4">
+
+      <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
         Klik tanggal untuk mengisi mood.
       </p>
 
@@ -143,7 +140,7 @@ const Calendar: React.FC<CalendarProps> = ({
         {weekDays.map((day) => (
           <div
             key={day}
-            className="text-center text-xs md:text-sm font-semibold text-gray-600 py-2"
+            className="text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 py-2"
           >
             {day}
           </div>
@@ -156,8 +153,8 @@ const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       {/* Legenda */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <p className="text-xs text-gray-500 text-center mb-3">Legenda Mood</p>
+      <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">Legenda Mood</p>
         <div className="flex flex-wrap justify-center gap-2 md:gap-3">
           {Object.entries(moodEmojis).map(([key, emoji]) => (
             <div
@@ -165,7 +162,7 @@ const Calendar: React.FC<CalendarProps> = ({
               className="flex items-center space-x-1 text-xs md:text-sm"
             >
               <span className="text-lg">{emoji}</span>
-              <span className="text-gray-600 capitalize">
+              <span className="text-gray-600 dark:text-gray-300 capitalize">
                 {key.replace('-', ' ')}
               </span>
             </div>
