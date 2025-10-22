@@ -9,16 +9,16 @@ import {
   MessageCircleHeart,
   Sun,
   Moon,
-  Menu, // Import ikon Menu (Hamburger)
+  Menu,
   X,
-  Brain, // Import ikon Close (X)
+  Brain,
 } from 'lucide-react';
 
 // === Brand Component ===
 const Brand = () => (
   <div className="flex items-center space-x-2">
-    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl shadow-lg flex items-center justify-center transform hover:scale-105 transition duration-300 ease-in-out">
-      <BookHeart className="w-6 h-6 text-white" fill="white" />
+    <div className="w-10 h-10  rounded-xl shadow-lg flex items-center justify-center transform hover:scale-105 transition duration-300 ease-in-out">
+      <img src="/public/img/jagaJiwa.png" alt="" />
     </div>
     <span className="text-xl font-extrabold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent tracking-tight dark:from-primary-400 dark:to-secondary-400">
       Jaga Jiwa
@@ -81,7 +81,7 @@ function Navbar() {
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
 
   // Classes untuk Desktop
   const activeClassDesktop =
@@ -103,8 +103,9 @@ function Navbar() {
   return (
     <>
       {/* === Desktop Navigation === */}
+      {/* Ganti md:block/sm:block menjadi lg:block */}
       <nav
-        className={`hidden md:block fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 ${navBackgroundClass} ${
+        className={`hidden lg:block fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 ${navBackgroundClass} ${
           scrolled ? 'shadow-lg' : ''
         }`}
       >
@@ -115,7 +116,8 @@ function Navbar() {
           </div>
 
           {/* Nav Items (Center) */}
-          <div className="flex gap-0 lg:gap-5 mx-auto w-fit p-1 rounded-xl">
+          {/* Ubah gap-0 menjadi gap-5 untuk tampilan lg */}
+          <div className="flex gap-5 mx-auto w-fit p-1 rounded-xl">
             {navItems.map(({ path, icon: Icon, label }) => {
               const active = isActive(path);
               return (
@@ -155,8 +157,9 @@ function Navbar() {
       {/* --- */}
 
       {/* === Mobile Header & Navigation === */}
+      {/* Ganti md:hidden/sm:hidden menjadi lg:hidden */}
       <header
-        className={`md:hidden fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 ${navBackgroundClass} shadow-lg`}
+        className={`lg:hidden fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 ${navBackgroundClass} shadow-lg`}
       >
         <div className="flex items-center justify-between h-full px-4">
           {/* Brand (Left) */}
@@ -178,8 +181,9 @@ function Navbar() {
       </header>
 
       {/* Mobile Menu Overlay */}
+      {/* Ganti md:hidden/sm:hidden menjadi lg:hidden */}
       <div
-        className={`md:hidden fixed inset-0 z-40 transition-opacity duration-300 ${
+        className={`lg:hidden fixed inset-0 z-40 transition-opacity duration-300 ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         } bg-black/50 dark:bg-black/70`}
         onClick={closeMenu} // Tutup menu saat klik di luar area menu
@@ -210,21 +214,21 @@ function Navbar() {
             })}
 
             <div className="pt-4 border-t border-gray-100 dark:border-gray-700 mt-2">
-                 {/* Dark Mode Toggle di dalam menu mobile */}
-                <button
-                    onClick={() => {
-                        toggleDarkMode();
-                        closeMenu(); // Tutup menu setelah toggle
-                    }}
-                    className={`flex items-center space-x-3 p-3 w-full rounded-xl transition-colors duration-200 text-base ${inactiveClassMobile}`}
-                >
-                    {isDarkMode ? (
-                        <Sun className="w-5 h-5 text-yellow-500" />
-                    ) : (
-                        <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                    )}
-                    <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-                </button>
+              {/* Dark Mode Toggle di dalam menu mobile */}
+              <button
+                onClick={() => {
+                  toggleDarkMode();
+                  closeMenu(); // Tutup menu setelah toggle
+                }}
+                className={`flex items-center space-x-3 p-3 w-full rounded-xl transition-colors duration-200 text-base ${inactiveClassMobile}`}
+              >
+                {isDarkMode ? (
+                  <Sun className="w-5 h-5 text-yellow-500" />
+                ) : (
+                  <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                )}
+                <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+              </button>
             </div>
           </div>
         </nav>
