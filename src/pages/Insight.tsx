@@ -27,6 +27,7 @@ import {
   GenerateContentResponse,
 } from "@google/genai";
 import { motion, AnimatePresence } from "framer-motion";
+import Swal from "sweetalert2";
 
 // ==================== INITIALISASI AI (Ganti dengan API Key Anda) ====================
 // PENTING: Dalam aplikasi nyata, JANGAN simpan API Key di client-side code seperti ini.
@@ -328,6 +329,8 @@ Perspektif Alternatif: ${data.alternative}
   }
 };
 
+
+
 // ==================== KOMPONEN UTAMA ====================
 const Insight = () => {
   const [moodData, setMoodData] = useState<MoodData>({});
@@ -379,6 +382,23 @@ const Insight = () => {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   // ==================== EFFECT HOOKS ====================
+
+  useEffect(() => {
+    // Cek apakah URL memiliki #artikel
+    if (window.location.hash === "#artikel") {
+        // 1. Ganti tab ke "education" (sesuaikan nama state tab Anda)
+        setActiveTab("education"); 
+        
+        // 2. Lakukan scroll setelah state berubah dan komponen dirender
+        // Kita menggunakan setTimeout singkat untuk memastikan tab sudah terbuka
+        setTimeout(() => {
+            const artikelElement = document.getElementById("artikel");
+            if (artikelElement) {
+                artikelElement.scrollIntoView({ behavior: "smooth" });
+            }
+        }, 100); // Penundaan singkat untuk render
+    }
+}, []); // [] agar hanya berjalan saat komponen dimuat
 
   // Load Data dari Local Storage
   useEffect(() => {
@@ -582,9 +602,7 @@ const Insight = () => {
             audioRef.current.load(); // Load audio baru
             audioRef.current.play().catch((error) => {
               console.error("Audio playback failed:", error);
-              alert(
-                "Gagal memutar audio. Pastikan file audio tersedia di direktori public."
-              );
+              Swal.fire('Error', 'Gagal memutar audio. Silakan coba lagi.', 'error');
               setIsPlaying(false);
             });
           }
@@ -604,12 +622,12 @@ const Insight = () => {
 
   const plantGratitudeSeed = async () => {
     if (!gratitudeText.trim()) {
-      alert("Tuliskan sesuatu yang kamu syukuri terlebih dahulu! 🌱");
+      Swal.fire('Peringatan', 'Tuliskan sesuatu yang kamu syukuri terlebih dahulu! 🌱', 'warning');
       return;
     }
 
     if (!canPlantToday) {
-      alert("Anda sudah menanam benih hari ini. Datang lagi besok! 😊");
+      Swal.fire('Peringatan', 'Anda sudah menanam benih hari ini. Datang lagi besok! 😊', 'warning');
       return;
     }
 
@@ -646,12 +664,10 @@ const Insight = () => {
       );
 
       setGratitudeText("");
-      alert(
-        "🌸 Benih syukur berhasil ditanam! Tamanmu semakin indah. Baca insight AI di bawah."
-      );
+      Swal.fire('Sukses', '🌸 Benih rasa syukur berhasil ditanam! Cek insight AI di bawah.', 'success');
     } catch (error) {
       console.error(error);
-      alert("Terjadi kesalahan saat menganalisis. Silakan coba lagi.");
+      Swal.fire('Error', 'Terjadi kesalahan saat menganalisis. Silakan coba lagi.', 'error');
     } finally {
       setIsGratitudeLoading(false); // Selesai loading
     }
@@ -659,7 +675,7 @@ const Insight = () => {
 
   const lockWorry = async () => {
     if (!worryText.trim() || !worryType) {
-      alert("Lengkapi kekhawatiranmu dan pilih kategorinya! 🔒");
+      Swal.fire('Peringatan', 'Lengkapi kekhawatiranmu dan pilih kategorinya! 🔒', 'warning');
       return;
     }
 
@@ -669,9 +685,7 @@ const Insight = () => {
         : "Tidak Dapat Dikontrol";
 
     if (worryType === "controllable" && !actionPlan.trim()) {
-      alert(
-        "Buat rencana aksi singkat untuk kekhawatiran yang bisa dikontrol! 📝"
-      );
+      Swal.fire('Peringatan', 'Tuliskan rencana aksi untuk kekhawatiran yang dapat dikontrol! 📝', 'warning');
       return;
     }
 
@@ -691,7 +705,7 @@ const Insight = () => {
 
       setLockedWorries((prev) => [...prev, newWorry]);
 
-      alert(`🔒 Kekhawatiran berhasil dikunci! Cek insight AI.`);
+      Swal.fire('Sukses', '🔒 Kekhawatiran berhasil dikunci! Cek insight AI di bawah.', 'success');
 
       // Save to Journal
       const journalContent = `[Worry Vault - ${typeLabel}]\nKekhawatiran: ${worryText}${
@@ -716,7 +730,7 @@ const Insight = () => {
       setShowWorryVault(false);
     } catch (error) {
       console.error(error);
-      alert("Terjadi kesalahan saat menganalisis. Silakan coba lagi.");
+      Swal.fire('Error', 'Terjadi kesalahan saat menganalisis. Silakan coba lagi.', 'error');
     } finally {
       setIsWorryLoading(false); // Selesai loading
     }
@@ -781,7 +795,7 @@ const Insight = () => {
       JSON.stringify([newEntry, ...currentEntries])
     );
 
-    alert("✅ Worksheet berhasil disimpan ke Journal!");
+    Swal.fire('Sukses', '✅ Worksheet berhasil disimpan ke Journal!', 'success');
     setWorksheetStep(0);
     setWorksheetData({
       situation: "",
@@ -1742,7 +1756,54 @@ const Insight = () => {
               transition={{ duration: 0.3 }}
               className="space-y-6 md:space-y-8"
             >
+
               <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="bg-white/80 dark:bg-gray-900 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-emerald-300 hover:border-[#1ff498] transition-all"
+              >
+                <div className="flex items-center space-x-3 mb-8">
+                  <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
+                  <h2 id="artikel" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                    Pusat Artikel & Wawasan
+                  </h2>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {ARTICLES.map((article, index) => (
+                    <motion.a
+                      key={article.id}
+                      href={`/insight/artikel/${article.id}`}
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
+                      whileHover={{ translateY: -3 }}
+                      className="block bg-white dark:bg-gray-900 rounded-2xl p-5 sm:p-6 hover:shadow-xl border-2 transition-all duration-300  group border-emerald-300/50"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="text-xs font-semibold px-3 py-1 sm:px-4 sm:py-2 bg-emerald-100 text-emerald-700 rounded-full">
+                          {article.category}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          {article.readTime}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-gray-900 mb-3 group-hover:text-emerald-700 transition-colors text-base sm:text-lg dark:text-white">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                        {article.summary}
+                      </p>
+                      <div className="flex items-center text-emerald-600 font-semibold text-sm">
+                        <span>Baca Selengkapnya</span>
+                        <ChevronRight className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </motion.a>
+                  ))}
+                </div>
+              </motion.div>
+
+                            <motion.div
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
@@ -1789,51 +1850,6 @@ const Insight = () => {
                 </div>
               </motion.div>
 
-              <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-white/80 dark:bg-gray-900 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-emerald-300 hover:border-[#1ff498] transition-all"
-              >
-                <div className="flex items-center space-x-3 mb-8">
-                  <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Pusat Artikel & Wawasan
-                  </h2>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {ARTICLES.map((article, index) => (
-                    <motion.a
-                      key={article.id}
-                      href={`/insight/artikel/${article.id}`}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
-                      whileHover={{ translateY: -3 }}
-                      className="block bg-white dark:bg-gray-900 rounded-2xl p-5 sm:p-6 hover:shadow-xl border-2 transition-all duration-300  group border-emerald-300/50"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <span className="text-xs font-semibold px-3 py-1 sm:px-4 sm:py-2 bg-emerald-100 text-emerald-700 rounded-full">
-                          {article.category}
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                          {article.readTime}
-                        </span>
-                      </div>
-                      <h3 className="font-bold text-gray-900 mb-3 group-hover:text-emerald-700 transition-colors text-base sm:text-lg dark:text-white">
-                        {article.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-                        {article.summary}
-                      </p>
-                      <div className="flex items-center text-emerald-600 font-semibold text-sm">
-                        <span>Baca Selengkapnya</span>
-                        <ChevronRight className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </motion.a>
-                  ))}
-                </div>
-              </motion.div>
 
               <motion.div
                 initial={{ scale: 0.95 }}
@@ -1962,6 +1978,73 @@ const Insight = () => {
 
       {/* Mini Audio Player (Di luar AnimatePresence utama) */}
       <AnimatePresence>{currentAudio && <MiniAudioPlayer />}</AnimatePresence>
+
+            <div className="relative h-32 w-full overflow-hidden ">
+              <motion.svg
+                viewBox="0 0 1200 120"
+                preserveAspectRatio="none"
+                className="absolute top-0 w-full h-full"
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: 1,
+                  transition: { duration: 1, delay: 0.5 },
+                }}
+              >
+                {/* Path 1: Biru terang dengan opacity rendah */}
+                <motion.path
+                  fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
+                  fillOpacity="0.1"
+                  d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
+                  initial={{ pathLength: 0, pathOffset: 1 }}
+                  animate={{
+                    pathLength: 1,
+                    pathOffset: 0,
+                    transition: {
+                      duration: 3,
+                      ease: "linear",
+                      repeat: Infinity,
+                      repeatType: "loop",
+                    },
+                  }}
+                />
+                {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
+                <motion.path
+                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                  fillOpacity="0.2"
+                  d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
+                  initial={{ pathLength: 0, pathOffset: 1 }}
+                  animate={{
+                    pathLength: 1,
+                    pathOffset: 0,
+                    transition: {
+                      duration: 3.5,
+                      ease: "linear",
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      delay: 0.2,
+                    },
+                  }}
+                />
+                {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
+                <motion.path
+                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                  fillOpacity="0.3"
+                  d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
+                  initial={{ pathLength: 0, pathOffset: 1 }}
+                  animate={{
+                    pathLength: 1,
+                    pathOffset: 0,
+                    transition: {
+                      duration: 4,
+                      ease: "linear",
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      delay: 0.4,
+                    },
+                  }}
+                />
+              </motion.svg>
+            </div>
     </div>
   );
 };

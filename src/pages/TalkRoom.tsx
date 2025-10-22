@@ -6,6 +6,7 @@ import { GoogleGenAI, Content, Chat, GenerateContentResponse } from '@google/gen
 import { v4 as uuidv4 } from 'uuid';
 import { motion } from 'framer-motion';
 import StyledPathWithLeaves from '../components/StyledPathWithLeaves';
+import Swal from 'sweetalert2';
 
 // --- INI HANYA SIMULASI KLIEN ---
 const ai = new GoogleGenAI({
@@ -430,7 +431,7 @@ function TalkRoom() {
                 localStorage.removeItem('chatHistorySummaries');
                 localStorage.removeItem('chatConversation');
                 startNewSession();
-                alert('Semua riwayat curhatmu telah dihapus. Ruangan baru telah dibuat.');
+                Swal.fire('Berhasil!', 'Semua riwayat curhat telah dihapus.', 'success');
             }
         } else {
             if (window.confirm("Yakin ingin menghapus sesi ini? Riwayat sesi ini akan hilang permanen.")) {
@@ -442,7 +443,7 @@ function TalkRoom() {
                 if (currentChatId === id) {
                     startNewSession();
                 }
-                alert('Sesi curhat telah berhasil dihapus.');
+                Swal.fire('Berhasil!', 'Riwayat sesi curhat telah dihapus.', 'success');
             }
         }
     };
