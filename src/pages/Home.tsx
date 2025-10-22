@@ -721,7 +721,7 @@ function Home() {
                 Artikel
             </h2>
             <a
-                href="/"
+                href="/insight#artikel"
                 className="font-bold text-lg inline-flex items-center text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
                 Lihat Semua Artikel <span className="ml-2 text-xl">&rarr;</span>
