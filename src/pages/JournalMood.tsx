@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   BookHeart,
+  Sparkles,
   Save,
   Trash2,
   Zap,
@@ -8,9 +9,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GoogleGenAI } from "@google/genai";
-import Swal from "sweetalert2"; // <-- Import SweetAlert2
+import Swal from "sweetalert2";
 
 // ==================== INITIALISASI AI ====================
+// Ganti dengan API Key Anda yang sebenarnya
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 const model = "gemini-2.5-flash";
 // =========================================================
@@ -41,16 +43,6 @@ const GradientText: React.FC<GradientTextProps> = ({
     };
   }, [colors, animationSpeed]);
 
-<<<<<<< HEAD
-=======
-  const borderStyle = showBorder
-    ? {
-      border: '2px solid transparent',
-      borderImage: `linear-gradient(90deg, ${colors.join(', ')}) 1`,
-    }
-    : {};
-
->>>>>>> 3c6d009bcb1f66977d79279016d5bb7a8376f1d8
   const keyframes = `
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
@@ -96,10 +88,10 @@ const generateGeminiSummary = async (text: string): Promise<string> => {
 
   try {
     const response = await ai.models.generateContent({
-      model: model,
-      contents: prompt,
+        model: model,
+        contents: prompt,
     });
-    return response.text!.trim();
+    return response.text.trim();
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "Maaf, AI gagal menganalisis. Silakan periksa koneksi atau kunci API Anda.";
@@ -107,27 +99,54 @@ const generateGeminiSummary = async (text: string): Promise<string> => {
 };
 // ========================================================================
 
-// ==================== VARIAN FRAMER MOTION ====================
-const aosVariants: any = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
+// ==================== VARIAN FRAMER MOTION BARU ====================
+
+// Varian AOS Kustom (untuk Header dan Input Card)
+const sophisticatedAosVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.98 },
+  visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: {
-      duration: 0.6,
-      ease: [0.4, 0, 0.2, 1],
+      delay: i * 0.1, // Staggering elements inside a container
+      duration: 0.7,
+      ease: [0.2, 0.6, 0.3, 1], // Custom bounce/spring-like ease
     },
-  },
+  }),
 };
 
-const listContainerVariants: any = {
+// Varian untuk daftar jurnal (staggered list)
+const listContainerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.1, // Jeda antar item
+      delayChildren: 0.1,
     },
   },
+};
+
+// Varian untuk item jurnal
+const listItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 10,
+    },
+  },
+  hover: { 
+    y: -7, 
+    scale: 1.01,
+    // Bayangan yang lebih menonjol dan berpigmen
+    boxShadow: "0 25px 50px -12px rgba(31, 244, 152, 0.25)",
+    transition: { type: "spring", stiffness: 300, damping: 15 }
+  }
 };
 // =============================================================
 
@@ -172,7 +191,7 @@ function JournalMood() {
     setCurrentEntry("");
     setGeneratedSummary("");
 
-    // SweetAlert Success TOAST (menggunakan style bawaan)
+    // SweetAlert Success TOAST
     Swal.fire({
       icon: 'success',
       title: 'Berhasil Disimpan!',
@@ -194,17 +213,14 @@ function JournalMood() {
       showCancelButton: true,
       confirmButtonText: 'Ya, Hapus Saja!',
       cancelButtonText: 'Batal',
-      // Menggunakan warna bawaan Swal: #3085d6 (Confirm) dan #d33 (Cancel)
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: '#3085d6', 
       cancelButtonColor: '#d33',
-      // Menghapus custom styling agar menggunakan bawaan SweetAlert
-      buttonsStyling: true,
+      buttonsStyling: true, // Menggunakan style bawaan SweetAlert
     });
 
     if (result.isConfirmed) {
       setEntries((prev) => prev.filter((entry) => entry.id !== id));
-
-      // SweetAlert Success setelah Hapus (menggunakan style bawaan)
+      
       Swal.fire(
         'Terhapus!',
         'Jurnal Anda berhasil dihapus.',
@@ -246,31 +262,26 @@ function JournalMood() {
       />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-9 md:py-14 relative z-10">
-
+        
         {/* === Header (AOS Effect) === */}
         <motion.div
-          variants={aosVariants}
+          variants={sophisticatedAosVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.8 }}
           className="mb-8 md:mb-12"
         >
           <div className="flex items-center space-x-4 mb-3">
-<<<<<<< HEAD
+            {/* Animasi Ikon Masuk yang Keren */}
             <motion.div
-              initial={{ rotate: -90, scale: 0 }}
-              animate={{ rotate: 0, scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 12 }}
+              initial={{ rotate: -180, scale: 0, opacity: 0 }}
+              animate={{ rotate: 0, scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.1 }}
               className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
               rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/50"
             >
-              <BookHeart className="w-7 h-7 text-teal-600 dark:text-teal-400" />
+              <BookHeart className="w-7 h-7 text-teal-600 dark:text-teal-400" /> 
             </motion.div>
-=======
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#1ff498] to-[#50b7f7] rounded-2xl flex items-center justify-center shadow-xl">
-              <BookHeart className="w-8 h-8 sm:w-9 sm:h-9 text-white"/>
-            </div>
->>>>>>> 3c6d009bcb1f66977d79279016d5bb7a8376f1d8
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
               <GradientText
                 colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
@@ -281,18 +292,26 @@ function JournalMood() {
               </GradientText>
             </h1>
           </div>
-          <p className="text-lg text-gray-600 dark:text-gray-400 ml-[72px]">
+          {/* Animasi teks P dengan delay sedikit */}
+          <motion.p 
+            variants={sophisticatedAosVariants}
+            initial="hidden"
+            whileInView="visible"
+            custom={0.2}
+            viewport={{ once: true, amount: 0.8 }}
+            className="text-lg text-gray-600 dark:text-gray-400 ml-[72px]"
+          >
             Curahkan isi hatimu, biarkan AI memahami dan membantu menenangkan jiwamu.
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* === Input Card (AOS Effect) === */}
         <motion.div
-          variants={aosVariants}
+          variants={sophisticatedAosVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ ...aosVariants.visible.transition, delay: 0.2 }}
+          custom={0.4} // Delay relatif
           animate={{ scale: isFocused ? 1.01 : 1 }}
           className="rounded-3xl p-6 md:p-8 border-2 shadow-xl mb-8
           border-[#72e4f8] bg-white/60 backdrop-blur-md 
@@ -319,17 +338,20 @@ function JournalMood() {
             {/* Tombol AI Analysis */}
             <motion.button
               whileHover={{ scale: 1.03, boxShadow: "0 10px 20px rgba(31, 244, 152, 0.4)" }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleGenerateSummary}
               disabled={!currentEntry.trim() || isGenerating}
               className="group flex-1 relative inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-[#1ff498] to-[#50b7f7] rounded-full transition-all duration-300 overflow-hidden shadow-md shadow-[#1ff498]/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-<<<<<<< HEAD
               {isGenerating ? (
-                <div className="flex items-center space-x-2">
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center space-x-2"
+                >
                   <Zap className="w-5 h-5 animate-spin" />
                   <span>Menganalisis...</span>
-                </div>
+                </motion.div>
               ) : (
                 <>
                   <Bot className="w-5 h-5 mr-2" />
@@ -337,19 +359,11 @@ function JournalMood() {
                 </>
               )}
             </motion.button>
-=======
-              <Sparkles
-                className={`w-5 h-5 mr-2 ${isGenerating ? "animate-spin" : "group-hover:animate-pulse-fast"
-                  }`}
-              />
-              <span>{isGenerating ? "Menganalisis..." : "Analisis dengan AI"}</span>
-            </button>
->>>>>>> 3c6d009bcb1f66977d79279016d5bb7a8376f1d8
 
             {/* Tombol Simpan */}
             <motion.button
               whileHover={{ scale: 1.03, borderColor: "#1ff498" }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleSaveEntry}
               disabled={!currentEntry.trim()}
               className="flex-1 inline-flex items-center justify-center px-8 py-3 text-lg font-semibold rounded-full transition-all duration-300 
@@ -394,7 +408,7 @@ function JournalMood() {
         {/* === Daftar Jurnal (Staggered List AOS) === */}
         <div className="space-y-6">
           <motion.h2
-            variants={aosVariants}
+            variants={sophisticatedAosVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.8 }}
@@ -405,11 +419,11 @@ function JournalMood() {
 
           {entries.length === 0 ? (
             <motion.div
-              variants={aosVariants}
+              variants={sophisticatedAosVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.8 }}
-              transition={{ ...aosVariants.visible.transition, delay: 0.1 }}
+              custom={0.1}
               className="rounded-3xl p-8 md:p-12 text-center border-2 
               border-gray-200 dark:border-gray-700 
               bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm"
@@ -431,9 +445,9 @@ function JournalMood() {
                 {entries.map((entry) => (
                   <motion.div
                     key={entry.id}
-                    variants={aosVariants}
+                    variants={listItemVariants} // Menggunakan varian item list
                     exit={{ opacity: 0, height: 0, marginBottom: 0, transition: { duration: 0.3 } }}
-                    whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05)" }}
+                    whileHover="hover" // Mengaktifkan efek hover premium
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className="rounded-3xl p-6 md:p-8 border border-gray-200 
                     dark:border-gray-700 bg-white/70 backdrop-blur-sm 
@@ -478,72 +492,73 @@ function JournalMood() {
           )}
         </div>
       </div>
-      <div className="relative h-32 w-full overflow-hidden flex-shrink-0 z-10">
-        <motion.svg
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-          className="absolute top-0 w-full h-full"
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            transition: { duration: 1, delay: 0.5 },
-          }}
-        >
-          {/* Path 1: Biru terang dengan opacity rendah */}
-          <motion.path
-            fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
-            fillOpacity="0.1"
-            d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
-            initial={{ pathLength: 0, pathOffset: 1 }}
-            animate={{
-              pathLength: 1,
-              pathOffset: 0,
-              transition: {
-                duration: 3,
-                ease: "linear",
-                repeat: Infinity,
-                repeatType: "loop",
-              },
-            }}
-          />
-          {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
-          <motion.path
-            fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
-            fillOpacity="0.2"
-            d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
-            initial={{ pathLength: 0, pathOffset: 1 }}
-            animate={{
-              pathLength: 1,
-              pathOffset: 0,
-              transition: {
-                duration: 3.5,
-                ease: "linear",
-                repeat: Infinity,
-                repeatType: "loop",
-                delay: 0.2,
-              },
-            }}
-          />
-          {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
-          <motion.path
-            fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
-            fillOpacity="0.3"
-            d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
-            initial={{ pathLength: 0, pathOffset: 1 }}
-            animate={{
-              pathLength: 1,
-              pathOffset: 0,
-              transition: {
-                duration: 4,
-                ease: "linear",
-                repeat: Infinity,
-                repeatType: "loop",
-                delay: 0.4,
-              },
-            }}
-          />
-        </motion.svg>
-      </div>
+            <div className="relative h-32 w-full overflow-hidden ">
+              <motion.svg
+                viewBox="0 0 1200 120"
+                preserveAspectRatio="none"
+                className="absolute top-0 w-full h-full"
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: 1,
+                  transition: { duration: 1, delay: 0.5 },
+                }}
+              >
+                {/* Path 1: Biru terang dengan opacity rendah */}
+                <motion.path
+                  fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
+                  fillOpacity="0.1"
+                  d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
+                  initial={{ pathLength: 0, pathOffset: 1 }}
+                  animate={{
+                    pathLength: 1,
+                    pathOffset: 0,
+                    transition: {
+                      duration: 3,
+                      ease: "linear",
+                      repeat: Infinity,
+                      repeatType: "loop",
+                    },
+                  }}
+                />
+                {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
+                <motion.path
+                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                  fillOpacity="0.2"
+                  d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
+                  initial={{ pathLength: 0, pathOffset: 1 }}
+                  animate={{
+                    pathLength: 1,
+                    pathOffset: 0,
+                    transition: {
+                      duration: 3.5,
+                      ease: "linear",
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      delay: 0.2,
+                    },
+                  }}
+                />
+                {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
+                <motion.path
+                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                  fillOpacity="0.3"
+                  d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
+                  initial={{ pathLength: 0, pathOffset: 1 }}
+                  animate={{
+                    pathLength: 1,
+                    pathOffset: 0,
+                    transition: {
+                      duration: 4,
+                      ease: "linear",
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      delay: 0.4,
+                    },
+                  }}
+                />
+              </motion.svg>
+            </div>
+            
     </div>
   );
 }

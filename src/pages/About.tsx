@@ -11,8 +11,8 @@ import {
   BarChart,
   TrendingUp,
   Activity,
-  Github, // <-- DITAMBAHKAN
-  Instagram, // <-- DITAMBAHKAN
+  Github,
+  Instagram,
 } from "lucide-react";
 import type { ChartOptions, ChartData } from "chart.js";
 import {
@@ -29,6 +29,9 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import GradientText from "../components/GradientText";
+import { motion } from "framer-motion"; // <-- DITAMBAHKAN
+import CountUp from "../components/CountUp";
+
 
 ChartJS.register(
   CategoryScale,
@@ -52,15 +55,54 @@ interface FeatureItem {
   description: string;
 }
 
-// --- INTERFACE DIPERBARUI ---
 interface TeamMember {
   name: string;
   role: string;
   bio: string;
   avatar: string;
-  github?: string; // <-- DITAMBAHKAN
-  instagram?: string; // <-- DITAMBAHKAN
+  github?: string;
+  instagram?: string;
 }
+
+// ===============================================
+// --- VARIANT ANIMASI FRAMER MOTION ---
+// ===============================================
+
+const containerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants: any = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+    },
+  },
+};
+
+const textVariants: any = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
 
 const About: React.FC = () => {
   const features: (FeatureItem & { color: string })[] = [
@@ -205,7 +247,8 @@ const About: React.FC = () => {
         label: "Prevalensi Estimasi Populasi Terkena Kasus (%)",
         data: mentalHealthTrend.map((d) => d.value),
         borderColor: "#0d9488",
-        backgroundColor: "rgba(13, 148, 136, 0.1)",
+        // --- Dark Mode Chart: Menggunakan warna Teal/Hijau yang lebih terang untuk background chart, #0be084 adalah warna neon
+        backgroundColor: "rgba(11, 224, 132, 0.1)", // Menggunakan #0be084 (Hijau Neon) dengan alpha
         fill: true,
         tension: 0.4,
         pointRadius: 5,
@@ -221,6 +264,7 @@ const About: React.FC = () => {
         position: "bottom" as const,
         labels: {
           padding: 15,
+          color: "rgb(156 163 175)", // Default color, akan di-override di lineChartOptions
         },
       },
       title: {
@@ -232,6 +276,7 @@ const About: React.FC = () => {
         padding: {
           bottom: 20,
         },
+        color: "rgb(156 163 175)", // Default color, akan di-override di lineChartOptions
       },
       tooltip: {
         backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -242,6 +287,20 @@ const About: React.FC = () => {
     scales: {
       y: {
         beginAtZero: true,
+        grid: {
+          color: "rgba(156, 163, 175, 0.2)", // Grid line color
+        },
+        ticks: {
+          color: "rgb(156 163 175)", // Tick label color
+        },
+      },
+      x: {
+        grid: {
+          color: "rgba(156, 163, 175, 0.2)", // Grid line color
+        },
+        ticks: {
+          color: "rgb(156 163 175)", // Tick label color
+        },
       },
     },
   };
@@ -254,6 +313,15 @@ const About: React.FC = () => {
         ...chartOptions.plugins!.title,
         text:
           "Tren Estimasi Kenaikan Prevalensi Gangguan Mental di Indonesia (2019-2025)",
+        // Mengubah warna title agar adaptif di dark mode
+        color: "rgb(156 163 175)", 
+      },
+      legend: {
+        ...chartOptions.plugins!.legend,
+        labels: {
+            ...chartOptions.plugins!.legend!.labels,
+            color: "rgb(156 163 175)",
+        }
       },
       tooltip: {
         ...chartOptions.plugins!.tooltip,
@@ -268,8 +336,23 @@ const About: React.FC = () => {
         title: {
           display: true,
           text: "Persentase Populasi (%)",
+          color: "rgb(156 163 175)", // Title Y axis
         },
+        grid: {
+            color: "rgba(156, 163, 175, 0.2)",
+        },
+        ticks: {
+            color: "rgb(156 163 175)",
+        }
       },
+      x: {
+        grid: {
+            color: "rgba(156, 163, 175, 0.2)",
+        },
+        ticks: {
+            color: "rgb(156 163 175)",
+        }
+      }
     },
   };
 
@@ -277,7 +360,8 @@ const About: React.FC = () => {
     <div
       className="min-h-screen relative overflow-hidden transition-colors duration-500
         bg-gradient-to-br from-indigo-50/70 via-white to-rose-50/70
-        dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950"
+        // --- DARK MODE PALET: Menggunakan #010907 (Hampir Hitam) sebagai pengganti gray-950
+        dark:from-[#010907] dark:via-gray-950 dark:to-indigo-950"
     >
       {/* === Background Blobs (Copied from Home.tsx) === */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob dark:bg-indigo-700 dark:opacity-30" />
@@ -288,7 +372,12 @@ const About: React.FC = () => {
       <section className="text-center py-20 md:py-36 relative z-10">
         <div className="space-y-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* === INI BAGIAN YANG DIBUNGKUS BORDER === */}
-          <div className="bg-white dark:bg-gray-800 backdrop-blur-sm border-2 border-teal-200 dark:border-teal-700 rounded-3xl p-6 md:p-8">
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="bg-white dark:bg-[#010907]/90 backdrop-blur-sm border-2 border-[#1ff498] dark:border-[#0be084] rounded-3xl p-6 md:p-8" // Mengubah warna dark:bg dan dark:border
+          >
             <div className="space-y-6 animate-slide-up">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight">
                 <GradientText
@@ -299,7 +388,7 @@ const About: React.FC = () => {
                 >
                   Tentang Kami
                 </GradientText>
-                <span className="block text-gray-900 mt-2 dark:text-gray-100 ">
+                <span className="block text-gray-900 mt-2 dark:text-[#ecfef7] "> {/* Mengubah dark:text */}
                   Jaga Jiwa.
                 </span>
               </h1>
@@ -309,7 +398,7 @@ const About: React.FC = () => {
                 menciptakan ruang aman bagi kesehatan mentalmu.
               </p>
             </div>
-          </div>
+          </motion.div>
           {/* === AKHIR BAGIAN YANG DIBUNGKUS BORDER === */}
         </div>
       </section>
@@ -317,21 +406,27 @@ const About: React.FC = () => {
 
       {/* Konten Asli Halaman About */}
       {/* Mengurangi padding atas sedikit agar tidak terlalu jauh */}
-      <section className="py-12 md:py-20 bg-gray-50 relative z-10 dark:bg-gray-900/50">
+      <section className="py-12 md:py-20 bg-gray-50 relative z-10 dark:bg-[#010907]/90"> {/* Mengubah dark:bg */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 dark:bg-teal-900/50 dark:text-teal-200">
+            {/* MISI KAMI (Text) */}
+            <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={textVariants}
+            >
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
                 <Target className="w-4 h-4" />
                 <span>Misi Kami</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 dark:text-white">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                 Kesehatan Mental untuk Semua
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-6 dark:text-gray-400">
                 Di Indonesia, masih banyak stigma seputar kesehatan mental yang
                 membuat orang enggan mencari bantuan.{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   Jaga Jiwa
                 </span>{" "}
                 hadir untuk mengubah itu.
@@ -341,10 +436,10 @@ const About: React.FC = () => {
                 untuk membantu siapa saja yang membutuhkan tempat untuk berbagi,
                 memahami perasaan mereka, dan mendapatkan dukungan awal.
               </p>
-              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-100 dark:from-teal-900/50 dark:to-emerald-900/50 dark:border-teal-800">
-                <Lightbulb className="w-6 h-6 text-teal-600 flex-shrink-0 mt-1 dark:text-teal-400" />
+              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-100 dark:from-[#0be084]/10 dark:to-emerald-900/10 dark:border-teal-800"> {/* Mengubah dark:from/to */}
+                <Lightbulb className="w-6 h-6 text-teal-600 flex-shrink-0 mt-1 dark:text-[#0be084]" /> {/* Mengubah dark:text */}
                 <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                  <span className="font-semibold dark:text-gray-100">
+                  <span className="font-semibold dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                     Catatan Penting:
                   </span>{" "}
                   Jaga Jiwa adalah alat pendukung awal dan tidak menggantikan
@@ -353,39 +448,59 @@ const About: React.FC = () => {
                   berlisensi.
                 </p>
               </div>
-            </div>
-
-            <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl overflow-hidden shadow-2xl dark:from-teal-900/60 dark:to-emerald-900/60">
+            </motion.div>
+            
+            {/* MISI KAMI (Visual) */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ type: "spring", stiffness: 50, delay: 0.2 }}
+                className="relative"
+            >
+              <div className="aspect-square bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl overflow-hidden shadow-2xl dark:from-[#086faf]/60 dark:to-[#0be084]/60"> {/* Mengubah dark:from/to */}
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="grid grid-cols-2 gap-4 w-full">
                     {[Heart, Shield, Users, Sparkles].map((Icon, index) => (
-                      <div
+                      <motion.div
                         key={index}
+                        initial={{ rotate: -10, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
                         className="aspect-square bg-white rounded-2xl shadow-lg flex items-center justify-center transform hover:scale-110 transition duration-300 dark:bg-gray-800"
                       >
-                        <Icon className="w-12 h-12 text-teal-600 dark:text-teal-400" />
-                      </div>
+                        <Icon className="w-12 h-12 text-teal-600 dark:text-[#0be084]" /> {/* Mengubah dark:text */}
+                      </motion.div>
                     ))}
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Bagian Tentang Kami, Tujuan, Visi Misi */}
-      <section className="py-16 md:py-20 bg-gray-50 relative z-10 dark:bg-gray-900/50">
+      <section className="py-16 md:py-20 bg-gray-50 relative z-10 dark:bg-[#010907]/90"> {/* Mengubah dark:bg */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div className="bg-white rounded-3xl p-8 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-gray-800/70 dark:border-teal-700 dark:hover:border-teal-500">
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 w-fit dark:bg-teal-900/50 dark:text-teal-200">
+          <motion.div
+            className="grid md:grid-cols-2 gap-8 mb-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={containerVariants}
+          >
+            {/* KARTU TENTANG KAMI */}
+            <motion.div
+                variants={itemVariants}
+                className="bg-white rounded-3xl p-8 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-[#010907]/70 dark:border-[#0be084] dark:hover:border-[#086faf]" // Mengubah dark:bg dan dark:border/hover
+            >
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 w-fit dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
                 <BookHeart className="w-4 h-4" />
                 <span>Tentang Kami</span>
               </div>
               <p className="text-gray-700 leading-relaxed mb-4 dark:text-gray-300">
-                <span className="font-semibold dark:text-gray-100">
+                <span className="font-semibold dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   Jaga Jiwa
                 </span>{" "}
                 adalah platform digital kesehatan mental yang dirancang untuk
@@ -396,7 +511,7 @@ const About: React.FC = () => {
               </p>
               <p className="text-gray-700 leading-relaxed dark:text-gray-300">
                 Lebih dari sekadar aplikasi,{" "}
-                <span className="font-semibold dark:text-gray-100">
+                <span className="font-semibold dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   Jaga Jiwa
                 </span>{" "}
                 adalah sahabat digital yang selalu siap mendengarkan tanpa
@@ -404,56 +519,52 @@ const About: React.FC = () => {
                 kesehatan mental dan membuat dukungan psikologis lebih mudah
                 diakses oleh semua kalangan, kapan saja dan di mana saja.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-3xl p-8 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-gray-800/70 dark:border-teal-700 dark:hover:border-teal-500">
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 w-fit dark:bg-teal-900/50 dark:text-teal-200">
+            {/* KARTU TUJUAN KAMI */}
+            <motion.div
+                variants={itemVariants}
+                className="bg-white rounded-3xl p-8 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-[#010907]/70 dark:border-[#0be084] dark:hover:border-[#086faf]" // Mengubah dark:bg dan dark:border/hover
+            >
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 w-fit dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
                 <Target className="w-4 h-4" />
                 <span>Tujuan Kami</span>
               </div>
               <ul className="space-y-4">
-                <li className="flex items-start space-x-3">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
-                  <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                    Mengedukasi masyarakat tentang pentingnya kesehatan mental
-                    dan mengurangi stigma yang ada.
-                  </p>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
-                  <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                    Menyediakan akses mudah ke dukungan kesehatan mental yang
-                    aman dan terpercaya.
-                  </p>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
-                  <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                    Mendorong kebiasaan pemantauan emosi melalui fitur tracking
-                    dan journaling interaktif.
-                  </p>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
-                  <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                    Membantu pengguna dalam memahami dan mengelola perasaan
-                    mereka dengan lebih baik.
-                  </p>
-                </li>
+                {/* UL LIST */}
+                {["Mengedukasi masyarakat tentang pentingnya kesehatan mental dan mengurangi stigma yang ada.",
+                  "Menyediakan akses mudah ke dukungan kesehatan mental yang aman dan terpercaya.",
+                  "Mendorong kebiasaan pemantauan emosi melalui fitur tracking dan journaling interaktif.",
+                  "Membantu pengguna dalam memahami dan mengelola perasaan mereka dengan lebih baik."
+                ].map((tujuan, index) => (
+                  <li key={index} className="flex items-start space-x-3">
+                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
+                    <p className="text-gray-700 leading-relaxed dark:text-gray-300">
+                      {tujuan}
+                    </p>
+                  </li>
+                ))}
               </ul>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="flex justify-center">
-            <div className="bg-white rounded-3xl p-8 md:p-12 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-gray-800/70 dark:border-teal-700 dark:hover:border-teal-500">
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-8 w-fit dark:bg-teal-900/50 dark:text-teal-200">
+          {/* KARTU VISI & MISI */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            variants={textVariants}
+            className="flex justify-center"
+          >
+            <div className="bg-white rounded-3xl p-8 md:p-12 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-[#010907]/70 dark:border-[#0be084] dark:hover:border-[#086faf] max-w-3xl w-full"> {/* Mengubah dark:bg dan dark:border/hover */}
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-8 w-fit dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
                 <Sparkles className="w-4 h-4" />
                 <span>Visi & Misi</span>
               </div>
 
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 dark:text-white">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                     Visi:
                   </h3>
                   <p className="text-gray-700 leading-relaxed dark:text-gray-300">
@@ -464,7 +575,7 @@ const About: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 dark:text-white">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                     Misi:
                   </h3>
                   <p className="text-gray-700 leading-relaxed dark:text-gray-300">
@@ -476,70 +587,99 @@ const About: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
+      {/* Mengapa Memilih Jaga Jiwa? (Features) */}
       <section className="py-16 md:py-24 bg-white relative z-10 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-white">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={textVariants}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
               Mengapa Memilih Jaga Jiwa?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-400">
               Kami berkomitmen memberikan dukungan terbaik untuk kesehatan
               mental Anda
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <motion.div
+            className="grid md:grid-cols-2 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={containerVariants}
+          >
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <div
+                <motion.div
                   key={index}
-                  className="group bg-white rounded-2xl p-8 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-gray-800/70 dark:border-teal-700 dark:hover:border-teal-500"
+                  variants={itemVariants}
+                  className="group bg-white rounded-2xl p-8 border-2 border-[#1ff498] hover:border-[#50b7f7] dark:bg-[#010907]/70 dark:border-[#0be084] dark:hover:border-[#086faf]" // Mengubah dark:bg dan dark:border/hover
                 >
                   <div
                     className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} mb-6 group-hover:scale-110 transition-transform duration-300`}
                   >
                     <Icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 dark:text-white">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                     {feature.title}
                   </h3>
                   <p className="text-gray-600 leading-relaxed dark:text-gray-400">
                     {feature.description}
                   </p>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ======================================= */}
       {/* === AWAL BAGIAN DESAIN KAMI (BARU) === */}
       {/* ======================================= */}
-      <section className="py-16 md:py-24 bg-gray-50 relative z-10 dark:bg-gray-900/50">
+      <section className="py-16 md:py-24 bg-gray-50 relative z-10 dark:bg-[#010907]/90"> {/* Mengubah dark:bg */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4 dark:bg-teal-900/50 dark:text-teal-200">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={textVariants}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4 dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
               <Sparkles className="w-4 h-4" /> <span>Desain Kami</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
               Palet Warna Jaga Jiwa
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-400">
               Warna-warna yang kami pilih dirancang untuk menciptakan lingkungan
               yang tenang, segar, dan mudah diakses.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={containerVariants}
+          >
             {/* --- Light Mode --- */}
-            <div className="bg-white border-2 border-[#1ff498] hover:border-[#50b7f7] rounded-3xl p-6 md:p-8 dark:bg-gray-800 dark:border-teal-700 dark:hover:border-teal-500">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 dark:text-white">
+            <motion.div
+                variants={itemVariants}
+                className="bg-white border-2 border-[#1ff498] hover:border-[#50b7f7] rounded-3xl p-6 md:p-8 dark:bg-gray-800 dark:border-teal-700 dark:hover:border-teal-500"
+            >
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                 Light Mode
               </h3>
 
@@ -548,7 +688,7 @@ const About: React.FC = () => {
                 {/* #f6fefc */}
                 <div className="text-center">
                   <div
-                    className="w-16 h-16 rounded-xl border border-gray-200"
+                    className="w-16 h-16 rounded-xl border border-gray-200 dark:border-gray-700" // Menambah dark:border
                     style={{ backgroundColor: "#f6fefc" }}
                   />
                   <span className="text-xs font-mono text-gray-600 mt-2 block dark:text-gray-400">
@@ -594,12 +734,13 @@ const About: React.FC = () => {
                 profesionalisme, sementara latar belakang putih (#f6fefc)
                 memberikan kesan bersih dan segar.
               </p>
-            </div>
+            </motion.div>
 
             {/* === KARTU DARK MODE === */}
-            <div
-              className="bg-white border-2 border-[#0be084] rounded-3xl p-6 md:p-8 hover:border-[#086faf]"
-              style={{ backgroundColor: "#f6fefc" }}
+            <motion.div
+              variants={itemVariants}
+              // Mengubah semua class ke Tailwind Dark Mode dengan palet yang ditentukan
+              className="bg-[#010907]/90 border-2 border-[#0be084] rounded-3xl p-6 md:p-8 hover:border-[#086faf]"
             >
               <h3 className="text-2xl font-bold text-[#ecfef7] mb-6">
                 Dark Mode
@@ -656,9 +797,9 @@ const About: React.FC = () => {
                 (#010907) yang mengurangi ketegangan mata dan menciptakan
                 pengalaman membaca yang nyaman di malam hari.
               </p>
-            </div>
+            </motion.div>
             {/* === AKHIR KARTU DARK MODE === */}
-          </div>
+          </motion.div>
         </div>
       </section>
       {/* === AKHIR BAGIAN DESAIN KAMI === */}
@@ -666,30 +807,43 @@ const About: React.FC = () => {
       {/* === BAGIAN TIM KAMI (DIPERBARUI) === */}
       <section className="py-16 md:py-24 bg-white relative z-10 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4 dark:bg-teal-900/50 dark:text-teal-200">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={textVariants}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4 dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
               <Users className="w-4 h-4" />
               <span>Tim Kami</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
               Orang-Orang di Balik Jaga Jiwa
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-400">
               Kami adalah tim profesional yang bersemangat untuk membuat
               perbedaan dalam dunia kesehatan mental.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={containerVariants}
+          >
             {teamMembers.map((member, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="group flex flex-col items-center text-center bg-gray-50 rounded-2xl p-8 border-2 border-[#1ff498] hover:border-teal-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 dark:bg-gray-800/70 dark:border-teal-700 dark:hover:border-teal-500"
+                variants={itemVariants}
+                className="group flex flex-col items-center text-center bg-gray-50 rounded-2xl p-8 border-2 border-[#1ff498] hover:border-teal-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 dark:bg-[#010907]/70 dark:border-[#0be084] dark:hover:border-[#086faf]" // Mengubah dark:bg dan dark:border/hover
               >
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-teal-100 to-emerald-200 transform scale-100 blur-lg transition-all duration-300 group-hover:scale-110 dark:from-teal-700 dark:to-emerald-700" />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-teal-100 to-emerald-200 transform scale-100 blur-lg transition-all duration-300 group-hover:scale-110 dark:from-[#0be084]/30 dark:to-[#086faf]/30" /> {/* Mengubah dark:from/to */}
                   <img
-                    className="relative w-32 h-32 rounded-full object-cover shadow-lg mx-auto ring-4 ring-white group-hover:ring-teal-300 transition-all duration-300 dark:ring-gray-800 dark:group-hover:ring-teal-500"
+                    className="relative w-32 h-32 rounded-full object-cover shadow-lg mx-auto ring-4 ring-white group-hover:ring-teal-300 transition-all duration-300 dark:ring-gray-800 dark:group-hover:ring-[#0be084]" // Mengubah dark:group-hover:ring
                     src={member.avatar}
                     alt={`Foto ${member.name}`}
                   />
@@ -699,10 +853,10 @@ const About: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col flex-grow items-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1 dark:text-white">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                     {member.name}
                   </h3>
-                  <p className="text-teal-600 font-semibold mb-4 dark:text-teal-400">
+                  <p className="text-teal-600 font-semibold mb-4 dark:text-[#0be084]"> {/* Mengubah dark:text */}
                     {member.role}
                   </p>
                   <p className="text-gray-600 leading-relaxed text-sm dark:text-gray-400">
@@ -711,13 +865,13 @@ const About: React.FC = () => {
                 </div>
 
                 {(member.github || member.instagram) && (
-                  <div className="flex items-center justify-center gap-5 mt-6 pt-6 border-t border-teal-100 dark:border-teal-700/50 w-full">
+                  <div className="flex items-center justify-center gap-5 mt-6 pt-6 border-t border-teal-100 dark:border-[#0be084]/50 w-full"> {/* Mengubah dark:border */}
                     {member.github && (
                       <a
                         href={member.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                        className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-[#ecfef7] transition-colors" // Mengubah dark:hover:text
                         aria-label={`${member.name}'s GitHub`}
                       >
                         <Github className="w-6 h-6" />
@@ -728,7 +882,7 @@ const About: React.FC = () => {
                         href={member.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-500 transition-colors"
+                        className="text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-[#0be084] transition-colors" // Mengubah dark:hover:text
                         aria-label={`${member.name}'s Instagram`}
                       >
                         <Instagram className="w-6 h-6" />
@@ -736,34 +890,46 @@ const About: React.FC = () => {
                     )}
                   </div>
                 )}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
       {/* === AKHIR BAGIAN TIM KAMI === */}
 
-      <section className="py-16 md:py-24 bg-teal-50/50 relative z-10 dark:bg-gray-900/50">
+      <section className="py-16 md:py-24 bg-teal-50/50 relative z-10 dark:bg-[#010907]/90"> {/* Mengubah dark:bg */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4 dark:bg-teal-900/50 dark:text-teal-200">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={textVariants}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 mb-4 dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
               <TrendingUp className="w-4 h-4" />
               <span>Data & Wawasan</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
               Memahami Lanskap Kesehatan Mental di Indonesia
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-400">
               Visualisasi data dari berbagai sumber ini menyoroti urgensi dan
               skala tantangan kesehatan mental yang kita hadapi bersama.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
+            <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.7 }}
+                className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800"
+            >
               <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 dark:text-white">
-                  <Activity className="text-teal-600 dark:text-teal-400" />
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
+                  <Activity className="text-teal-600 dark:text-[#0be084]" /> {/* Mengubah dark:text */}
                   Tren yang Perlu Diwaspadai
                 </h3>
                 <p className="text-gray-600 mt-2 dark:text-gray-400">
@@ -773,12 +939,18 @@ const About: React.FC = () => {
                 </p>
               </div>
               <Line options={lineChartOptions} data={lineChartData} />
-            </div>
+            </motion.div>
           </div>
 
           {/* === BAGIAN LATAR BELAKANG (DIPERBARUI) === */}
-          <div className="mt-12 max-w-7xl mx-auto bg-white border border-teal-200 rounded-2xl p-10 shadow-sm dark:bg-gray-800 dark:border-teal-700">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 dark:bg-teal-900/50 dark:text-teal-200">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={textVariants}
+            className="mt-12 max-w-7xl mx-auto bg-white border border-teal-200 rounded-2xl p-10 shadow-sm dark:bg-[#010907]/70 dark:border-[#0be084]" // Mengubah dark:bg dan dark:border
+          >
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 border border-teal-200 dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
               <Lightbulb className="w-5 h-4" />
               <span>Latar Belakang</span>
             </div>
@@ -789,11 +961,11 @@ const About: React.FC = () => {
                 cerminan dari tantangan nyata yang dihadapi oleh jutaan
                 masyarakat Indonesia. Tren kenaikan prevalensi yang konsisten
                 menjadi{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   latar belakang utama
                 </span>{" "}
                 dan panggilan mendesak bagi kami. Kami melihat adanya{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   kebutuhan mendesak
                 </span>{" "}
                 akan dukungan kesehatan mental yang lebih mudah dijangkau.
@@ -805,17 +977,17 @@ const About: React.FC = () => {
                 Di saat yang sama, kami menyadari adanya jurang besar antara
                 mereka yang membutuhkan bantuan dan mereka yang
                 mendapatkannya.{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   Stigma sosial
                 </span>{" "}
                 yang masih melekat kuat membuat banyak orang takut untuk
                 berbicara atau dicap "lemah". Selain itu,{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   akses yang terbatas
                 </span>{" "}
                 ke psikolog atau psikiater profesional—baik karena lokasi
                 geografis maupun antrean panjang—serta{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   biaya konsultasi yang tinggi
                 </span>
                 , menjadi penghalang yang nyata. Akibatnya, jutaan individu
@@ -824,7 +996,7 @@ const About: React.FC = () => {
               </p>
               <p>
                 Oleh karena itu,{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   Jaga Jiwa lahir
                 </span>{" "}
                 sebagai jawaban atas tantangan ini. Kami hadir untuk
@@ -833,7 +1005,7 @@ const About: React.FC = () => {
                 orang berhak mendapatkan ruang untuk didengar. Dengan
                 memanfaatkan kekuatan teknologi dan AI yang empatik, kami
                 berkomitmen menyediakan sebuah platform digital yang{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                   aman, mudah diakses 24/7, sepenuhnya anonim, tanpa stigma, dan
                   gratis
                 </span>
@@ -842,50 +1014,71 @@ const About: React.FC = () => {
                 menjaga kesehatan jiwanya.
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-emerald-50 relative z-10 dark:from-teal-900/50 dark:to-emerald-900/50">
+      {/* Dampak Kami Dalam Angka (Statistics) */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-emerald-50 relative z-10 dark:from-[#010907] dark:to-gray-900"> {/* Mengubah dark:from/to */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-white">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            variants={textVariants}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
               Dampak Kami dalam Angka
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
               Bersama membangun masyarakat yang lebih sehat
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-6"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={containerVariants}
+          >
             {statistics.map((stat, index) => {
               const Icon = stat.icon;
               return (
-                <div
+                <motion.div
                   key={index}
-                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:bg-gray-800"
+                  variants={itemVariants}
+                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:bg-[#010907]/90" // Mengubah dark:bg
                 >
-                  <Icon className="w-10 h-10 text-teal-600 mb-4 mx-auto dark:text-teal-400" />
+                  <Icon className="w-10 h-10 text-teal-600 mb-4 mx-auto dark:text-[#0be084]" /> {/* Mengubah dark:text */}
                   <div className="text-center">
-                    <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 dark:text-white">
+                    <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                       {stat.number}
                     </div>
                     <div className="text-sm text-gray-600 font-medium dark:text-gray-400">
                       {stat.label}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
+      {/* Fitur Unggulan */}
       <section className="py-10 md:py-12 bg-white relative z-10 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border-2 border-teal-200 bg-white dark:bg-gray-800/70 dark:border-teal-700">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={containerVariants}
+            className="rounded-3xl border-2 border-teal-200 bg-white dark:bg-[#010907]/70 dark:border-[#0be084]" // Mengubah dark:bg dan dark:border
+          >
             <div className="flex items-center gap-2 px-6 md:px-8 pt-6">
-              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 dark:bg-teal-900/50 dark:text-teal-200">
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold bg-teal-50 text-teal-700 dark:bg-[#0be084]/20 dark:text-[#0be084]"> {/* Mengubah dark:bg dan dark:text */}
                 <Sparkles className="w-4 h-4" />
                 <span>Fitur-Fitur kami</span>
               </div>
@@ -896,16 +1089,17 @@ const About: React.FC = () => {
                 {jjFiturUnggulan.map((item, idx) => {
                   const Icon = item.icon;
                   return (
-                    <div
+                    <motion.div
                       key={idx}
-                      className="rounded-xl border border-teal-100 bg-teal-50/40 p-6 hover:shadow-md transition-shadow duration-300 dark:border-teal-800 dark:bg-teal-900/30"
+                      variants={itemVariants}
+                      className="rounded-xl border border-teal-100 bg-teal-50/40 p-6 hover:shadow-md transition-shadow duration-300 dark:border-[#0be084]/50 dark:bg-[#010907]/90" // Mengubah dark:border dan dark:bg
                     >
                       <div className="flex items-start gap-4">
-                        <div className="shrink-0 rounded-lg p-2 bg-teal-100 dark:bg-teal-800">
-                          <Icon className="w-6 h-6 text-teal-700 dark:text-teal-300" />
+                        <div className="shrink-0 rounded-lg p-2 bg-teal-100 dark:bg-[#0be084]/20"> {/* Mengubah dark:bg */}
+                          <Icon className="w-6 h-6 text-teal-700 dark:text-[#0be084]" /> {/* Mengubah dark:text */}
                         </div>
                         <div>
-                          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-[#ecfef7]"> {/* Mengubah dark:text */}
                             {item.title}
                           </h3>
                           <p className="mt-2 text-sm text-gray-600 leading-relaxed dark:text-gray-400">
@@ -913,12 +1107,12 @@ const About: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>
