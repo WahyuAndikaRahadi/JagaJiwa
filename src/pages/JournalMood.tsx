@@ -41,6 +41,16 @@ const GradientText: React.FC<GradientTextProps> = ({
     };
   }, [colors, animationSpeed]);
 
+<<<<<<< HEAD
+=======
+  const borderStyle = showBorder
+    ? {
+      border: '2px solid transparent',
+      borderImage: `linear-gradient(90deg, ${colors.join(', ')}) 1`,
+    }
+    : {};
+
+>>>>>>> 3c6d009bcb1f66977d79279016d5bb7a8376f1d8
   const keyframes = `
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
@@ -246,6 +256,7 @@ function JournalMood() {
           className="mb-8 md:mb-12"
         >
           <div className="flex items-center space-x-4 mb-3">
+<<<<<<< HEAD
             <motion.div
               initial={{ rotate: -90, scale: 0 }}
               animate={{ rotate: 0, scale: 1 }}
@@ -255,6 +266,11 @@ function JournalMood() {
             >
               <BookHeart className="w-7 h-7 text-teal-600 dark:text-teal-400" />
             </motion.div>
+=======
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#1ff498] to-[#50b7f7] rounded-2xl flex items-center justify-center shadow-xl">
+              <BookHeart className="w-8 h-8 sm:w-9 sm:h-9 text-white"/>
+            </div>
+>>>>>>> 3c6d009bcb1f66977d79279016d5bb7a8376f1d8
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
               <GradientText
                 colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
@@ -308,6 +324,7 @@ function JournalMood() {
               disabled={!currentEntry.trim() || isGenerating}
               className="group flex-1 relative inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-[#1ff498] to-[#50b7f7] rounded-full transition-all duration-300 overflow-hidden shadow-md shadow-[#1ff498]/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
+<<<<<<< HEAD
               {isGenerating ? (
                 <div className="flex items-center space-x-2">
                   <Zap className="w-5 h-5 animate-spin" />
@@ -320,6 +337,14 @@ function JournalMood() {
                 </>
               )}
             </motion.button>
+=======
+              <Sparkles
+                className={`w-5 h-5 mr-2 ${isGenerating ? "animate-spin" : "group-hover:animate-pulse-fast"
+                  }`}
+              />
+              <span>{isGenerating ? "Menganalisis..." : "Analisis dengan AI"}</span>
+            </button>
+>>>>>>> 3c6d009bcb1f66977d79279016d5bb7a8376f1d8
 
             {/* Tombol Simpan */}
             <motion.button
