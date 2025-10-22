@@ -37,9 +37,9 @@ const GradientText: React.FC<GradientTextProps> = ({
 
   const borderStyle = showBorder
     ? {
-        border: '2px solid transparent',
-        borderImage: `linear-gradient(90deg, ${colors.join(', ')}) 1`,
-      }
+      border: '2px solid transparent',
+      borderImage: `linear-gradient(90deg, ${colors.join(', ')}) 1`,
+    }
     : {};
 
   const keyframes = `
@@ -187,11 +187,8 @@ function JournalMood() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-9 md:py-14 relative z-10">
         <div className="mb-8 md:mb-12">
           <div className="flex items-center space-x-4 mb-3">
-            <div
-              className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
-              rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/50"
-            >
-              <BookHeart className="w-7 h-7 text-teal-600 dark:text-teal-400" /> 
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#1ff498] to-[#50b7f7] rounded-2xl flex items-center justify-center shadow-xl">
+              <BookHeart className="w-8 h-8 sm:w-9 sm:h-9 text-white"/>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
               <GradientText
@@ -241,9 +238,8 @@ function JournalMood() {
               className="group flex-1 relative inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-[#1ff498] to-[#50b7f7] rounded-full transform hover:scale-105 transition-all duration-300 overflow-hidden hover:shadow-md hover:shadow-[#1ff498]/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <Sparkles
-                className={`w-5 h-5 mr-2 ${
-                  isGenerating ? "animate-spin" : "group-hover:animate-pulse-fast"
-                }`}
+                className={`w-5 h-5 mr-2 ${isGenerating ? "animate-spin" : "group-hover:animate-pulse-fast"
+                  }`}
               />
               <span>{isGenerating ? "Menganalisis..." : "Analisis dengan AI"}</span>
             </button>
