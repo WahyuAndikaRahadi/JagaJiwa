@@ -1063,6 +1063,53 @@ const Insight = () => {
                 )}
               </motion.div>
 
+                            <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className={`bg-gradient-to-br ${todayEmotion.color} rounded-3xl p-6 md:p-8 shadow-xl text-white border-2 border-white/30`}
+              >
+                <div className="flex items-center space-x-4 mb-6">
+                  <span className="text-4xl sm:text-5xl">
+                    {todayEmotion.icon}
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-bold">
+                    Emosi Fokus: {todayEmotion.name}
+                  </h2>
+                </div>
+                <p className="text-lg sm:text-xl mb-6 opacity-95 leading-relaxed">
+                  {todayEmotion.definition}
+                </p>
+
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 sm:p-6 mb-6 border-2 border-white/30">
+                  <h3 className="font-bold text-base sm:text-lg mb-3">
+                    Pemicu Umum:
+                  </h3>
+                  <ul className="space-y-2">
+                    {todayEmotion.triggers.map((trigger, i) => (
+                      <li key={i} className="flex items-start space-x-3">
+                        <span className="text-lg sm:text-xl">•</span>
+                        <span className="text-sm sm:text-base">{trigger}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border-2 border-white/30">
+                  <h3 className="font-bold text-base sm:text-lg mb-3">
+                    Tips Mengelola:
+                  </h3>
+                  <ul className="space-y-3">
+                    {todayEmotion.managementTips.map((tip, i) => (
+                      <li key={i} className="flex items-start space-x-3">
+                        <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm sm:text-base">{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+
               <motion.div
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
@@ -1800,53 +1847,6 @@ const Insight = () => {
                       </div>
                     </motion.a>
                   ))}
-                </div>
-              </motion.div>
-
-                            <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className={`bg-gradient-to-br ${todayEmotion.color} rounded-3xl p-6 md:p-8 shadow-xl text-white border-2 border-white/30`}
-              >
-                <div className="flex items-center space-x-4 mb-6">
-                  <span className="text-4xl sm:text-5xl">
-                    {todayEmotion.icon}
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-bold">
-                    Emosi Fokus: {todayEmotion.name}
-                  </h2>
-                </div>
-                <p className="text-lg sm:text-xl mb-6 opacity-95 leading-relaxed">
-                  {todayEmotion.definition}
-                </p>
-
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 sm:p-6 mb-6 border-2 border-white/30">
-                  <h3 className="font-bold text-base sm:text-lg mb-3">
-                    Pemicu Umum:
-                  </h3>
-                  <ul className="space-y-2">
-                    {todayEmotion.triggers.map((trigger, i) => (
-                      <li key={i} className="flex items-start space-x-3">
-                        <span className="text-lg sm:text-xl">•</span>
-                        <span className="text-sm sm:text-base">{trigger}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border-2 border-white/30">
-                  <h3 className="font-bold text-base sm:text-lg mb-3">
-                    Tips Mengelola:
-                  </h3>
-                  <ul className="space-y-3">
-                    {todayEmotion.managementTips.map((tip, i) => (
-                      <li key={i} className="flex items-start space-x-3">
-                        <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm sm:text-base">{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </motion.div>
 

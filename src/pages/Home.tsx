@@ -2,16 +2,13 @@ import {
   Brain,
   MessageCircle,
   TrendingUp,
-  BookOpen, // Pastikan BookOpen diimport
+  BookOpen,
   Zap,
   Smile,
   Sparkles,
   HelpCircle,
   ChevronDown,
   Quote,
-  Tag,
-  Clock,
-  ChevronRight,
 } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 // 1. Import Framer Motion
@@ -27,13 +24,6 @@ interface FaqItemProps {
   question: string;
   answer: string;
   index: number;
-}
-interface Article {
-  id: number;
-  title: string;
-  summary: string;
-  category: string; // Tambahan dari Insight
-  readTime: string; // Tambahan dari Insight
 }
 
 const FaqItem: React.FC<FaqItemProps> = ({ question, answer, index }) => {
@@ -69,111 +59,28 @@ const FaqItem: React.FC<FaqItemProps> = ({ question, answer, index }) => {
   );
 };
 
-// =========================================================================
-// !!! START: MODIFIKASI ArticleCard UNTUK TAMPILAN LEBAR DENGAN IKON BUKU !!!
-// =========================================================================
-const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
-  return (
-    <motion.a
-      variants={itemVariants}
-      // PERUBAHAN: Tautan dinamis ke /insight/artikel/[id]
-      href={`/insight/artikel/${article.id}`} 
-      className="block p-6 md:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-400 dark:hover:border-emerald-600"
-    >
-      <div className="flex items-start space-x-5"> {/* Menggunakan flex untuk ikon dan konten */}
-        {/* Ikon Buku yang Menonjol */}
-        <div className="flex-shrink-0 mt-1">
-          <BookOpen className="w-8 h-8 text-emerald-500 dark:text-emerald-400" /> 
-        </div>
 
-        {/* Konten Artikel */}
-        <div className="flex-grow">
-          <div className="flex items-center space-x-3 mb-3">
-            {/* Kategori */}
-            <span className="flex items-center space-x-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-400">
-              <Tag className="w-3 h-3" />
-              <span>{article.category}</span>
-            </span>
-            {/* Waktu Baca */}
-            <span className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
-              <Clock className="w-3 h-3" />
-              <span>{article.readTime}</span>
-            </span>
-          </div>
-
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
-            {article.title}
-          </h3>
-          <p className="text-base text-gray-600 dark:text-gray-400 line-clamp-3">
-            {article.summary}
-          </p>
-          <div className="mt-4 inline-flex items-center font-bold text-base transition-colors text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300">
-            Baca Selengkapnya <ChevronRight className="w-4 h-4 ml-2" />
-          </div>
-        </div>
-      </div>
-    </motion.a>
-  );
-};
-// =========================================================================
-// !!! END: MODIFIKASI ArticleCard UNTUK TAMPILAN LEBAR DENGAN IKON BUKU !!!
-// =========================================================================
-
-
-const ARTICLES: Article[] = [
- {
-    id: 1,
-    title: "Mengatasi Burnout Akademik",
-    summary:
-      "Strategi praktis untuk mengenali dan mengatasi kelelahan mental akibat tuntutan akademik.",
-    category: "Akademik",
-    readTime: "5 menit",
-  },
-  {
-    id: 2,
-    title: "Mindfulness untuk Pemula",
-    summary:
-      "Panduan sederhana memulai praktik mindfulness dalam kehidupan sehari-hari.",
-    category: "Teknik",
-    readTime: "7 menit",
-  },
-  {
-    id: 3,
-    title: "Membangun Resiliensi Mental",
-    summary:
-      "Cara mengembangkan ketahanan mental untuk menghadapi tantangan hidup.",
-    category: "Pengembangan Diri",
-    readTime: "6 menit",
-  },
-  {
-    id: 4,
-    title: "Mengelola Kecemasan Sosial",
-    summary: "Tips praktis mengatasi rasa gugup dalam situasi sosial.",
-    category: "Sosial",
-    readTime: "5 menit",
-  }
-];
 // --- Data Testimoni (Tidak Berubah) ---
 const TESTIMONIALS = [
   {
     quote: "Mood Tracker sangat membantu saya memahami pola emosi, dan Talk Room terasa seperti memiliki teman yang selalu ada.",
-    name: "Alex K.",
-    title: "Mahasiswa | Pengguna 6 Bulan",
+    name: "Rangga Awan",
+    title: "Mahasiswa",
     avatar: "https://cdn-icons-png.flaticon.com/128/236/236831.png",
     color: "border-rose-300 dark:bg-rose-900/10 dark:border-rose-700",
   },
   {
     quote: "Desainnya menenangkan dan fitur AI Journal-nya memberikan wawasan yang sangat mendalam tentang kecemasan saya.",
-    name: "Bunga P.",
-    title: "Karyawan Swasta | Pengguna 4 Bulan",
-    avatar: "https://source.unsplash.com/random/100x100?portrait&sig=2",
+    name: "Darren Aurelyo",
+    title: "Pelajar",
+    avatar: "https://cdn-icons-png.flaticon.com/128/236/236831.png",
     color: "border-indigo-300 dark:bg-indigo-900/10 dark:border-indigo-700",
   },
   {
     quote: "Sebagai platform gratis, kualitasnya luar biasa. Rasanya seperti mendapat dukungan mental tanpa perlu khawatir biaya.",
-    name: "Chandra W.",
-    title: "Freelancer | Pengguna 9 Bulan",
-    avatar: "https://source.unsplash.com/random/100x100?portrait&sig=3",
+    name: "Wafa Arieb",
+    title: "Pelajar",
+    avatar: "https://cdn-icons-png.flaticon.com/128/236/236831.png",
     color: "border-emerald-300 dark:bg-emerald-900/10 dark:border-emerald-700",
   },
 ];
@@ -280,27 +187,55 @@ const randomFloat: any = {
 
 // --- Data Konten (Tetap Sama) ---
 const FEATURES = [
-  {
-    icon: TrendingUp,
-    title: "Mood Tracker",
-    description: "Pantau perubahan suasana hatimu setiap hari",
-    color: "from-purple-500 to-indigo-600",
-  },
-  {
-    icon: Brain,
-    title: "Journal Mood",
-    description: "Tulis dan analisis perasaanmu dengan AI",
-    color: "from-rose-500 to-pink-600",
-  },
-  {
-    icon: MessageCircle,
-    title: "Talk Room",
-    description: "Curhat dengan AI yang siap mendengarkan",
-    color: "from-emerald-500 to-teal-600",
-  },
+    {
+        id: "mood-tracker", // ID untuk target internal
+        link: "/tracker", // Link spesifik
+        icon: TrendingUp,
+        title: "Mood Tracker",
+        description: "Pantau perubahan suasana hatimu setiap hari",
+        color: "from-purple-500 to-indigo-600",
+    },
+    {
+        id: "journal-mood",
+        link: "/journal",
+        icon: Brain,
+        title: "Journal Mood",
+        description: "Tulis dan analisis perasaanmu dengan AI",
+        color: "from-rose-500 to-pink-600",
+    },
+    {
+        id: "talk-room",
+        link: "/talkroom",
+        icon: MessageCircle,
+        title: "Talk Room",
+        description: "Curhat dengan AI yang siap mendengarkan",
+        color: "from-emerald-500 to-teal-600",
+    },
 ];
 
-
+const ARTICLES = [
+  {
+    id: 1,
+    title: "Mengatasi Burnout Akademik: Tips dan Strategi",
+    summary:
+      "Pelajari cara mengenali tanda-tanda burnout dan strategi efektif untuk mengatasinya agar tetap produktif.",
+    link: "/insight/artikel/1",
+  },
+  {
+    id: 2,
+    title: "Pentingnya Mindfulness dalam Rutinitas Harian",
+    summary:
+      "Integrasikan praktik mindfulness ke dalam keseharianmu untuk meningkatkan fokus dan mengurangi stres.",
+    link: "/insight/artikel/2",
+  },
+  {
+    id: 3,
+    title: "Membangun Resiliensi Mental di Era Digital",
+    summary:
+      "Kembangkan ketahanan mental untuk menghadapi tantangan di dunia digital yang serba cepat dan penuh tekanan.",
+    link: "/insight/artikel/3",
+  },
+];
 
 const FAQ_DATA = [
   {
@@ -617,7 +552,7 @@ function Home() {
                 className="flex flex-col sm:flex-row justify-center gap-4 pt-4"
               >
                 <a
-                  href="/tracker"
+                  href="/insight"
                   className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white bg-gradient-to-r from-[#1ff498] to-[#50b7f7] rounded-full transform hover:scale-105 transition-all duration-300 overflow-hidden hover:shadow-md hover:shadow-[#1ff498]/50"
                 >
                   <Zap className="w-5 h-5 mr-2" />
@@ -728,117 +663,146 @@ function Home() {
           Mengapa Kami Berbeda?
         </h2>
 
-        <motion.div
-          ref={featuresRef}
-          variants={containerVariants}
-          initial="initial"
-          animate={isFeaturesInView ? "animate" : "initial"}
-          className="grid md:grid-cols-3 gap-10 mb-24"
-        >
-          {FEATURES.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <motion.div
+       <motion.div
+    ref={featuresRef}
+    variants={containerVariants}
+    initial="initial"
+    animate={isFeaturesInView ? "animate" : "initial"}
+    className="grid md:grid-cols-3 gap-10 mb-24"
+>
+    {FEATURES.map((feature, index) => {
+        const Icon = feature.icon;
+        
+        // Ambil ID fitur (diasumsikan sudah ada di data FEATURES)
+        const featureId = feature.id || `feature-${index}`; 
+
+        return (
+            <motion.div
                 key={index}
+                // (OPSIONAL TAPI DISARANKAN): Tambahkan ID di sini
+                id={featureId} 
                 variants={itemVariants}
                 className="rounded-3xl p-8 border-2 backdrop-blur-sm transition-all duration-500 transform group flex flex-col items-center text-center
                 border-[#72e4f8] hover:border-[#1ff498] dark:bg-gray-900/50"
-              >
+            >
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 dark:bg-indigo-500/20">
-                  <Icon className="w-10 h-10 text-[#1ff498] transition-transform group-hover:scale-110" />
+                    <Icon className="w-10 h-10 text-[#1ff498] transition-transform group-hover:scale-110" />
                 </div>
                 <h3 className="text-2xl font-extrabold mb-3 text-gray-900 dark:text-gray-100">
-                  {feature.title}
+                    {feature.title}
                 </h3>
                 <p className="leading-relaxed mb-4 text-gray-600 dark:text-gray-400">
-                  {feature.description}
+                    {feature.description}
                 </p>
                 <a
-                  href="#"
-                  className="mt-auto inline-flex items-center font-bold text-base transition-colors text-[#1ff498] hover:text-[#50b7f7]"
+                    // PERUBAHAN KRUSIAL: Menggunakan link dari data FEATURES
+                    href={feature.link} 
+                    className="mt-auto inline-flex items-center font-bold text-base transition-colors text-[#1ff498] hover:text-[#50b7f7]"
                 >
-                  Lihat Fitur <span className="ml-2 text-xl">&rarr;</span>
+                    Lihat Fitur <span className="ml-2 text-xl">&rarr;</span>
                 </a>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+            </motion.div>
+        );
+    })}
+</motion.div>
       </div>
       {/* AKHIR: Kontainer Filosofi & Fitur */}
 
       {/* StyledPathWithLeaves KEDUA - FULL WIDTH */}
       <StyledPathWithLeaves className="w-full" />
-
-      {/* Kontainer untuk Artikel dan FAQ (dengan batasan lebar) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-9 relative z-10">
-        {/* === Wawasan Terbaru / Artikel (Diberi Animasi Grid) === */}
-        <div className="mb-24 pt-10 ">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-10">
-
-            {/* --- START: Perbaikan Ikon dan Alignment --- */}
-            <h2 className="text-4xl font-extrabold text-center sm:text-left mb-6 sm:mb-0 text-gray-900 dark:text-gray-100 flex items-center">
-              {/* Container untuk Ikon Lingkaran yang Besar */}
-              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/40 mr-4 flex-shrink-0">
-                <BookOpen className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              Artikel Terbaru
+      
+{/* Kontainer untuk Artikel dan FAQ (dengan batasan lebar) */}
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-9 relative z-10">
+    {/* === Wawasan Terbaru / Artikel (Diberi Animasi Grid) === */}
+    <div className="mb-24 pt-10 ">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-10">
+            <h2 className="text-4xl font-extrabold text-center sm:text-left mb-6 sm:mb-0 text-gray-900 dark:text-gray-100">
+                <BookOpen className="inline-block w-9 h-9 mr-3 text-emerald-600 dark:text-emerald-400" />
+                Artikel
             </h2>
-            {/* --- END: Perbaikan Ikon dan Alignment --- */}
-
             <a
-              href="/insight#artikel"
-              className="font-bold text-lg inline-flex items-center text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+                href="/insight#artikel"
+                className="font-bold text-lg inline-flex items-center text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
-              Lihat Semua Artikel <span className="ml-2 text-xl">&rarr;</span>
+                Lihat Semua Artikel <span className="ml-2 text-xl">&rarr;</span>
             </a>
-          </div>
+        </div>
 
-          <motion.div
-            // Modifikasi grid menjadi 1 kolom di mobile dan 2 kolom di desktop untuk tampilan yang lebih lebar
-            className="grid gap-8 md:grid-cols-2" 
+        <motion.div
+            ref={articlesRef}
             variants={containerVariants}
             initial="initial"
             animate={isArticlesInView ? "animate" : "initial"}
-          >
-            {/* Menggunakan ArticleCard baru dan data dari Insight */}
-            {ARTICLES.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </motion.div>
+            className="grid md:grid-cols-3 gap-10"
+        >
+            {ARTICLES.map((article, index) => (
+                <motion.a
+                    key={article.id}
+                    variants={itemVariants}
+                    href={article.link}
+                    // Kelas disesuaikan: Menghilangkan overflow-hidden karena tidak ada gambar.
+                    // Menambahkan gradien halus sebagai pengganti gambar.
+                    className="block rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-2 
+                                bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 
+                                border-2 dark:border-gray-700"
+                >
+                    {/* HILANGKAN: Kontainer Gambar */}
 
-       
-        </div>
-        {/* === FAQ Section (Diberi Animasi) === */}
-        <section ref={faqRef} className="mb-24 pt-10">
-          <motion.h2
+                    <div className="p-7">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-2 block">
+                            {/* Contoh: Tanggal atau Kategori */}
+                            {article.category || 'Kesehatan Mental'} 
+                        </span>
+                        <h3 className="text-xl font-bold mb-3 leading-snug text-gray-900 group-hover:text-emerald-700 dark:text-gray-100 dark:group-hover:text-emerald-400">
+                            {article.title}
+                        </h3>
+                        {/* Ringkasan dibuat lebih menonjol */}
+                        <p className="text-base line-clamp-3 text-gray-600 dark:text-gray-400">
+                            {article.summary}
+                        </p>
+                        <div className="mt-5 pt-3 border-t border-gray-200 dark:border-gray-700">
+                             <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 group-hover:underline">
+                                Baca Selengkapnya &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </motion.a>
+            ))}
+        </motion.div>
+    </div>
+
+    {/* === FAQ Section (Tidak diubah dari permintaan Anda) === */}
+    <section ref={faqRef} className="mb-24 pt-10">
+        <motion.h2
             variants={fadeInUp}
             initial="initial"
             animate={isFaqInView ? "animate" : "initial"}
             className="text-4xl font-extrabold mb-12 text-center text-gray-900 dark:text-gray-100"
-          >
+        >
             <HelpCircle className="inline-block w-9 h-9 mr-3 text-[#50b7f7] dark:text-[#72e4f8]" />
             Pertanyaan yang Sering Diajukan (FAQ)
-          </motion.h2>
+        </motion.h2>
 
-          <motion.div
+        <motion.div
             variants={fadeInUp}
             initial="initial"
             animate={isFaqInView ? "animate" : "initial"}
             transition={{ delay: 0.2 }}
-            className="max-w-4xl mx-auto rounded-3xl overflow-hidden border-2 border-gray-800 shadow-xl bg-white dark:bg-gray-800"
-          >
+            // DARK MODE: Mengubah latar belakang FAQ
+            className="max-w-4xl mx-auto rounded-3xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-xl bg-white dark:bg-gray-900" 
+        >
             {FAQ_DATA.map((item, index) => (
-              <FaqItem
-                key={index}
-                question={item.question}
-                answer={item.answer}
-                index={index}
-              />
+                <FaqItem
+                    key={index}
+                    question={item.question}
+                    answer={item.answer}
+                    index={index}
+                />
             ))}
-          </motion.div>
-        </section>
-      </div>
-      {/* AKHIR: Kontainer Artikel & FAQ */}
+        </motion.div>
+    </section>
+</div>
+{/* AKHIR: Kontainer Artikel & FAQ */}
 
       {/* StyledPathWithLeaves KEEMPAT - FULL WIDTH */}
       <StyledPathWithLeaves className="w-full" />
@@ -921,8 +885,8 @@ function Home() {
                   key={index}
                   onClick={() => goToSlide(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-300 focus:outline-none ${index === activeTestimonial
-                    ? "bg-[#1ff498] w-8 shadow-md"
-                    : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400"
+                      ? "bg-[#1ff498] w-8 shadow-md"
+                      : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400"
                     }`}
                   aria-label={`Go to testimonial ${index + 1}`}
                 />
@@ -1024,9 +988,9 @@ function Home() {
           />
         </motion.svg>
       </div>
-
+      
     </div>
-
+    
   );
 }
 
