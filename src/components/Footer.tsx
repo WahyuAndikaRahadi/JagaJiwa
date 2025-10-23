@@ -49,17 +49,16 @@ const HoverLink = ({ to, children, className = "" }) => {
 
 const Footer = () => {
    const features = [
+    { name: "Insight", path: "/insight" },
     { name: "Mood Tracker", path: "/tracker" },
     { name: "Journal Mood", path: "/journal" },
-    // Menghapus 'Darurat' dari nama
-    { name: "Talk Room", path: "/talk" }, 
-    { name: "Insight", path: "/insight" },
+    { name: "Talk Room", path: "/talkroom" },
   ];
 
   // Halaman Utama hanya berisi Home dan About, serta link kebijakan
   const mainPages = [
-    { name: "Beranda", path: "/" },
-    { name: "Tentang Kami", path: "/about" }
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" }
   ];
 
   return (
@@ -159,12 +158,13 @@ const Footer = () => {
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               {/* Icon media sosial dengan animasi hover sederhana */}
-              {['Twitter', 'Instagram', 'Github'].map((social) => {
+              {[ 'Github'].map((social) => {
                 const Icon = social === 'Twitter' ? Twitter : social === 'Instagram' ? Instagram : Github;
                 return (
                   <motion.a
                     key={social}
-                    href="#"
+                    href="https://github.com/WahyuAndikaRahadi/Mood-IndonesianGold"
+                    target="_blank"
                     className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
                     aria-label={social}
                     whileHover={{ scale: 1.1, rotate: 5 }} // Efek hover

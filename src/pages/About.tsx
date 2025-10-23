@@ -359,9 +359,16 @@ const About: React.FC = () => {
 
   return (
     <div
+<<<<<<< HEAD
       className="min-h-screen relative overflow-hidden transition-colors duration-500 
       bg-gradient-to-br from-indigo-50/70 via-white to-teal-50/70 
       dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950"
+=======
+      className="min-h-screen relative overflow-hidden transition-colors duration-500
+        bg-gradient-to-br from-indigo-50/70 via-white to-teal-50/70 
+        // --- PERUBAHAN DI SINI: Menyalin dark mode palette dari Home.tsx
+        dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950"
+>>>>>>> 250d7b7b2114086d0ad528d421d2122753250bbe
     >
       {/* === Background Blobs (Copied from Home.tsx) === */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob dark:bg-indigo-700 dark:opacity-30" />
@@ -828,7 +835,7 @@ const About: React.FC = () => {
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 gap-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
@@ -1019,8 +1026,12 @@ const About: React.FC = () => {
       </section>
 
       {/* Dampak Kami Dalam Angka (Statistics) */}
+<<<<<<< HEAD
       {/* Dampak Kami Dalam Angka (Statistics) */}
       <section className="py-16 md:py-24  relative z-10">
+=======
+      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-emerald-50 relative z-10 dark:from-gray-900 dark:to-gray-900"> {/* Mengubah dark:from/to */}
+>>>>>>> 250d7b7b2114086d0ad528d421d2122753250bbe
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
