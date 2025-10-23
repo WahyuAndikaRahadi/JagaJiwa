@@ -217,6 +217,7 @@ const ARTICLES = [
   {
     id: 1,
     title: "Mengatasi Burnout Akademik: Tips dan Strategi",
+    category: "Akademik",
     summary:
       "Pelajari cara mengenali tanda-tanda burnout dan strategi efektif untuk mengatasinya agar tetap produktif.",
     link: "/insight/artikel/1",
@@ -224,6 +225,7 @@ const ARTICLES = [
   {
     id: 2,
     title: "Pentingnya Mindfulness dalam Rutinitas Harian",
+    category: "Teknik",
     summary:
       "Integrasikan praktik mindfulness ke dalam keseharianmu untuk meningkatkan fokus dan mengurangi stres.",
     link: "/insight/artikel/2",
@@ -231,6 +233,7 @@ const ARTICLES = [
   {
     id: 3,
     title: "Membangun Resiliensi Mental di Era Digital",
+    category: "Pengembangan Diri",
     summary:
       "Kembangkan ketahanan mental untuk menghadapi tantangan di dunia digital yang serba cepat dan penuh tekanan.",
     link: "/insight/artikel/3",

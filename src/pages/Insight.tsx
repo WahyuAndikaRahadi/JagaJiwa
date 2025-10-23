@@ -12,19 +12,15 @@ import {
   PlayCircle,
   CheckCircle,
   ChevronRight,
-  Sparkles,
-  Calendar,
-  Lock,
   Loader,
   PauseCircle,
   StopCircle,
+  Flower,
+  BookLock,
 } from "lucide-react";
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   GoogleGenAI,
-  Content,
-  Chat,
-  GenerateContentResponse,
 } from "@google/genai";
 import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
@@ -346,6 +342,9 @@ const Insight = () => {
   const [gratitudeText, setGratitudeText] = useState("");
   const [canPlantToday, setCanPlantToday] = useState(true);
   const [lastPlantDate, setLastPlantDate] = useState("");
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains('dark')
+  );
   const [aiGratitudeAnalysis, setAiGratitudeAnalysis] = useState<string | null>(
     null
   );
@@ -381,6 +380,8 @@ const Insight = () => {
 
   // State untuk perbaikan race condition localStorage
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  
 
   // ==================== EFFECT HOOKS ====================
 
@@ -447,6 +448,25 @@ const Insight = () => {
     setLastPlantDate(savedLastPlantDate || "");
 
     // Tandai bahwa data telah selesai dimuat
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "class"
+        ) {
+          setIsDark(document.documentElement.classList.contains("dark"));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+    });
+
+    // Cleanup observer
+    return () => observer.disconnect();
+    
     setIsDataLoaded(true);
   }, []);
 
@@ -526,43 +546,68 @@ const Insight = () => {
     };
   }, [moodData]);
 
+  const stopWords = [
+    "aku", "saya", "kamu", "dia", "mereka", "kita", "kami",
+    "yang", "dan", "atau", "tapi", "namun", "juga", "serta", "seperti",
+    "di", "ke", "dari", "untuk", "oleh", "pada", "tentang", "dengan", "tanpa",
+    "ini", "itu", "adalah", "ialah", "merupakan", "tidak", "bukan", "sudah",
+    "belum", "akan", "sedang", "saat", "waktu", "kalau", "ketika", "lagi",
+    "ada", "telah", "tapi", "jadi", "bisa", "harus", "cuma", "hanya",
+    "mau", "ingin", "pun", "nya", "sangat", "lebih", "paling", "kurang",
+    "sekali", "begitu", "hanya", "dan", "juga", "deh", "loh", "nih", "ya",
+];
+
   const topTriggers = useMemo(() => {
-    const lowMoodEntries = journalEntries.filter((entry) => {
-      const dateKey = entry.date.split("T")[0];
-      const mood = moodData[dateKey];
-      return mood === "sad" || mood === "very-sad";
+    // journalEntries harus didefinisikan di MoodTracker.tsx
+    // Asumsi struktur journalEntries: Array<{ date: string, content: string }>
+
+    // 1. Filter entri yang mood-nya rendah
+    const lowMoodEntries = journalEntries.filter((entry: any) => { // Ganti 'any' dengan tipe JournalEntry yang benar
+        const dateKey = entry.date.split("T")[0];
+        const mood = moodData[dateKey];
+        return mood === "sad" || mood === "very-sad";
     });
 
-    const wordFrequency: { [key: string]: number } = {};
-    const stopWords = [
-      "aku",
-      "saya",
-      "yang",
-      "dan",
-      "di",
-      "ke",
-      "dari",
-      "untuk",
-      "ini",
-      "itu",
-      "adalah",
-    ];
+    const phraseFrequency: { [key: string]: number } = {};
 
-    lowMoodEntries.forEach((entry) => {
-      const words = entry.content.toLowerCase().split(/\s+/);
-      words.forEach((word) => {
-        const cleaned = word.replace(/[^\w]/g, "");
-        if (cleaned.length > 3 && !stopWords.includes(cleaned)) {
-          wordFrequency[cleaned] = (wordFrequency[cleaned] || 0) + 1;
+    lowMoodEntries.forEach((entry: any) => { // Ganti 'any' dengan tipe JournalEntry yang benar
+        // Membersihkan konten: huruf kecil, hapus karakter non-alfanumerik/spasi, lalu split
+        const content = entry.content.toLowerCase();
+        const cleanedContent = content.replace(/[^\w\s]/g, "");
+        const words = cleanedContent.split(/\s+/).filter(w => w.length > 2); // Filter kata-kata pendek
+
+        // Helper untuk memeriksa apakah frasa mengandung stopword
+        const hasStopWord = (phraseWords: string[]) => {
+            return phraseWords.some(word => stopWords.includes(word));
+        };
+
+        // --- Analisis N-gram (Bigram & Trigram) ---
+        
+        // Bigram (Frasa 2 kata)
+        for (let i = 0; i < words.length - 1; i++) {
+            const bigramWords = [words[i], words[i + 1]];
+            if (!hasStopWord(bigramWords)) {
+                const bigram = bigramWords.join(" ");
+                phraseFrequency[bigram] = (phraseFrequency[bigram] || 0) + 1;
+            }
         }
-      });
+
+        // Trigram (Frasa 3 kata)
+        for (let i = 0; i < words.length - 2; i++) {
+            const trigramWords = [words[i], words[i + 1], words[i + 2]];
+            if (!hasStopWord(trigramWords)) {
+                const trigram = trigramWords.join(" ");
+                phraseFrequency[trigram] = (phraseFrequency[trigram] || 0) + 1;
+            }
+        }
     });
 
-    return Object.entries(wordFrequency)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([word, count]) => ({ word, count }));
-  }, [journalEntries, moodData]);
+    // Urutkan dan ambil 3 frasa teratas
+    return Object.entries(phraseFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([word, count]) => ({ word, count }));
+}, [journalEntries, moodData]);
 
   const todayEmotion = useMemo(() => {
     const dayOfYear = Math.floor(
@@ -1196,122 +1241,181 @@ const Insight = () => {
               className="space-y-6 md:space-y-8"
             >
               {/* The Gratitude Garden */}
-              <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-emerald-300 dark:border-emerald-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
-                  <div className="flex items-center space-x-3">
-                    <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                      The Gratitude Garden 🌸
-                    </h2>
-                  </div>
-                  <div className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                    {gardenSeeds} Benih Ditanam
-                  </div>
+<motion.div
+    initial={{ scale: 0.95 }}
+    animate={{ scale: 1 }}
+    transition={{ duration: 0.5, delay: 0.1 }}
+    // Shadow dipertebal, border dipertebal, background sedikit lebih transparan
+    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-emerald-300 dark:border-emerald-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
+>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2 border-b pb-4 border-emerald-100 dark:border-gray-700">
+        <div className="flex items-center space-x-3">
+            <Flower className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600 dark:text-emerald-400" />
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                The Gratitude Garden
+            </h2>
+        </div>
+        <div className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+            {gardenSeeds} Benih Ditanam 🌳
+        </div>
+    </div>
+
+    <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
+        Tumbuhkan taman syukurmu! Setiap kali kamu menuliskan hal yang
+        kamu syukuri, sebuah bunga indah akan mekar di tamanmu.
+        Maksimal satu benih per hari.
+    </p>
+
+    {/* === VISUAL TAMAN YANG LEBIH ESTETIK & DINAMIS === */}
+    <div
+        // Latar belakang diubah untuk kesan langit/horizon
+        className="bg-gradient-to-b from-sky-50 to-emerald-100 dark:from-gray-900 dark:to-green-950 rounded-3xl p-4 sm:p-8 mb-6 min-h-[250px] sm:min-h-[300px] border-4 border-emerald-400 dark:border-emerald-700 relative overflow-hidden flex flex-col justify-end shadow-inner shadow-green-900/10"
+    >
+
+        {/* SUN / MOON (dengan Framer Motion dan deteksi dark mode) */}
+        <AnimatePresence mode="wait">
+            {/* Ganti 'isDarkMode' dengan variabel deteksi tema Anda yang sebenarnya */}
+            {isDark ? (
+                <motion.div
+                    key="moon"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5 }}
+                    className='absolute top-4 right-4 text-4xl text-blue-300 animate-pulse'
+                >
+                    🌙
+                </motion.div>
+            ) : (
+                <motion.div
+                    key="sun"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5 }}
+                    className='absolute top-4 right-4 text-4xl text-yellow-500 animate-pulse'
+                >
+                    ☀️
+                </motion.div>
+            )}
+        </AnimatePresence>
+        
+        {/* Lapisan 1: Jaring-jaring rumput/tanah (z-index rendah) */}
+        <div className="absolute inset-0 bg-repeat bg-center opacity-30 dark:opacity-20 z-0" 
+             style={{ 
+                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 20 20'%3E%3Cpath fill='%2365a30d' d='M0 0h10v10H0zm10 10h10v10H10z' opacity='0.05'/%3E%3C/svg%3E")`
+             }}>
+        </div>
+
+        {/* --- Area Bunga (Z-index 30, selalu di depan rumput) --- */}
+        <div className="flex-grow w-full grid grid-cols-6 md:grid-cols-10 gap-x-2 gap-y-1 items-end justify-center z-30">
+            {gardenFlowers.length === 0 ? (
+                <div className="col-span-10 text-center py-10 sm:py-12">
+                    <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2 animate-bounce">
+                        Tamanmu masih kosong 🌱
+                    </p>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm sm:text-base">
+                        Mulai tanam benih syukur pertamamu!
+                    </p>
                 </div>
-
-                <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
-                  Tumbuhkan taman syukurmu! Setiap kali kamu menuliskan hal yang
-                  kamu syukuri, sebuah bunga indah akan mekar di tamanmu.
-                  Maksimal satu benih per hari. 🌺
-                </p>
-
-                <div className="bg-gradient-to-b from-teal-50 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30 rounded-3xl p-4 sm:p-8 mb-6 min-h-[200px] sm:min-h-[250px] border-4 border-emerald-300 dark:border-emerald-700 relative overflow-hidden flex flex-col justify-end">
-                  <div className="flex-grow w-full grid grid-cols-6 md:grid-cols-10 gap-2 items-end justify-center">
-                    {gardenFlowers.length === 0 ? (
-                      <div className="col-span-10 text-center py-10 sm:py-12">
-                        <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2">
-                          Tamanmu masih kosong 🌱
-                        </p>
-                        <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm sm:text-base">
-                          Mulai tanam benih syukur pertamamu!
-                        </p>
-                      </div>
-                    ) : (
-                      gardenFlowers.map((flower, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{
+            ) : (
+                gardenFlowers.map((flower, index) => (
+                    <motion.div
+                        key={index}
+                        initial={{ scale: 0, opacity: 0, y: 50 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        transition={{
                             type: "spring",
                             stiffness: 150,
                             damping: 10,
                             delay: index * 0.05,
-                          }}
-                          className="text-4xl sm:text-5xl text-center"
-                          style={{
+                        }}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        // Z-index 30 agar bunga di atas rumput
+                        className="text-4xl sm:text-5xl text-center cursor-pointer relative z-30"
+                        style={{
                             alignSelf: "flex-end",
-                          }}
-                        >
-                          {flower}
-                        </motion.div>
-                      ))
-                    )}
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 h-10 bg-green-800/50 dark:bg-green-900/70 rounded-b-3xl"></div>
-                </div>
-
-                <div className="space-y-4">
-                  <textarea
-                    value={gratitudeText}
-                    onChange={(e) => {
-                      setGratitudeText(e.target.value);
-                      setAiGratitudeAnalysis(null);
-                    }}
-                    className="w-full h-24 px-5 py-4 bg-white dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base"
-                    placeholder="Apa yang kamu syukuri hari ini?"
-                    disabled={isGratitudeLoading}
-                  />
-                  <motion.button
-                    onClick={plantGratitudeSeed}
-                    disabled={
-                      !canPlantToday ||
-                      !gratitudeText.trim() ||
-                      isGratitudeLoading
-                    }
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-2xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base sm:text-lg flex items-center justify-center space-x-2"
-                  >
-                    {isGratitudeLoading ? (
-                      <>
-                        <Loader className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
-                        <span>Menganalisis...</span>
-                      </>
-                    ) : (
-                      <span>
-                        {canPlantToday
-                          ? "🌱 Tanam Benih Syukur"
-                          : "✅ Sudah Menanam Hari Ini"}
-                      </span>
-                    )}
-                  </motion.button>
-                </div>
-
-                <AnimatePresence>
-                  {aiGratitudeAnalysis && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 dark:border-blue-700"
+                            transform: `translateX(${Math.floor(Math.random() * 10 - 5)}px)`
+                        }}
                     >
-                      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                        <strong className="text-blue-700 dark:text-blue-400">
-                          Wawasan AI:
-                        </strong>{" "}
-                        {aiGratitudeAnalysis}
-                      </p>
+                        {flower}
                     </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                ))
+            )}
+        </div>
+
+        {/* --- Lapisan Rumput & Tanah (z-index 10) --- */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-green-700 to-green-600 dark:from-green-900 dark:to-green-800 rounded-b-3xl z-10">
+            {/* Tekstur rumput dengan SVG */}
+            <div className="absolute inset-0 bg-repeat opacity-20" 
+                 style={{ 
+                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 20 20'%3E%3Cpath fill='%2322c55e' d='M0 0h10v10H0zm10 10h10v10H10z' opacity='0.1'/%3E%3C/svg%3E")`
+                 }}>
+            </div>
+        </div>
+
+        {/* Garis Tanah Paling Bawah (z-index 20, menutupi rumput) */}
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-green-800 dark:bg-green-950 rounded-b-[22px] shadow-xl z-20"></div>
+
+    </div>
+    {/* === AKHIR VISUAL TAMAN === */}
+
+    <div className="space-y-4">
+        <textarea
+            value={gratitudeText}
+            onChange={(e) => {
+                setGratitudeText(e.target.value);
+                setAiGratitudeAnalysis(null);
+            }}
+            className="w-full h-24 px-5 py-4 bg-white dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 dark:focus:ring-emerald-500/50 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base shadow-inner"
+            placeholder="Apa yang kamu syukuri hari ini?"
+            disabled={isGratitudeLoading}
+        />
+        <motion.button
+            onClick={plantGratitudeSeed}
+            disabled={
+                !canPlantToday ||
+                !gratitudeText.trim() ||
+                isGratitudeLoading
+            }
+            whileHover={{ scale: 1.02, boxShadow: "0 10px 15px -3px rgba(16, 185, 129, 0.5)" }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base sm:text-lg flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+        >
+            {isGratitudeLoading ? (
+                <>
+                    <Loader className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
+                    <span>Menganalisis...</span>
+                </>
+            ) : (
+                <span>
+                    {canPlantToday
+                        ? " Tanam Benih Syukur"
+                        : " Sudah Menanam Hari Ini"}
+                </span>
+            )}
+        </motion.button>
+    </div>
+
+    <AnimatePresence>
+        {aiGratitudeAnalysis && (
+            <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 dark:border-blue-700 shadow-md"
+            >
+                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                    <strong className="text-blue-700 dark:text-blue-400">
+                        Wawasan AI:
+                    </strong>{" "}
+                    {aiGratitudeAnalysis}
+                </p>
+            </motion.div>
+        )}
+    </AnimatePresence>
+</motion.div>
 
               {/* Worry Vault */}
               <motion.div
@@ -1322,9 +1426,9 @@ const Insight = () => {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
                   <div className="flex items-center space-x-3">
-                    <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
+                    <BookLock className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                      Worry Vault 🔒
+                      Worry Vault 
                     </h2>
                   </div>
                   <div className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
@@ -1335,7 +1439,7 @@ const Insight = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
                   Tulis kekhawatiranmu dan kunci di brankas mental. Pisahkan
                   mana yang bisa kamu kontrol dan mana yang harus kamu lepaskan.
-                  🧘
+                  
                 </p>
 
                 <AnimatePresence mode="wait">
@@ -1351,7 +1455,7 @@ const Insight = () => {
                       whileTap={{ scale: 0.98 }}
                       className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl hover:shadow-lg transition-all text-base sm:text-lg"
                     >
-                      🔓 Buka Worry Vault
+                       Buka Worry Vault
                     </motion.button>
                   ) : (
                     <motion.div
@@ -1379,7 +1483,7 @@ const Insight = () => {
                             whileTap={{ scale: 0.97 }}
                             className={`p-5 rounded-2xl border-2 transition-all  ${
                               worryType === "controllable"
-                                ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-400 shadow-lg scale-105"
+                                ? " border-blue-400 shadow-lg scale-105"
                                 : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-600 hover:border-blue-300"
                             } disabled:opacity-50 text-left sm:text-center`}
                           >
@@ -1399,7 +1503,7 @@ const Insight = () => {
                             whileTap={{ scale: 0.97 }}
                             className={`p-5 rounded-2xl border-2 transition-all  ${
                               worryType === "uncontrollable"
-                                ? "bg-gradient-to-br from-purple-50 to-pink-50 border-purple-400 shadow-lg scale-105"
+                                ? " border-purple-400 shadow-lg scale-105"
                                 : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-600 hover:border-purple-300"
                             } disabled:opacity-50 text-left sm:text-center`}
                           >
@@ -1445,7 +1549,7 @@ const Insight = () => {
                             className="bg-white dark:bg-gray-900 dark:border-gray-600 rounded-2xl p-4 sm:p-5 border-2 border-purple-200"
                           >
                             <p className="text-sm text-gray-700 dark:text-gray-400">
-                              💜 <strong>Reminder:</strong> Karena ini di luar
+                               <strong>Reminder:</strong> Karena ini di luar
                               kontrolmu, fokus pada menerima dan melepaskan.
                             </p>
                           </motion.div>
@@ -1498,7 +1602,7 @@ const Insight = () => {
                 {lockedWorries.length > 0 && (
                   <div className="mt-6 space-y-3">
                     <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-4 dark:text-white">
-                      📦 Kekhawatiran Terkunci Terbaru:
+                       Kekhawatiran Terkunci Terbaru:
                     </h3>
                     {lockedWorries
                       .slice(-3)
@@ -1554,7 +1658,7 @@ const Insight = () => {
                 <div className="flex items-center space-x-3 mb-6">
                   <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600" />
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Buku Latihan CBT 📝
+                    Buku Latihan CBT
                   </h2>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
@@ -1667,9 +1771,9 @@ const Insight = () => {
                       transition={{ duration: 0.3 }}
                       className="space-y-6"
                     >
-                      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-5 sm:p-6 border-2 border-purple-200">
-                        <h3 className="text-lg sm:text-xl font-bold text-purple-900 mb-4">
-                          📝 Rangkuman & Analisis CBT
+                      <div className=" rounded-2xl p-5 sm:p-6 border-2 border-purple-200">
+                        <h3 className="text-lg sm:text-xl font-bold text-purple-500 mb-4">
+                           Rangkuman & Analisis CBT
                         </h3>
                         <div className="space-y-4 text-sm">
                           <div className="bg-white dark:bg-gray-900 rounded-xl p-4">
@@ -1724,7 +1828,7 @@ const Insight = () => {
                           whileTap={{ scale: 0.99 }}
                           className="w-full sm:w-auto px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-300 font-semibold"
                         >
-                          🔄 Mulai Ulang
+                          Mulai Ulang
                         </motion.button>
                         <motion.button
                           onClick={saveWorksheet}
@@ -1732,7 +1836,7 @@ const Insight = () => {
                           whileTap={{ scale: 0.98 }}
                           className="w-full sm:flex-grow px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl hover:shadow-lg font-semibold transition-all"
                         >
-                          💾 Simpan ke Journal
+                          Simpan ke Journal
                         </motion.button>
                       </div>
                     </motion.div>
@@ -1750,7 +1854,7 @@ const Insight = () => {
                 <div className="flex items-center space-x-3 mb-6">
                   <PlayCircle className="w-6 h-6 sm:w-7 sm:h-7 text-teal-600" />
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Panduan Audio Fokus 🎧
+                    Panduan Audio Fokus 
                   </h2>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">

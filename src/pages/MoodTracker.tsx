@@ -93,7 +93,7 @@ function MoodTracker() {
     // Fungsi yang dipanggil saat mood dipilih
     const handleMoodSelect = (mood: string) => {
         if (!selectedDateKey) return;
-        
+
         const existingMood = moodData[selectedDateKey];
         const isEditing = existingMood !== undefined;
         const newMoodLabel = moodOptions.find(opt => opt.value === mood)?.label || mood;
@@ -117,23 +117,28 @@ function MoodTracker() {
         }).then((result) => {
             if (result.isConfirmed) {
                 // HANYA dipanggil jika user mengklik "Ya, Ubah!"
-                updateMood(mood, selectedDateKey); 
+                updateMood(mood, selectedDateKey);
             } else {
                 // Tutup pop-up jika dibatalkan
-                setTimeout(() => setSelectedDateKey(null), 300); 
+                setTimeout(() => setSelectedDateKey(null), 300);
             }
         });
         // --- AKHIR Logika Konfirmasi ---
-        
+
         // PENTING: updateMood() yang lama di akhir dihapus!
     };
 
     // Menghitung tanggal yang dipilih dalam format bahasa Indonesia
     const selectedDateLabel = useMemo(() => {
         if (!selectedDateKey) return '';
-        const date = new Date(selectedDateKey);
-        // CATATAN: Penyesuaian +1 hari untuk zona waktu dipertahankan
-        date.setDate(date.getDate() + 1);
+
+        // Perbaikan: Parsing string YYYY-MM-DD sebagai tanggal di zona waktu lokal 
+        // dengan menambahkan waktu (misalnya, T12:00:00) agar tidak tergeser ke hari sebelumnya.
+        const localKey = `${selectedDateKey}T12:00:00`;
+        const date = new Date(localKey);
+
+        // **TIDAK PERLU lagi penyesuaian +1 hari**
+
         return date.toLocaleDateString('id-ID', {
             weekday: 'long',
             day: 'numeric',
@@ -141,7 +146,6 @@ function MoodTracker() {
             year: 'numeric',
         });
     }, [selectedDateKey]);
-
 
     const moodOptions = [
         // Menggunakan warna yang lebih sesuai dengan skema teal/blue
@@ -196,27 +200,27 @@ function MoodTracker() {
                     className="mb-8 md:mb-12 pt-6"
                 >
                     <div className="flex items-center space-x-4 mb-2">
-            <div
-              className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
+                        <div
+                            className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
               rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/50"
-            >
-              <Smile className="w-7 h-7 text-teal-600 dark:text-teal-400" /> 
-            </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
-              <GradientText
-                colors={[
-                  "#40ffaa",
-                  "#4079ff",
-                  "#40ffaa",
-                  "#4079ff",
-                  "#40ffaa",
-                ]}
-                animationSpeed={8}
-                showBorder={false}
-              >
-                Mood Tracker
-              </GradientText>
-            </h1>
+                        >
+                            <Smile className="w-7 h-7 text-teal-600 dark:text-teal-400" />
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
+                            <GradientText
+                                colors={[
+                                    "#40ffaa",
+                                    "#4079ff",
+                                    "#40ffaa",
+                                    "#4079ff",
+                                    "#40ffaa",
+                                ]}
+                                animationSpeed={8}
+                                showBorder={false}
+                            >
+                                Mood Tracker
+                            </GradientText>
+                        </h1>
                     </div>
                     <p className="text-lg text-gray-600 dark:text-gray-400 ml-16">
                         Pantau, catat, dan analisis pola emosi serta suasana hatimu.
@@ -346,72 +350,72 @@ function MoodTracker() {
 
             </div>
 
-                  <div className="relative h-32 w-full overflow-hidden ">
-                    <motion.svg
-                      viewBox="0 0 1200 120"
-                      preserveAspectRatio="none"
-                      className="absolute top-0 w-full h-full"
-                      initial={{ opacity: 0 }}
-                      animate={{
+            <div className="relative h-32 w-full overflow-hidden ">
+                <motion.svg
+                    viewBox="0 0 1200 120"
+                    preserveAspectRatio="none"
+                    className="absolute top-0 w-full h-full"
+                    initial={{ opacity: 0 }}
+                    animate={{
                         opacity: 1,
                         transition: { duration: 1, delay: 0.5 },
-                      }}
-                    >
-                      {/* Path 1: Biru terang dengan opacity rendah */}
-                      <motion.path
+                    }}
+                >
+                    {/* Path 1: Biru terang dengan opacity rendah */}
+                    <motion.path
                         fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
                         fillOpacity="0.1"
                         d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
                         animate={{
-                          pathLength: 1,
-                          pathOffset: 0,
-                          transition: {
-                            duration: 3,
-                            ease: "linear",
-                            repeat: Infinity,
-                            repeatType: "loop",
-                          },
+                            pathLength: 1,
+                            pathOffset: 0,
+                            transition: {
+                                duration: 3,
+                                ease: "linear",
+                                repeat: Infinity,
+                                repeatType: "loop",
+                            },
                         }}
-                      />
-                      {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
-                      <motion.path
+                    />
+                    {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
+                    <motion.path
                         fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
                         fillOpacity="0.2"
                         d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
                         animate={{
-                          pathLength: 1,
-                          pathOffset: 0,
-                          transition: {
-                            duration: 3.5,
-                            ease: "linear",
-                            repeat: Infinity,
-                            repeatType: "loop",
-                            delay: 0.2,
-                          },
+                            pathLength: 1,
+                            pathOffset: 0,
+                            transition: {
+                                duration: 3.5,
+                                ease: "linear",
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                delay: 0.2,
+                            },
                         }}
-                      />
-                      {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
-                      <motion.path
+                    />
+                    {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
+                    <motion.path
                         fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
                         fillOpacity="0.3"
                         d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
                         animate={{
-                          pathLength: 1,
-                          pathOffset: 0,
-                          transition: {
-                            duration: 4,
-                            ease: "linear",
-                            repeat: Infinity,
-                            repeatType: "loop",
-                            delay: 0.4,
-                          },
+                            pathLength: 1,
+                            pathOffset: 0,
+                            transition: {
+                                duration: 4,
+                                ease: "linear",
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                delay: 0.4,
+                            },
                         }}
-                      />
-                    </motion.svg>
-                  </div>
+                    />
+                </motion.svg>
+            </div>
         </div>
     );
 }
