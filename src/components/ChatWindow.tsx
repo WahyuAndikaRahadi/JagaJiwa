@@ -1,7 +1,7 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useRef } from 'react'; // useRef tetap diimpor
 import { Send, Bot, User, Loader2, Mic, AlertTriangle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-// import remarkGfm from 'remark-gfm'; // Dihapus untuk memperbaiki error kompilasi
+// import remarkGfm from 'remark-gfm'; 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 // =======================================================
@@ -106,6 +106,9 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
 function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps) {
   const [inputValue, setInputValue] = useState('');
   const [isVoiceMode, setIsVoiceMode] = useState(false);
+  
+  // Ref untuk menunjuk ke elemen DIV yang dapat di-scroll (kontainer pesan)
+  const scrollableContainerRef = useRef<HTMLDivElement>(null); 
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
@@ -115,6 +118,20 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
 
   const formatTime = (date: Date) =>
     date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+  // Fungsi untuk melakukan auto-scroll menggunakan scrollTop
+  const scrollToBottom = () => {
+    const container = scrollableContainerRef.current;
+    if (container) {
+      // Mengatur scrollTop ke scrollHeight akan menggulir kontainer ke paling bawah
+      container.scrollTop = container.scrollHeight;
+    }
+  };
+  
+  // Hook yang dipanggil setiap kali 'conversation' berubah (pesan baru)
+  useEffect(() => {
+    scrollToBottom();
+  }, [conversation]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,10 +203,14 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
       </header>
 
       {/* Area Pesan Dark Mode */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900">
+      <div 
+        className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900"
+        ref={scrollableContainerRef} // Ref dipasang pada kontainer yang memiliki scrollbar
+      >
         {conversation.map((message, index) => (
           <MessageBubble key={index} message={message} formatTime={formatTime} />
         ))}
+        {/* Div target scroll tidak diperlukan lagi di sini karena kita menggunakan scrollTop pada parent */}
       </div>
 
       {/* Input Area Dark Mode */}
