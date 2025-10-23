@@ -156,7 +156,9 @@ const ArticleDetail = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       // Tambahkan dark:from-gray-900 / dark:to-teal-900 untuk background
-      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-teal-900 p-4 sm:p-8"
+      className="min-h-screen relative overflow-hidden transition-colors duration-500 
+      bg-gradient-to-br from-indigo-50/70 via-white to-teal-50/70 
+      dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950 p-4 sm:p-8"
     >
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 md:p-10 border-t-8 border-teal-500 dark:border-teal-400">
         
