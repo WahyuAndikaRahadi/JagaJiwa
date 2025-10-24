@@ -463,10 +463,12 @@ const Insight = () => {
       attributes: true,
     });
 
+    setIsDataLoaded(true);
+    
     // Cleanup observer
     return () => observer.disconnect();
     
-    setIsDataLoaded(true);
+    
   }, []);
 
   // Save Garden and Worry Vault Data ke Local Storage
