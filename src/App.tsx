@@ -15,7 +15,6 @@ function App() {
   const mainContentRef = useRef(null); 
   
   const { pathname } = useLocation();
-
   useEffect(() => {
     if (mainContentRef.current) {
       mainContentRef.current.scrollIntoView({ 
@@ -24,7 +23,6 @@ function App() {
       }); 
     }
   }, [pathname]); 
-
   return (
     <div className="min-h-screen bg-gray-50">
       
