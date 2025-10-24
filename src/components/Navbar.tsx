@@ -81,7 +81,7 @@ function Navbar() {
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path: any) => location.pathname === path;
 
   // Classes untuk Desktop
   const activeClassDesktop =

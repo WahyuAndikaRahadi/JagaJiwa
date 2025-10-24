@@ -21,8 +21,14 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+interface HoverLinkProps {
+  to: string; // Diasumsikan 'to' adalah URL (string)
+  children: React.ReactNode; // Tipe standar untuk konten yang dirender (bisa string, element, dll.)
+  className?: string; // Tipe untuk string opsional
+}
+
 // Komponen kustom untuk link dengan hover animasi (Garis Bawah)
-const HoverLink = ({ to, children, className = "" }) => {
+const HoverLink = ({ to, children, className = "" }: HoverLinkProps) => {
   return (
     <motion.li
       // Menggunakan itemVariants untuk staggered effect dari parent

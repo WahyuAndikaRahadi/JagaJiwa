@@ -150,7 +150,7 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                                     onClick={() => setMoodFilter(mood)}
                                     className={`text-xs py-1 px-3 rounded-full transition duration-150 border ${
                                         moodFilter === mood
-                                            ? `${moodColors[mood]} border-2 border-current shadow-md`
+                                            ? `${moodColors[mood as HistorySummary["mood"]]} border-2 border-current shadow-md`
                                             : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                                 >
