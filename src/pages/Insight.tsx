@@ -44,6 +44,15 @@ interface JournalEntry {
   summary?: string;
 }
 
+interface MoodAnalysisResult {
+  avgMood: string;
+  totalDays: number;
+  moodCounts: { [key: string]: number; };
+  trend: 'positive' | 'negative' | 'stable';
+  // Properti yang hilang
+  dominantMoodKey: string; 
+}
+
 interface EmotionGuide {
   name: string;
   definition: string;
@@ -77,98 +86,88 @@ interface AudioGuide {
 }
 
 // ==================== DATA EDUKASI ====================
-const EMOTION_GUIDES: EmotionGuide[] = [
-  {
-    name: "Rasa Bersalah",
-    definition:
-      "Perasaan menyesal atau bertanggung jawab atas kesalahan yang dilakukan, baik nyata maupun yang dibayangkan.",
+const EMOTION_GUIDES: Record<string, EmotionGuide> = {
+  "very-happy": {
+    name: "Sangat Bahagia",
+    definition: "Keadaan euforia dan kepuasan tertinggi. Anda merasakan kegembiraan dan optimisme yang meluap-luap.",
     triggers: [
-      "Mengecewakan orang lain",
-      "Tidak memenuhi ekspektasi diri sendiri",
-      "Membuat keputusan yang merugikan",
+      "Pencapaian besar atau tujuan tercapai",
+      "Menerima kabar baik yang tak terduga",
+      "Waktu berkualitas dengan orang terkasih",
     ],
     managementTips: [
-      "Bedakan antara rasa bersalah yang konstruktif dan destruktif",
-      "Minta maaf jika memang ada kesalahan nyata",
-      "Latih self-compassion - ingat bahwa semua orang membuat kesalahan",
-      "Fokus pada pembelajaran, bukan penyesalan berkepanjangan",
+      "Nikmati momen ini dan catat apa yang membuat Anda merasakannya.",
+      "Salurkan energi positif ke proyek atau tujuan baru.",
+      "Bagikan kegembiraan Anda dengan orang lain (tanpa berlebihan).",
     ],
-    color: "from-purple-500 to-indigo-600",
-    icon: "💭",
+    color: "from-green-400 to-teal-500",
+    icon: "😄",
   },
-  {
-    name: "Kecemasan",
-    definition:
-      "Respons emosional terhadap ancaman yang dipersepsikan, ditandai dengan kekhawatiran berlebihan tentang masa depan.",
+  happy: {
+    name: "Bahagia",
+    definition: "Perasaan senang, puas, dan nyaman secara umum. Anda merasa optimis dan bersemangat.",
     triggers: [
-      "Ketidakpastian atau perubahan besar",
-      "Tekanan akademik atau sosial",
-      "Overthinking tentang hal-hal di luar kendali",
+      "Mencapai target kecil harian",
+      "Interaksi sosial yang menyenangkan",
+      "Menyelesaikan tugas yang tertunda",
     ],
     managementTips: [
-      "Praktikkan teknik grounding 5-4-3-2-1",
-      "Tulis worry list dan kategorikan: bisa dikontrol vs tidak bisa",
-      "Lakukan breathing exercise 4-7-8",
-      "Batasi konsumsi berita atau media yang memicu cemas",
+      "Pertahankan rutinitas yang mendukung suasana hati ini (tidur cukup, olahraga).",
+      "Lakukan *gratitude journaling* untuk menguatkan perasaan positif.",
+      "Terus cari kegiatan yang memberi Anda kegembiraan yang berkelanjutan.",
     ],
-    color: "from-yellow-500 to-orange-500",
-    icon: "😰",
+    color: "from-yellow-400 to-orange-500",
+    icon: "😊",
   },
-  {
-    name: "Kesedihan",
-    definition:
-      "Respons emosional terhadap kehilangan, kekecewaan, atau situasi yang tidak sesuai harapan.",
+  neutral: {
+    name: "Netral",
+    definition: "Kondisi emosional stabil, tenang, dan tidak didorong oleh emosi kuat. Baik untuk fokus dan refleksi.",
     triggers: [
-      "Kehilangan seseorang atau sesuatu yang berharga",
-      "Kegagalan atau penolakan",
-      "Merasa tidak dihargai atau diabaikan",
+      "Hari yang monoton atau rutin",
+      "Istirahat mental dari stres dan drama",
+      "Fokus pada tugas-tugas yang membutuhkan konsentrasi tinggi",
     ],
     managementTips: [
-      "Izinkan dirimu merasakan kesedihan tanpa menghakimi",
-      "Berbicara dengan orang yang dipercaya",
-      "Tulis ekspresif journaling tentang perasaanmu",
-      "Lakukan aktivitas yang biasanya membuatmu nyaman",
+      "Gunakan waktu ini untuk refleksi dan perencanaan tanpa tekanan emosional.",
+      "Hindari melakukan perubahan drastis; pertahankan stabilitas.",
+      "Pastikan 'netral' bukanlah penghindaran dari emosi yang lebih dalam.",
     ],
-    color: "from-blue-500 to-cyan-600",
-    icon: "😢",
+    color: "from-blue-gray-400 to-gray-500",
+    icon: "😐",
   },
-  {
-    name: "Kemarahan",
-    definition:
-      "Respons emosional terhadap ketidakadilan, frustrasi, atau pelanggaran batas personal.",
+  sad: {
+    name: "Sedih",
+    definition: "Perasaan tidak bahagia, kecewa, atau kehilangan. Ini adalah sinyal bahwa ada kebutuhan emosional yang belum terpenuhi.",
     triggers: [
-      "Merasa diperlakukan tidak adil",
-      "Batas personal dilanggar",
-      "Frustrasi akumulatif yang tidak terselesaikan",
+      "Kegagalan atau kekecewaan kecil",
+      "Kesepian atau isolasi sebentar",
+      "Kelelahan atau kurang tidur",
     ],
     managementTips: [
-      "Identifikasi kebutuhan di balik kemarahanmu",
-      "Praktikkan progressive muscle relaxation",
-      "Komunikasikan perasaan dengan assertif, bukan agresif",
-      "Beri jeda sebelum bereaksi (count to 10)",
+      "Izinkan diri Anda merasakan emosi tersebut tanpa menghakiminya.",
+      "Cari dukungan dengan berbicara kepada orang yang Anda percayai.",
+      "Lakukan self-care ringan seperti mendengarkan musik santai atau membuat teh hangat.",
     ],
-    color: "from-red-500 to-rose-600",
-    icon: "😠",
+    color: "from-blue-400 to-indigo-600",
+    icon: "😔",
   },
-  {
-    name: "Stres",
-    definition:
-      "Respons fisik dan mental terhadap tuntutan atau tekanan yang melebihi kapasitas koping.",
+  "very-sad": {
+    name: "Sangat Sedih/Tertekan",
+    definition: "Rasa duka yang mendalam, putus asa, atau tertekan. Membutuhkan perhatian dan dukungan serius.",
     triggers: [
-      "Beban tugas atau tanggung jawab berlebihan",
-      "Deadline yang ketat",
-      "Konflik interpersonal",
+      "Peristiwa traumatis atau menyedihkan",
+      "Stres berkepanjangan yang tidak tertangani",
+      "Masalah kesehatan mental yang membutuhkan bantuan profesional",
     ],
     managementTips: [
-      "Prioritaskan tugas dengan Eisenhower Matrix",
-      "Break down tugas besar menjadi langkah kecil",
-      "Jadwalkan break time secara konsisten",
-      "Lakukan aktivitas fisik ringan setiap hari",
+      "Prioritaskan konsultasi dengan profesional kesehatan mental (terapis/psikolog).",
+      "Fokus pada kebutuhan dasar: makan, tidur, dan hidrasi.",
+      "Hindari isolasi; tetap terhubung dengan jaringan dukungan Anda dan minta bantuan.",
     ],
-    color: "from-orange-500 to-amber-600",
-    icon: "😣",
+    color: "from-purple-700 to-red-800",
+    icon: "😭",
   },
-];
+};
 
 const ARTICLES = [
   {
@@ -215,6 +214,118 @@ const ARTICLES = [
     summary: "Latihan sederhana untuk mengatasi panic attack dan overwhelm.",
     category: "Teknik",
     readTime: "3 menit",
+  },
+  {
+    id: 7,
+    title: "Mengatur Ekspektasi Diri Sendiri",
+    summary:
+      "Belajar membedakan antara ambisi sehat dan perfeksionisme yang merusak.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 8,
+    title: "Digital Detox untuk Kesehatan Mental",
+    summary:
+      "Cara melepaskan ketergantungan pada layar dan kembali ke kehidupan nyata.",
+    category: "Kesehatan",
+    readTime: "6 menit",
+  },
+  {
+    id: 9,
+    title: "Menulis Jurnal sebagai Terapi Diri",
+    summary:
+      "Manfaat menulis harian untuk mengelola emosi dan meningkatkan kesadaran diri.",
+    category: "Teknik",
+    readTime: "4 menit",
+  },
+  {
+    id: 10,
+    title: "Mengenali dan Mengatasi Prokrastinasi",
+    summary:
+      "Memahami akar prokrastinasi dan cara mengubahnya menjadi aksi.",
+    category: "Akademik",
+    readTime: "6 menit",
+  },
+  {
+    id: 11,
+    title: "Menjaga Motivasi Jangka Panjang",
+    summary:
+      "Strategi mempertahankan semangat saat tujuan terasa jauh.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 12,
+    title: "Menghadapi Kegagalan dengan Bijak",
+    summary:
+      "Mengubah kegagalan dari akhir menjadi awal yang baru.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 13,
+    title: "Membangun Rutinitas Pagi yang Menenangkan",
+    summary:
+      "Cara memulai hari dengan tenang dan penuh energi positif.",
+    category: "Kesehatan",
+    readTime: "4 menit",
+  },
+  {
+    id: 14,
+    title: "Mengelola Konflik dengan Teman atau Rekan",
+    summary:
+      "Cara berkomunikasi asertif tanpa merusak hubungan.",
+    category: "Sosial",
+    readTime: "6 menit",
+  },
+  {
+    id: 15,
+    title: "Mengatasi Rasa Tidak Cukup (Impostor Syndrome)",
+    summary:
+      "Mengenali dan melawan perasaan sebagai 'penipu' meski sudah berprestasi.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 16,
+    title: "Latihan Pernapasan untuk Menenangkan Pikiran",
+    summary:
+      "Teknik pernapasan sederhana yang bisa dilakukan di mana saja.",
+    category: "Teknik",
+    readTime: "3 menit",
+  },
+  {
+    id: 17,
+    title: "Menjaga Keseimbangan Hidup Mahasiswa",
+    summary:
+      "Tips mengelola waktu antara kuliah, organisasi, dan kehidupan pribadi.",
+    category: "Akademik",
+    readTime: "6 menit",
+  },
+  {
+    id: 18,
+    title: "Mengelola Emosi Negatif dengan Sehat",
+    summary:
+      "Cara mengakui, memahami, dan menyalurkan emosi seperti marah, sedih, atau kecewa.",
+    category: "Kesehatan",
+    readTime: "5 menit",
+  },
+  {
+    id: 19,
+    title: "Membangun Kebiasaan Belajar yang Efektif",
+    summary:
+      "Strategi berbasis sains untuk belajar lebih cerdas, bukan lebih lama.",
+    category: "Akademik",
+    readTime: "7 menit",
+  },
+  {
+    id: 20,
+    title: "Menemukan Makna dalam Perjalanan Akademik",
+    summary:
+      "Menghubungkan studi dengan nilai dan tujuan hidup yang lebih besar.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
   },
 ];
 
@@ -508,7 +619,8 @@ const Insight = () => {
 
   // ==================== MEMORIZED VALUES (ANALISIS) ====================
 
-  const moodAnalysis = useMemo(() => {
+  // Ubah tipe return 'useMemo' menjadi MoodAnalysisResult | null
+const moodAnalysis: MoodAnalysisResult | null = useMemo(() => {
     const entries = Object.entries(moodData);
     if (entries.length === 0) return null;
 
@@ -531,9 +643,9 @@ const Insight = () => {
     const avgMood =
       last7Days.length > 0
         ? last7Days.reduce(
-          (sum, [, mood]) => sum + (moodValues[mood] || 3),
-          0
-        ) / last7Days.length
+            (sum, [, mood]) => sum + (moodValues[mood] || 3),
+            0
+          ) / last7Days.length
         : 3;
 
     const moodCounts = last7Days.reduce((acc, [, mood]) => {
@@ -541,14 +653,30 @@ const Insight = () => {
       return acc;
     }, {} as { [key: string]: number });
 
+    // ===============================================
+    // LOGIKA PENAMBAHAN UNTUK MENCARI MOOD DOMINAN
+    let dominantMoodKey = 'neutral'; // Default jika tidak ada data
+    let maxCount = 0;
+
+    // Cari mood yang paling banyak muncul
+    for (const mood in moodCounts) {
+        if (moodCounts[mood] > maxCount) {
+            maxCount = moodCounts[mood];
+            dominantMoodKey = mood;
+        }
+    }
+    // ===============================================
+
     return {
       avgMood: avgMood.toFixed(1),
       totalDays: last7Days.length,
       moodCounts,
+      // TAMBAHKAN properti yang hilang di sini:
+      dominantMoodKey, 
       trend:
         avgMood >= 3.5 ? "positive" : avgMood <= 2.5 ? "negative" : "stable",
     };
-  }, [moodData]);
+}, [moodData]);
 
   const stopWords = [
     "aku", "saya", "kamu", "dia", "mereka", "kita", "kami",
@@ -614,13 +742,13 @@ const Insight = () => {
   }, [journalEntries, moodData]);
 
   const todayEmotion = useMemo(() => {
-    const dayOfYear = Math.floor(
-      (new Date().getTime() -
-        new Date(new Date().getFullYear(), 0, 0).getTime()) /
-      (1000 * 60 * 60 * 24)
-    );
-    return EMOTION_GUIDES[dayOfYear % EMOTION_GUIDES.length];
-  }, []);
+    // Ambil kunci emosi dominan dari analisis 7 hari
+    if (moodAnalysis && moodAnalysis.dominantMoodKey) {
+        return EMOTION_GUIDES[moodAnalysis.dominantMoodKey];
+    }
+    // Default jika tidak ada data/analisis
+    return EMOTION_GUIDES['neutral'];
+  }, [moodAnalysis]);
 
 
   const analyzeEmotionTriggers = async () => {
@@ -1213,7 +1341,7 @@ ${journalText}
                     {todayEmotion.icon}
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-bold">
-                    Emosi Fokus: {todayEmotion.name}
+                    Emosi Dominan: {todayEmotion.name}
                   </h2>
                 </div>
                 <p className="text-lg sm:text-xl mb-6 opacity-95 leading-relaxed">
