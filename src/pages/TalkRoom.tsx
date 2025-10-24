@@ -9,12 +9,10 @@ import StyledPathWithLeaves from '../components/StyledPathWithLeaves';
 import Swal from 'sweetalert2';
 import GradientText from '../components/GradientText';
 
-// --- INI HANYA SIMULASI KLIEN ---
 const ai = new GoogleGenAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
 });
 const MODEL = "gemini-2.5-flash";
-// ---------------------------------
 
 interface Message {
     role: 'ai' | 'user';
@@ -39,9 +37,6 @@ const INDONESIA_CRISIS_RESOURCES = [
     { title: "Pemadam Kebakaran", number: "113", description: "Layanan Pemadam Kebakaran.", type: "emergency" },
 ];
 
-// =======================================================
-// ✅ FUNGSI GLOBAL BARU: MEMBUAT KONTEKS DENGAN DETAIL PERCAKAPAN
-// =======================================================
 const generateGlobalContext = (history: HistorySummary[]): string => {
     if (history.length === 0) {
         return 'Belum ada riwayat percakapan yang tersimpan.';
@@ -79,7 +74,6 @@ ${contextText}
 `;
 };
 
-// JIWA_SYSTEM_INSTRUCTION (Tetap sama)
 const JIWA_SYSTEM_INSTRUCTION = (globalContext = '') => `
 Anda adalah psikolog virtual pribadi dalam aplikasi Jaga Jiwa.
 Peran Anda adalah menjadi tempat aman bagi remaja dan pelajar Indonesia (usia 15–20 tahun) untuk berbagi perasaan tanpa takut dihakimi.
@@ -148,9 +142,6 @@ const createNewChatSession = (history?: Content[], globalContext: string = ''): 
     });
 };
 
-// =======================================================
-// ✅ VARIAN FRAMER MOTION BARU (Sophisticated AOS)
-// =======================================================
 const aosVariants: any = {
   hidden: { opacity: 0, y: 50, scale: 0.98 },
   visible: (i: number = 0) => ({
@@ -160,12 +151,11 @@ const aosVariants: any = {
     transition: {
       delay: i * 0.1, 
       duration: 0.7,
-      ease: [0.2, 0.6, 0.3, 1], // Custom bounce/spring-like ease
+      ease: [0.2, 0.6, 0.3, 1], 
     },
   }),
 };
 
-// Varian Framer Motion untuk Background Blobs (dari file lama)
 const pulseSlowVariants: any = {
   animate: {
     scale: [1, 1.2, 1],
@@ -204,12 +194,12 @@ const upAndDown: any = {
 
 const randomFloat: any = {
   animate: {
-    x: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
-    y: () => `${Math.random() * 40 - 20}%`, // -20% to 20%
-    scale: () => [1, 0.8 + Math.random() * 0.4, 1], // 0.8 to 1.2
-    opacity: () => [0.1, 0.3 + Math.random() * 0.2, 0.1], // 0.3 to 0.5
+    x: () => `${Math.random() * 40 - 20}%`, 
+    y: () => `${Math.random() * 40 - 20}%`, 
+    scale: () => [1, 0.8 + Math.random() * 0.4, 1],
+    opacity: () => [0.1, 0.3 + Math.random() * 0.2, 0.1], 
     transition: {
-      duration: () => 10 + Math.random() * 10, // 10 to 20 seconds
+      duration: () => 10 + Math.random() * 10, 
       repeat: Infinity,
       ease: "easeInOut",
     }
@@ -242,9 +232,6 @@ const floatSlowVariants: any = {
     },
   },
 };
-// =======================================================
-// ✅ AKHIR VARIAN FRAMER MOTION
-// =======================================================
 
 function TalkRoom() {
     const [conversation, setConversation] = useState<Message[]>(() => {
@@ -569,7 +556,6 @@ function TalkRoom() {
 
     const currentConversation = typingMessage ? [...conversation, typingMessage] : conversation;
 
-    // Komponen CrisisPopup tetap sama (tanpa Framer Motion pada CrisisPopup, namun menggunakan SweetAlert bawaan)
     const CrisisPopup = () => (
         <div className={`fixed inset-0 z-50 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 ${isCrisisPopupVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
@@ -625,7 +611,6 @@ function TalkRoom() {
         </div>
     );
 
-    // ✅ Mini Intervention Card dengan AnimatePresence untuk entry/exit yang halus
     const MiniInterventionCard = () => {
         if (!miniInterventionSuggestion) return null;
 
@@ -664,16 +649,11 @@ function TalkRoom() {
 
  return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex relative overflow-hidden">
-        {/* ======================================================= */}
-        {/* 🚀 PENAMBAHAN BLOB ANIMASI DARI FILE LAMA (z-index: 1) */}
-        {/* ======================================================= */}
         <div className="absolute inset-0 z-[1] pointer-events-none opacity-50 dark:opacity-30">
-            {/* Blobs statis dengan animasi Tailwind CSS (asumsi 'animate-blob' didefinisikan secara global) */}
             <div className="absolute top-0 left-0 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply opacity-20 animate-blob dark:bg-indigo-700 dark:opacity-10" />
             <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply opacity-20 animate-blob animation-delay-2000 dark:bg-emerald-700 dark:opacity-10" />
             <div className="absolute top-1/2 left-1/4 w-52 h-52 bg-teal-300 rounded-full mix-blend-multiply opacity-20 animate-blob animation-delay-4000 dark:bg-teal-700 dark:opacity-10" />
 
-            {/* Ornamen Tambahan dengan Framer Motion */}
             <motion.div
                 className="absolute top-0 left-0 w-40 h-40 bg-[#72e4f8]/20 dark:bg-[#07798d]/20 rounded-full -translate-x-1/3 -translate-y-1/3"
                 variants={pulseSlowVariants}
@@ -690,7 +670,6 @@ function TalkRoom() {
                 animate="animate"
             ></motion.div>
 
-            {/* Ornamen Hero Area Tambahan (Bola-bola lebih banyak dan beragam) */}
             <motion.div
                 className="absolute top-[10%] left-[10%] w-16 h-16 bg-purple-500/20 dark:bg-purple-700/20 rounded-full"
                 variants={randomFloat}
@@ -732,15 +711,10 @@ function TalkRoom() {
                 style={{ transitionDelay: '2.5s' }}
             ></motion.div>
         </div>
-        {/* ======================================================= */}
-        {/* ✅ AKHIR PENAMBAHAN BLOB ANIMASI */}
-        {/* ======================================================= */}
         
-        {/* 1. Pop-up Krisis & Intervensi Mini (Posisi Fixed) */}
         <CrisisPopup />
         <MiniInterventionCard />
 
-        {/* 2. Chat History Sidebar */}
         <ChatHistorySidebar
             history={historySummaries}
             onSelectHistory={handleSelectHistory}
@@ -752,7 +726,6 @@ function TalkRoom() {
             isOpen={isSidebarOpen}
         />
 
-        {/* 3. Overlay Mobile untuk Sidebar */}
         {isSidebarOpen && window.innerWidth < 1024 && (
             <div
                 className="fixed inset-0 bg-black/50 z-30"
@@ -760,10 +733,8 @@ function TalkRoom() {
             />
         )}
         
-        {/* 4. Konten Utama Chat */}
         <div className={`flex-grow flex flex-col w-full transition-all duration-300 ease-in-out z-10`}>
 
-            {/* Header (tetap fixed di atas) */}
             <header className={`px-4 sm:px-6 lg:px-8 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b dark:border-gray-700 sticky top-0 z-20 shadow-sm flex-shrink-0`}>
                 <motion.div 
                     initial={{ y: -30, opacity: 0 }}
@@ -771,7 +742,6 @@ function TalkRoom() {
                     transition={{ type: "spring", stiffness: 100, delay: 0.1 }}
                     className="flex items-center space-x-3"
                 >
-                    {/* Tombol Toggle Sidebar Mobile */}
                     {!isSidebarOpen && (
                         <button
                             onClick={() => setIsSidebarOpen(true)}
@@ -805,10 +775,8 @@ function TalkRoom() {
                 </motion.div>
             </header>
 
-            {/* Container Konten Chat */}
             <div className="flex-grow w-full flex flex-col min-h-0 px-4 sm:px-6 lg:px-8 py-6 md:py-8 overflow-y-auto z-10">
 
-                {/* Judul Ruang Curhat (AOS) */}
                 <motion.div
                     variants={aosVariants}
                     initial="hidden"
@@ -822,7 +790,6 @@ function TalkRoom() {
                     </p>
                 </motion.div>
 
-                {/* Chat Window (AOS dengan delay) */}
                 <motion.div
                     variants={aosVariants}
                     initial="hidden"
@@ -838,7 +805,6 @@ function TalkRoom() {
                     />
                 </motion.div>
 
-                {/* Tips Berbicara (AOS dengan delay lebih jauh) */}
                 <motion.div
                     variants={aosVariants}
                     initial="hidden"
@@ -878,7 +844,6 @@ function TalkRoom() {
 
             </div>
 
-            {/* SVG Wave/Footer */}
             <div className="relative h-32 w-full overflow-hidden flex-shrink-0 z-10">
                 <motion.svg
                     viewBox="0 0 1200 120"
@@ -890,9 +855,8 @@ function TalkRoom() {
                         transition: { duration: 1, delay: 0.5 },
                     }}
                 >
-                    {/* Path 1: Biru terang dengan opacity rendah */}
                     <motion.path
-                        fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
+                        fill="#4079ff" 
                         fillOpacity="0.1"
                         d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
@@ -907,9 +871,8 @@ function TalkRoom() {
                             },
                         }}
                     />
-                    {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
                     <motion.path
-                        fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                        fill="#40ffaa" 
                         fillOpacity="0.2"
                         d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
@@ -925,9 +888,8 @@ function TalkRoom() {
                             },
                         }}
                     />
-                    {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
                     <motion.path
-                        fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                        fill="#40ffaa" 
                         fillOpacity="0.3"
                         d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
