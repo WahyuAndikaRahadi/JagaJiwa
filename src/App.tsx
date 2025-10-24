@@ -1,8 +1,7 @@
-import { Routes, Route, useLocation } from 'react-router-dom'; // Menambahkan useLocation di sini
-import React, { useRef, useEffect } from 'react'; // Menambahkan useEffect
-// Hapus import ScrollToTop
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { useRef, useEffect } from 'react';
+
 import Navbar from './components/Navbar';
-// ... (Import komponen lainnya)
 import Home from './pages/Home';
 import MoodTracker from './pages/MoodTracker';
 import JournalMood from './pages/JournalMood';
@@ -13,32 +12,24 @@ import ArticleDetail from './pages/ArticleDetail';
 import Footer from './components/Footer';
 
 function App() {
-  // 1. Buat Ref untuk elemen <main>
   const mainContentRef = useRef(null); 
   
-  // 2. Ambil pathname dari useLocation
   const { pathname } = useLocation();
 
-  // 3. Pindahkan logika scroll ke dalam useEffect di App
   useEffect(() => {
-    // Memastikan elemen target tersedia
     if (mainContentRef.current) {
-      // Menggunakan scrollIntoView pada elemen <main>
-      // 'block: "start"' memastikan elemen berada di bagian atas viewport (tepat di bawah Navbar)
       mainContentRef.current.scrollIntoView({ 
         behavior: 'smooth',
         block: 'start' 
       }); 
     }
-  }, [pathname]); // Efek dipanggil setiap kali rute (pathname) berubah
+  }, [pathname]); 
 
   return (
     <div className="min-h-screen bg-gray-50">
       
-      {/* Hapus pemanggilan ScrollToTop */}
-      
       <Navbar />
-      {/* Pasang Ref ke elemen <main> */}
+      
       <main ref={mainContentRef} className="pt-16 md:pt-16">
         <Routes>
           <Route path="/" element={<Home />} />

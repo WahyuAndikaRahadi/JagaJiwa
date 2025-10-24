@@ -7,7 +7,6 @@ import {
   Lightbulb,
   Activity,
   Heart,
-  Zap,
   Phone,
   PlayCircle,
   CheckCircle,

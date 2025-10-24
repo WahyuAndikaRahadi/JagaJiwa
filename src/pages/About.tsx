@@ -24,8 +24,6 @@ import {
   Title,
   Tooltip,
   Legend,
-  ArcElement,
-  BarElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import GradientText from "../components/GradientText";
