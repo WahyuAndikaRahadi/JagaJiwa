@@ -223,7 +223,7 @@ const About: React.FC = () => {
       role: "Front-End",
       bio: "Saya adalah Front-End Developer. Berfokus pada arsitektur komponen React dan desain responsif Tailwind CSS. Menciptakan pengalaman web mulus dan berkinerja tinggi.",
       avatar: "/img/Bagus.jpeg",
-      github: "https://github.com/Zyenmax",
+      github: "https://github.com/Zyzenmax",
       instagram: "https://instagram.com/bagushsnali",
     },
   ];
