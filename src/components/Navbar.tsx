@@ -21,7 +21,7 @@ const Brand = () => (
       <img src="/public/img/jagaJiwa.png" alt="" />
     </div>
     <span className="text-xl font-extrabold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent tracking-tight dark:from-primary-400 dark:to-secondary-400">
-      Jaga Jiwa
+      Jaga J
     </span>
   </div>
 );
