@@ -3,10 +3,6 @@ import { Send, Bot, User, Loader2, Mic, AlertTriangle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 // import remarkGfm from 'remark-gfm'; 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-
-// =======================================================
-// Interface
-// =======================================================
 interface Message {
   role: 'ai' | 'user';
   text: string;
@@ -24,17 +20,12 @@ interface MessageBubbleProps {
   formatTime: (date: Date) => string;
 }
 
-// =======================================================
-// Komponen MessageBubble
-// =======================================================
 const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
   const isUser = message.role === 'user';
   const isTyping = message.text === 'Jiwamu sedang mengetik...';
 
-  // Dark Mode Adjustments for AI/Typing Bubbles
   const typingBg = 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
   const aiBg = 'bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-100';
-  // User bubble remains bright for maximum contrast in both modes
   const userBg = 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white';
 
   const AiMarkdownComponents = {
@@ -50,7 +41,6 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
           {children}
         </code>
       ) : (
-        // Code Block Dark Mode
         <pre className="bg-gray-100 p-2 rounded-lg my-2 overflow-x-auto text-xs dark:bg-gray-900">
           <code className="text-gray-800 dark:text-gray-200" {...props}>{children}</code>
         </pre>
@@ -82,7 +72,6 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
               {isUser ? (
                 <p>{message.text}</p>
               ) : (
-                // Menghapus remarkPlugins={[remarkGfm]} untuk memperbaiki masalah resolusi paket
                 <ReactMarkdown components={AiMarkdownComponents}>
                   {message.text}
                 </ReactMarkdown>
@@ -92,7 +81,6 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
         </div>
 
         {!isTyping && (
-          // Timestamp Dark Mode
           <span className="text-xs text-gray-500 mt-1 px-1 dark:text-gray-400">{formatTime(message.timestamp)}</span>
         )}
       </div>
@@ -100,14 +88,10 @@ const MessageBubble = memo(({ message, formatTime }: MessageBubbleProps) => {
   );
 });
 
-// =======================================================
-// Komponen ChatWindow
-// =======================================================
 function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps) {
   const [inputValue, setInputValue] = useState('');
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   
-  // Ref untuk menunjuk ke elemen DIV yang dapat di-scroll (kontainer pesan)
   const scrollableContainerRef = useRef<HTMLDivElement>(null); 
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
@@ -119,16 +103,13 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
   const formatTime = (date: Date) =>
     date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-  // Fungsi untuk melakukan auto-scroll menggunakan scrollTop
   const scrollToBottom = () => {
     const container = scrollableContainerRef.current;
     if (container) {
-      // Mengatur scrollTop ke scrollHeight akan menggulir kontainer ke paling bawah
       container.scrollTop = container.scrollHeight;
     }
   };
   
-  // Hook yang dipanggil setiap kali 'conversation' berubah (pesan baru)
   useEffect(() => {
     scrollToBottom();
   }, [conversation]);
@@ -175,7 +156,6 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
 
   if (!browserSupportsSpeechRecognition) {
     return (
-      // Disabled Browser Warning Dark Mode
       <div className="flex flex-col h-full bg-white rounded-2xl shadow-lg overflow-hidden items-center justify-center p-8 text-center dark:bg-gray-800">
         <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
         <h2 className="text-xl font-bold text-gray-800 mb-2 dark:text-gray-100">Browser Tidak Didukung</h2>
@@ -187,9 +167,7 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
   }
 
   return (
-    // Main Container Dark Mode
     <div className="flex flex-col h-full max-h-[85vh] bg-white rounded-2xl shadow-lg overflow-hidden dark:bg-gray-800">
-      {/* Header (Kept bright for branding) */}
       <header className="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-white flex-shrink-0">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -202,7 +180,6 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
         </div>
       </header>
 
-      {/* Area Pesan Dark Mode */}
       <div 
         className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900"
         ref={scrollableContainerRef} // Ref dipasang pada kontainer yang memiliki scrollbar
@@ -210,13 +187,10 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
         {conversation.map((message, index) => (
           <MessageBubble key={index} message={message} formatTime={formatTime} />
         ))}
-        {/* Div target scroll tidak diperlukan lagi di sini karena kita menggunakan scrollTop pada parent */}
       </div>
 
-      {/* Input Area Dark Mode */}
       <form onSubmit={handleSubmit} className="border-t border-gray-200 p-4 bg-white flex-shrink-0 dark:bg-gray-800 dark:border-gray-700">
         <div className="flex items-center space-x-2">
-          {/* Tombol Mikrofon (colors kept consistent for listening state) */}
           <button
             type="button"
             onClick={toggleListening}
@@ -232,7 +206,6 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
             <Mic className="w-5 h-5 relative z-10" />
           </button>
 
-          {/* Input Field Dark Mode */}
           <input
             type="text"
             value={inputValue}
@@ -255,7 +228,6 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
                 : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400'}`}
           />
 
-          {/* Tombol Kirim (colors kept consistent for function) */}
           <button
             type="submit"
             disabled={!inputValue.trim() || isDisabled || listening}

@@ -4,34 +4,30 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import React from "react";
 
-// Variasi untuk animasi kontainer (staggered effect)
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // Jeda antar elemen anak
+      staggerChildren: 0.1, 
     },
   },
 };
 
-// Variasi untuk setiap item (fade-in dari bawah)
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
 
 interface HoverLinkProps {
-  to: string; // Diasumsikan 'to' adalah URL (string)
-  children: React.ReactNode; // Tipe standar untuk konten yang dirender (bisa string, element, dll.)
-  className?: string; // Tipe untuk string opsional
+  to: string; 
+  children: React.ReactNode; 
+  className?: string; 
 }
 
-// Komponen kustom untuk link dengan hover animasi (Garis Bawah)
 const HoverLink = ({ to, children, className = "" }: HoverLinkProps) => {
   return (
     <motion.li
-      // Menggunakan itemVariants untuk staggered effect dari parent
       variants={itemVariants}
       key={to}
     >
@@ -40,7 +36,6 @@ const HoverLink = ({ to, children, className = "" }: HoverLinkProps) => {
         className={`relative inline-block text-base text-gray-600 dark:text-gray-400 hover:text-[#1ff498] transition-colors duration-200 group ${className}`}
       >
         {children}
-        {/* Garis bawah animasi */}
         <motion.span
           className="absolute left-0 bottom-[-2px] h-[2px] w-full bg-[#1ff498] rounded-full"
           initial={{ scaleX: 0, originX: 0 }}
@@ -61,7 +56,6 @@ const Footer = () => {
     { name: "Talk Room", path: "/talkroom" },
   ];
 
-  // Halaman Utama hanya berisi Home dan About, serta link kebijakan
   const mainPages = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" }
@@ -71,19 +65,16 @@ const Footer = () => {
     <footer
       className="relative z-10 bg-white/50 dark:bg-gray-900 backdrop-blur-sm"
     >
-      {/* Container utama dengan animasi inisial */}
       <motion.div 
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
         initial="hidden"
-        whileInView="visible" // Animasi muncul saat masuk viewport
-        viewport={{ once: true, amount: 0.1 }} // Hanya sekali saat 10% elemen terlihat
+        whileInView="visible" 
+        viewport={{ once: true, amount: 0.1 }}
         variants={containerVariants}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Bagian Brand */}
           <motion.div variants={itemVariants} className="lg:col-span-6">
             <Link to="/" className="flex items-center space-x-3 mb-4">
-              {/* Logo icon/container TIDAK perlu motion.div lagi karena sudah di-wrap di atas */}
               <div
                 className="w-12 h-12 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
                                 rounded-xl  shadow-lg border-2 border-white/50"
@@ -106,13 +97,8 @@ const Footer = () => {
             </motion.p>
           </motion.div>
 
-          {/* Bagian Links yang Sudah Disederhanakan */}
           <div className="lg:col-span-6 grid grid-cols-2 gap-8">
             
-            {/* Kolom 1: Fitur & Kesehatan Mental */}
-
-
-            {/* Kolom 2: Halaman Utama (Home dan About) */}
             <motion.div variants={itemVariants}>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white tracking-wider uppercase">
                 Halaman Utama
@@ -121,7 +107,7 @@ const Footer = () => {
                 className="mt-4 space-y-3"
                 initial="hidden"
                 animate="visible"
-                variants={containerVariants} // Container untuk list item
+                variants={containerVariants} 
               >
                 {mainPages.map((item) => (
                     <HoverLink key={item.name} to={item.path}>
@@ -139,7 +125,7 @@ const Footer = () => {
                 className="mt-4 space-y-3"
                 initial="hidden"
                 animate="visible"
-                variants={containerVariants} // Container untuk list item
+                variants={containerVariants} 
               >
                 {features.map((item) => (
                   <HoverLink key={item.name} to={item.path}>
@@ -164,7 +150,6 @@ const Footer = () => {
               kesehatan mental.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              {/* Icon media sosial dengan animasi hover sederhana */}
               {[ 'Github'].map((social) => {
                 const Icon = social === 'Twitter' ? Twitter : social === 'Instagram' ? Instagram : Github;
                 return (

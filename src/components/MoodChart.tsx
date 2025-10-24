@@ -1,14 +1,8 @@
 import { useState, useMemo } from 'react';
-import { BarChart3, Bot, Zap } from 'lucide-react'; // Menambahkan Bot dan Zap icon
-// Pastikan package ini sudah diinstal: npm install @google/genai
+import { BarChart3, Bot, Zap } from 'lucide-react'; 
 import { GoogleGenAI } from "@google/genai"; 
-
-// ==================== INITIALISASI AI (Ganti dengan API Key Anda) ====================
-// PENTING: Gunakan server-side proxy untuk melindungi API Key di aplikasi nyata.
-// Karena Anda meminta langsung pakai 'ai', saya asumsikan environment Anda mendukung ini.
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 const model = "gemini-2.5-flash";
-// =====================================================================================
 
 interface MoodChartProps {
   moodData: { [key: string]: string };
@@ -16,7 +10,6 @@ interface MoodChartProps {
   currentYear: number;
 }
 
-// Utilitas untuk mendapatkan daftar kunci tanggal YYYY-MM-DD
 const getDateKeys = (daysAgo: number) => {
   const dates: string[] = [];
   const today = new Date();
@@ -35,7 +28,6 @@ const getDateKeys = (daysAgo: number) => {
   return dates;
 };
 
-// Daftar Nama Bulan
 const monthNames = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
@@ -45,11 +37,8 @@ type PeriodType = 7 | 30 | 'all' | 'month';
 
 
 function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
-  // State
   const [period, setPeriod] = useState<PeriodType>(7);
   const [selectedMonthYear, setSelectedMonthYear] = useState<string>(`${currentYear}-${currentMonth}`);
-  
-  // New AI States
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   // ---------------------
@@ -66,7 +55,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
     if (filterPeriod === 'month') {
       const [year, monthIndexStr] = monthYearFilter.split('-');
       const monthIndex = parseInt(monthIndexStr);
-      // monthIndex adalah 0-11, jadi tambahkan 1 untuk format YYYY-MM-DD
       const prefix = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
 
       const filtered: { [key: string]: string } = {};
@@ -115,7 +103,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
       });
   }, [moodData]);
 
-  // LOGIC MEMO UTAMA: Menghitung semua statistik berdasarkan filter
   const { average, distribution, totalDays, dominantMoodKey } = useMemo(() => {
     const filteredMoodData = filterMoodData(moodData, period, selectedMonthYear);
 
@@ -142,8 +129,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
     }
 
     const avg = daysLoggedCount === 0 ? 0 : (sum / daysLoggedCount);
-    
-    // Pastikan dominantMoodKey selalu punya nilai, default ke 'neutral'
     const finalDominantMoodKey = dominantKey || 'neutral';
 
 
@@ -181,8 +166,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
   };
   const primaryColor = 'text-[#1ff498] dark:text-[#0be084]';
 
-
-  // --- FUNGSI GENERATE AI SUMMARY ---
   const generateSummary = async () => {
     if (totalDays === 0) {
       setAiSummary("Tidak ada data mood yang tercatat untuk periode ini. Tidak dapat membuat ringkasan.");
@@ -192,7 +175,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
     setIsLoading(true);
     setAiSummary(null);
 
-    // Format data distribusi
     const distributionText = Object.entries(distribution)
       .filter(([mood, count]) => count > 0)
       .map(([mood, count]) => {
@@ -225,7 +207,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
             contents: prompt,
         });
         
-        // Simpan hasil dari AI.
         setAiSummary(response.text!.trim());
     } catch (error) {
       console.error("Gemini API Error:", error);
@@ -234,7 +215,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
       setIsLoading(false);
     }
   };
-  // ------------------------------------
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 shadow-lg dark:shadow-xl dark:shadow-gray-950/50">
@@ -247,8 +227,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
           </h3>
         </div>
       </div>
-
-      {/* Tombol Pemilih Periode */}
       <div className="mb-4">
         <div className="flex justify-around bg-gray-100 dark:bg-gray-700 rounded-lg p-1 overflow-x-auto">
           <button
@@ -261,7 +239,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
             className={`flex-shrink-0 px-3 py-2 rounded-md text-sm font-medium transition-all ${period === 30 ? 'bg-white dark:bg-gray-900 text-primary-600 dark:text-[#1ff498] shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
               }`}
           > 30 Hari </button>
-          {/* Dropdown Filter Bulan */}
           <select
             value={period === 'month' ? selectedMonthYear : currentMonthYearDefault}
             onChange={(e) => { setPeriod('month'); setSelectedMonthYear(e.target.value); setAiSummary(null); }}
@@ -286,7 +263,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
         </div>
       </div>
 
-      {/* Rata-rata Mood */}
       <div className="mb-6 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-indigo-900/40 dark:to-teal-900/40 rounded-xl">
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Rata-rata Mood</p>
         <div className="flex items-baseline space-x-2">
@@ -297,7 +273,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
         </div>
       </div>
 
-      {/* Distribusi Mood */}
       <div className="space-y-3">
         <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
           Distribusi Mood ({periodLabel})
@@ -329,7 +304,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
         )}
       </div>
       
-      {/* TOMBOL AI SUMMARY BARU */}
       {totalDays > 0 && (
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
               <button
@@ -354,7 +328,6 @@ function MoodChart({ moodData, currentMonth, currentYear }: MoodChartProps) {
           </div>
       )}
 
-      {/* TAMPILAN RINGKASAN AI BARU */}
       {aiSummary && (
           <div className="mt-4 p-4 rounded-xl border-2 border-[#50b7f7] dark:border-[#1ff498] bg-white dark:bg-gray-700/50 shadow-inner">
               <h4 className="text-md font-bold text-[#50b7f7] dark:text-[#1ff498] mb-2 flex items-center space-x-2">

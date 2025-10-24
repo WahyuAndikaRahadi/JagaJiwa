@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { Plus, Menu, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
-
-// ========================
-// 🧩 Interface & Types
-// ========================
 interface HistorySummary {
     id: string;
     date: Date;
@@ -25,9 +21,6 @@ interface ChatHistorySidebarProps {
     isOpen: boolean;
 }
 
-// ========================
-// 🎨 Mood Color Map
-// ========================
 const moodColors: Record<HistorySummary["mood"], string> = {
     "😄":
         "bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700",
@@ -43,9 +36,7 @@ const moodColors: Record<HistorySummary["mood"], string> = {
 
 const allMoods: MoodFilter[] = ["😄", "😊", "😐", "😔", "😢"];
 
-// ========================
-// 🧠 Komponen Sidebar
-// ========================
+
 const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
     history,
     onSelectHistory,
@@ -74,9 +65,6 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                 ${isOpen ? "lg:w-72 lg:translate-x-0" : "lg:w-16 lg:translate-x-0 lg:overflow-visible"}
             `}
         >
-            {/* ======================== */}
-            {/* 🔹 Header Sidebar */}
-            {/* ======================== */}
             <div
                 className={`
                     p-4 border-b border-gray-200 dark:border-gray-700 flex items-center flex-shrink-0 h-16
@@ -104,10 +92,6 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                     </h2>
                 )}
             </div>
-
-            {/* ========================================================================= */}
-            {/* 🔹 Konten Sidebar (Main Scrollable Area - flex-grow overflow-y-auto) */}
-            {/* ========================================================================= */}
             <div className={`flex-grow overflow-y-auto ${isOpen ? "p-3" : "hidden"}`}>
                 {/* Tombol Curhat Baru */}
                 <div className="mb-3 flex-shrink-0">
@@ -122,7 +106,6 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                     </button>
                 </div>
 
-                {/* Filter Emosi */}
                 <div className="pb-3 border-b border-gray-200 dark:border-gray-700 mb-3 flex-shrink-0">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
                         Filter Perasaan ({history.length}):
@@ -160,10 +143,6 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                         })}
                     </div>
                 </div>
-
-                {/* ======================== */}
-                {/* 🔹 Daftar Riwayat (KONTROL SCROLL DI SINI) */}
-                {/* ======================== */}
                 <div
                     className={`
                         space-y-2 pb-3
@@ -220,7 +199,6 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        // PENTING: Jangan gunakan window.confirm() di lingkungan canvas
                                         if (window.confirm("Yakin ingin menghapus sesi curhat ini?")) {
                                             onDeleteHistory(item.id);
                                         }
@@ -236,10 +214,6 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                         ))
                     )}
                 </div>
-
-                {/* ======================== */}
-                {/* 🔹 Footer - Hapus Semua */}
-                {/* ======================== */}
                 {history.length > 0 && (
                     <div className="p-3 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
                         <button
@@ -254,11 +228,6 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                     </div>
                 )}
             </div> 
-            {/* Akhir Konten Sidebar - SCROLLABLE AREA UTAMA */}
-
-            {/* ======================== */}
-            {/* 🌊 Wave Background Animation - DIPINDAHKAN KE LUAR BLOK SCROLL, DI BAWAHNYA */}
-            {/* ======================== */}
             {isOpen && (
                 <div className="relative h-32 w-full overflow-hidden flex-shrink-0">
                     <motion.svg
