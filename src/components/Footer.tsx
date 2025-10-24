@@ -86,9 +86,9 @@ const Footer = () => {
               {/* Logo icon/container TIDAK perlu motion.div lagi karena sudah di-wrap di atas */}
               <div
                 className="w-12 h-12 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
-                                rounded-xl pb-2 shadow-lg border-2 border-white/50"
+                                rounded-xl shadow-lg border-2 border-white/50"
               >
-               <img src="/img/jaga jiwa.png" alt="Jaga Jiwa Logo"/>
+               <img src="https://res.cloudinary.com/dceylrkji/image/upload/v1761313876/jagaJiwa_alwzth.png" alt="Jaga Jiwa Logo" className="p-2"/>
               </div>
               <span className="font-extrabold text-3xl">
                 <GradientText
