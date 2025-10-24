@@ -77,9 +77,9 @@ const Footer = () => {
             <Link to="/" className="flex items-center space-x-3 mb-4">
               <div
                 className="w-12 h-12 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
-                                rounded-xl  shadow-lg border-2 border-white/50"
+                                rounded-xl shadow-lg border-2 border-white/50"
               >
-               <img src="/img/jaga jiwa.png" alt="Jaga Jiwa Logo"/>
+               <img src="/img/jagaJiwa.png" alt="Jaga Jiwa Logo" className="p-2"/>
               </div>
               <span className="font-extrabold text-3xl">
                 <GradientText

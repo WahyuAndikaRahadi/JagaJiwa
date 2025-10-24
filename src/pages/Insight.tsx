@@ -23,6 +23,7 @@ import {
 } from "@google/genai";
 import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
+import ReactMarkdown from 'react-markdown';
 import GradientText from "../components/GradientText";
 
 // ==================== INITIALISASI AI (Ganti dengan API Key Anda) ====================
@@ -41,6 +42,15 @@ interface JournalEntry {
   date: string;
   content: string;
   summary?: string;
+}
+
+interface MoodAnalysisResult {
+  avgMood: string;
+  totalDays: number;
+  moodCounts: { [key: string]: number; };
+  trend: 'positive' | 'negative' | 'stable';
+  // Properti yang hilang
+  dominantMoodKey: string; 
 }
 
 interface EmotionGuide {
@@ -76,98 +86,88 @@ interface AudioGuide {
 }
 
 // ==================== DATA EDUKASI ====================
-const EMOTION_GUIDES: EmotionGuide[] = [
-  {
-    name: "Rasa Bersalah",
-    definition:
-      "Perasaan menyesal atau bertanggung jawab atas kesalahan yang dilakukan, baik nyata maupun yang dibayangkan.",
+const EMOTION_GUIDES: Record<string, EmotionGuide> = {
+  "very-happy": {
+    name: "Sangat Bahagia",
+    definition: "Keadaan euforia dan kepuasan tertinggi. Anda merasakan kegembiraan dan optimisme yang meluap-luap.",
     triggers: [
-      "Mengecewakan orang lain",
-      "Tidak memenuhi ekspektasi diri sendiri",
-      "Membuat keputusan yang merugikan",
+      "Pencapaian besar atau tujuan tercapai",
+      "Menerima kabar baik yang tak terduga",
+      "Waktu berkualitas dengan orang terkasih",
     ],
     managementTips: [
-      "Bedakan antara rasa bersalah yang konstruktif dan destruktif",
-      "Minta maaf jika memang ada kesalahan nyata",
-      "Latih self-compassion - ingat bahwa semua orang membuat kesalahan",
-      "Fokus pada pembelajaran, bukan penyesalan berkepanjangan",
+      "Nikmati momen ini dan catat apa yang membuat Anda merasakannya.",
+      "Salurkan energi positif ke proyek atau tujuan baru.",
+      "Bagikan kegembiraan Anda dengan orang lain (tanpa berlebihan).",
     ],
-    color: "from-purple-500 to-indigo-600",
-    icon: "💭",
+    color: "from-green-400 to-teal-500",
+    icon: "😄",
   },
-  {
-    name: "Kecemasan",
-    definition:
-      "Respons emosional terhadap ancaman yang dipersepsikan, ditandai dengan kekhawatiran berlebihan tentang masa depan.",
+  happy: {
+    name: "Bahagia",
+    definition: "Perasaan senang, puas, dan nyaman secara umum. Anda merasa optimis dan bersemangat.",
     triggers: [
-      "Ketidakpastian atau perubahan besar",
-      "Tekanan akademik atau sosial",
-      "Overthinking tentang hal-hal di luar kendali",
+      "Mencapai target kecil harian",
+      "Interaksi sosial yang menyenangkan",
+      "Menyelesaikan tugas yang tertunda",
     ],
     managementTips: [
-      "Praktikkan teknik grounding 5-4-3-2-1",
-      "Tulis worry list dan kategorikan: bisa dikontrol vs tidak bisa",
-      "Lakukan breathing exercise 4-7-8",
-      "Batasi konsumsi berita atau media yang memicu cemas",
+      "Pertahankan rutinitas yang mendukung suasana hati ini (tidur cukup, olahraga).",
+      "Lakukan *gratitude journaling* untuk menguatkan perasaan positif.",
+      "Terus cari kegiatan yang memberi Anda kegembiraan yang berkelanjutan.",
     ],
-    color: "from-yellow-500 to-orange-500",
-    icon: "😰",
+    color: "from-yellow-400 to-orange-500",
+    icon: "😊",
   },
-  {
-    name: "Kesedihan",
-    definition:
-      "Respons emosional terhadap kehilangan, kekecewaan, atau situasi yang tidak sesuai harapan.",
+  neutral: {
+    name: "Netral",
+    definition: "Kondisi emosional stabil, tenang, dan tidak didorong oleh emosi kuat. Baik untuk fokus dan refleksi.",
     triggers: [
-      "Kehilangan seseorang atau sesuatu yang berharga",
-      "Kegagalan atau penolakan",
-      "Merasa tidak dihargai atau diabaikan",
+      "Hari yang monoton atau rutin",
+      "Istirahat mental dari stres dan drama",
+      "Fokus pada tugas-tugas yang membutuhkan konsentrasi tinggi",
     ],
     managementTips: [
-      "Izinkan dirimu merasakan kesedihan tanpa menghakimi",
-      "Berbicara dengan orang yang dipercaya",
-      "Tulis ekspresif journaling tentang perasaanmu",
-      "Lakukan aktivitas yang biasanya membuatmu nyaman",
+      "Gunakan waktu ini untuk refleksi dan perencanaan tanpa tekanan emosional.",
+      "Hindari melakukan perubahan drastis; pertahankan stabilitas.",
+      "Pastikan 'netral' bukanlah penghindaran dari emosi yang lebih dalam.",
     ],
-    color: "from-blue-500 to-cyan-600",
-    icon: "😢",
+    color: "from-blue-gray-400 to-gray-500",
+    icon: "😐",
   },
-  {
-    name: "Kemarahan",
-    definition:
-      "Respons emosional terhadap ketidakadilan, frustrasi, atau pelanggaran batas personal.",
+  sad: {
+    name: "Sedih",
+    definition: "Perasaan tidak bahagia, kecewa, atau kehilangan. Ini adalah sinyal bahwa ada kebutuhan emosional yang belum terpenuhi.",
     triggers: [
-      "Merasa diperlakukan tidak adil",
-      "Batas personal dilanggar",
-      "Frustrasi akumulatif yang tidak terselesaikan",
+      "Kegagalan atau kekecewaan kecil",
+      "Kesepian atau isolasi sebentar",
+      "Kelelahan atau kurang tidur",
     ],
     managementTips: [
-      "Identifikasi kebutuhan di balik kemarahanmu",
-      "Praktikkan progressive muscle relaxation",
-      "Komunikasikan perasaan dengan assertif, bukan agresif",
-      "Beri jeda sebelum bereaksi (count to 10)",
+      "Izinkan diri Anda merasakan emosi tersebut tanpa menghakiminya.",
+      "Cari dukungan dengan berbicara kepada orang yang Anda percayai.",
+      "Lakukan self-care ringan seperti mendengarkan musik santai atau membuat teh hangat.",
     ],
-    color: "from-red-500 to-rose-600",
-    icon: "😠",
+    color: "from-blue-400 to-indigo-600",
+    icon: "😔",
   },
-  {
-    name: "Stres",
-    definition:
-      "Respons fisik dan mental terhadap tuntutan atau tekanan yang melebihi kapasitas koping.",
+  "very-sad": {
+    name: "Sangat Sedih/Tertekan",
+    definition: "Rasa duka yang mendalam, putus asa, atau tertekan. Membutuhkan perhatian dan dukungan serius.",
     triggers: [
-      "Beban tugas atau tanggung jawab berlebihan",
-      "Deadline yang ketat",
-      "Konflik interpersonal",
+      "Peristiwa traumatis atau menyedihkan",
+      "Stres berkepanjangan yang tidak tertangani",
+      "Masalah kesehatan mental yang membutuhkan bantuan profesional",
     ],
     managementTips: [
-      "Prioritaskan tugas dengan Eisenhower Matrix",
-      "Break down tugas besar menjadi langkah kecil",
-      "Jadwalkan break time secara konsisten",
-      "Lakukan aktivitas fisik ringan setiap hari",
+      "Prioritaskan konsultasi dengan profesional kesehatan mental (terapis/psikolog).",
+      "Fokus pada kebutuhan dasar: makan, tidur, dan hidrasi.",
+      "Hindari isolasi; tetap terhubung dengan jaringan dukungan Anda dan minta bantuan.",
     ],
-    color: "from-orange-500 to-amber-600",
-    icon: "😣",
+    color: "from-purple-700 to-red-800",
+    icon: "😭",
   },
-];
+};
 
 const ARTICLES = [
   {
@@ -214,6 +214,118 @@ const ARTICLES = [
     summary: "Latihan sederhana untuk mengatasi panic attack dan overwhelm.",
     category: "Teknik",
     readTime: "3 menit",
+  },
+  {
+    id: 7,
+    title: "Mengatur Ekspektasi Diri Sendiri",
+    summary:
+      "Belajar membedakan antara ambisi sehat dan perfeksionisme yang merusak.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 8,
+    title: "Digital Detox untuk Kesehatan Mental",
+    summary:
+      "Cara melepaskan ketergantungan pada layar dan kembali ke kehidupan nyata.",
+    category: "Kesehatan",
+    readTime: "6 menit",
+  },
+  {
+    id: 9,
+    title: "Menulis Jurnal sebagai Terapi Diri",
+    summary:
+      "Manfaat menulis harian untuk mengelola emosi dan meningkatkan kesadaran diri.",
+    category: "Teknik",
+    readTime: "4 menit",
+  },
+  {
+    id: 10,
+    title: "Mengenali dan Mengatasi Prokrastinasi",
+    summary:
+      "Memahami akar prokrastinasi dan cara mengubahnya menjadi aksi.",
+    category: "Akademik",
+    readTime: "6 menit",
+  },
+  {
+    id: 11,
+    title: "Menjaga Motivasi Jangka Panjang",
+    summary:
+      "Strategi mempertahankan semangat saat tujuan terasa jauh.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 12,
+    title: "Menghadapi Kegagalan dengan Bijak",
+    summary:
+      "Mengubah kegagalan dari akhir menjadi awal yang baru.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 13,
+    title: "Membangun Rutinitas Pagi yang Menenangkan",
+    summary:
+      "Cara memulai hari dengan tenang dan penuh energi positif.",
+    category: "Kesehatan",
+    readTime: "4 menit",
+  },
+  {
+    id: 14,
+    title: "Mengelola Konflik dengan Teman atau Rekan",
+    summary:
+      "Cara berkomunikasi asertif tanpa merusak hubungan.",
+    category: "Sosial",
+    readTime: "6 menit",
+  },
+  {
+    id: 15,
+    title: "Mengatasi Rasa Tidak Cukup (Impostor Syndrome)",
+    summary:
+      "Mengenali dan melawan perasaan sebagai 'penipu' meski sudah berprestasi.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
+  },
+  {
+    id: 16,
+    title: "Latihan Pernapasan untuk Menenangkan Pikiran",
+    summary:
+      "Teknik pernapasan sederhana yang bisa dilakukan di mana saja.",
+    category: "Teknik",
+    readTime: "3 menit",
+  },
+  {
+    id: 17,
+    title: "Menjaga Keseimbangan Hidup Mahasiswa",
+    summary:
+      "Tips mengelola waktu antara kuliah, organisasi, dan kehidupan pribadi.",
+    category: "Akademik",
+    readTime: "6 menit",
+  },
+  {
+    id: 18,
+    title: "Mengelola Emosi Negatif dengan Sehat",
+    summary:
+      "Cara mengakui, memahami, dan menyalurkan emosi seperti marah, sedih, atau kecewa.",
+    category: "Kesehatan",
+    readTime: "5 menit",
+  },
+  {
+    id: 19,
+    title: "Membangun Kebiasaan Belajar yang Efektif",
+    summary:
+      "Strategi berbasis sains untuk belajar lebih cerdas, bukan lebih lama.",
+    category: "Akademik",
+    readTime: "7 menit",
+  },
+  {
+    id: 20,
+    title: "Menemukan Makna dalam Perjalanan Akademik",
+    summary:
+      "Menghubungkan studi dengan nilai dan tujuan hidup yang lebih besar.",
+    category: "Pengembangan Diri",
+    readTime: "5 menit",
   },
 ];
 
@@ -371,6 +483,8 @@ const Insight = () => {
     aiAnalysis: "",
   });
   const [isCBTLoading, setIsCBTLoading] = useState(false); // State Loading
+  const [aiTriggerAnalysis, setAiTriggerAnalysis] = useState<string | null>(null);
+  const [isTriggerLoading, setIsTriggerLoading] = useState(false);
 
   // Audio Player State (BARU)
   const [currentAudio, setCurrentAudio] = useState<AudioGuide | null>(null);
@@ -380,26 +494,26 @@ const Insight = () => {
   // State untuk perbaikan race condition localStorage
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  
+
 
   // ==================== EFFECT HOOKS ====================
 
   useEffect(() => {
     // Cek apakah URL memiliki #artikel
     if (window.location.hash === "#artikel") {
-        // 1. Ganti tab ke "education" (sesuaikan nama state tab Anda)
-        setActiveTab("education"); 
-        
-        // 2. Lakukan scroll setelah state berubah dan komponen dirender
-        // Kita menggunakan setTimeout singkat untuk memastikan tab sudah terbuka
-        setTimeout(() => {
-            const artikelElement = document.getElementById("artikel");
-            if (artikelElement) {
-                artikelElement.scrollIntoView({ behavior: "smooth" });
-            }
-        }, 100); // Penundaan singkat untuk render
+      // 1. Ganti tab ke "education" (sesuaikan nama state tab Anda)
+      setActiveTab("education");
+
+      // 2. Lakukan scroll setelah state berubah dan komponen dirender
+      // Kita menggunakan setTimeout singkat untuk memastikan tab sudah terbuka
+      setTimeout(() => {
+        const artikelElement = document.getElementById("artikel");
+        if (artikelElement) {
+          artikelElement.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100); // Penundaan singkat untuk render
     }
-}, []); // [] agar hanya berjalan saat komponen dimuat
+  }, []); // [] agar hanya berjalan saat komponen dimuat
 
   // Load Data dari Local Storage
   useEffect(() => {
@@ -463,10 +577,12 @@ const Insight = () => {
       attributes: true,
     });
 
+    setIsDataLoaded(true);
+
     // Cleanup observer
     return () => observer.disconnect();
-    
-    setIsDataLoaded(true);
+
+
   }, []);
 
   // Save Garden and Worry Vault Data ke Local Storage
@@ -503,7 +619,8 @@ const Insight = () => {
 
   // ==================== MEMORIZED VALUES (ANALISIS) ====================
 
-  const moodAnalysis = useMemo(() => {
+  // Ubah tipe return 'useMemo' menjadi MoodAnalysisResult | null
+const moodAnalysis: MoodAnalysisResult | null = useMemo(() => {
     const entries = Object.entries(moodData);
     if (entries.length === 0) return null;
 
@@ -536,14 +653,30 @@ const Insight = () => {
       return acc;
     }, {} as { [key: string]: number });
 
+    // ===============================================
+    // LOGIKA PENAMBAHAN UNTUK MENCARI MOOD DOMINAN
+    let dominantMoodKey = 'neutral'; // Default jika tidak ada data
+    let maxCount = 0;
+
+    // Cari mood yang paling banyak muncul
+    for (const mood in moodCounts) {
+        if (moodCounts[mood] > maxCount) {
+            maxCount = moodCounts[mood];
+            dominantMoodKey = mood;
+        }
+    }
+    // ===============================================
+
     return {
       avgMood: avgMood.toFixed(1),
       totalDays: last7Days.length,
       moodCounts,
+      // TAMBAHKAN properti yang hilang di sini:
+      dominantMoodKey, 
       trend:
         avgMood >= 3.5 ? "positive" : avgMood <= 2.5 ? "negative" : "stable",
     };
-  }, [moodData]);
+}, [moodData]);
 
   const stopWords = [
     "aku", "saya", "kamu", "dia", "mereka", "kita", "kami",
@@ -554,7 +687,7 @@ const Insight = () => {
     "ada", "telah", "tapi", "jadi", "bisa", "harus", "cuma", "hanya",
     "mau", "ingin", "pun", "nya", "sangat", "lebih", "paling", "kurang",
     "sekali", "begitu", "hanya", "dan", "juga", "deh", "loh", "nih", "ya",
-];
+  ];
 
   const topTriggers = useMemo(() => {
     // journalEntries harus didefinisikan di MoodTracker.tsx
@@ -562,61 +695,137 @@ const Insight = () => {
 
     // 1. Filter entri yang mood-nya rendah
     const lowMoodEntries = journalEntries.filter((entry: any) => { // Ganti 'any' dengan tipe JournalEntry yang benar
-        const dateKey = entry.date.split("T")[0];
-        const mood = moodData[dateKey];
-        return mood === "sad" || mood === "very-sad";
+      const dateKey = entry.date.split("T")[0];
+      const mood = moodData[dateKey];
+      return mood === "sad" || mood === "very-sad";
     });
 
     const phraseFrequency: { [key: string]: number } = {};
 
     lowMoodEntries.forEach((entry: any) => { // Ganti 'any' dengan tipe JournalEntry yang benar
-        // Membersihkan konten: huruf kecil, hapus karakter non-alfanumerik/spasi, lalu split
-        const content = entry.content.toLowerCase();
-        const cleanedContent = content.replace(/[^\w\s]/g, "");
-        const words = cleanedContent.split(/\s+/).filter(w => w.length > 2); // Filter kata-kata pendek
+      // Membersihkan konten: huruf kecil, hapus karakter non-alfanumerik/spasi, lalu split
+      const content = entry.content.toLowerCase();
+      const cleanedContent = content.replace(/[^\w\s]/g, "");
+      const words = cleanedContent.split(/\s+/).filter(w => w.length > 2); // Filter kata-kata pendek
 
-        // Helper untuk memeriksa apakah frasa mengandung stopword
-        const hasStopWord = (phraseWords: string[]) => {
-            return phraseWords.some(word => stopWords.includes(word));
-        };
+      // Helper untuk memeriksa apakah frasa mengandung stopword
+      const hasStopWord = (phraseWords: string[]) => {
+        return phraseWords.some(word => stopWords.includes(word));
+      };
 
-        // --- Analisis N-gram (Bigram & Trigram) ---
-        
-        // Bigram (Frasa 2 kata)
-        for (let i = 0; i < words.length - 1; i++) {
-            const bigramWords = [words[i], words[i + 1]];
-            if (!hasStopWord(bigramWords)) {
-                const bigram = bigramWords.join(" ");
-                phraseFrequency[bigram] = (phraseFrequency[bigram] || 0) + 1;
-            }
+      // --- Analisis N-gram (Bigram & Trigram) ---
+
+      // Bigram (Frasa 2 kata)
+      for (let i = 0; i < words.length - 1; i++) {
+        const bigramWords = [words[i], words[i + 1]];
+        if (!hasStopWord(bigramWords)) {
+          const bigram = bigramWords.join(" ");
+          phraseFrequency[bigram] = (phraseFrequency[bigram] || 0) + 1;
         }
+      }
 
-        // Trigram (Frasa 3 kata)
-        for (let i = 0; i < words.length - 2; i++) {
-            const trigramWords = [words[i], words[i + 1], words[i + 2]];
-            if (!hasStopWord(trigramWords)) {
-                const trigram = trigramWords.join(" ");
-                phraseFrequency[trigram] = (phraseFrequency[trigram] || 0) + 1;
-            }
+      // Trigram (Frasa 3 kata)
+      for (let i = 0; i < words.length - 2; i++) {
+        const trigramWords = [words[i], words[i + 1], words[i + 2]];
+        if (!hasStopWord(trigramWords)) {
+          const trigram = trigramWords.join(" ");
+          phraseFrequency[trigram] = (phraseFrequency[trigram] || 0) + 1;
         }
+      }
     });
 
     // Urutkan dan ambil 3 frasa teratas
     return Object.entries(phraseFrequency)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([word, count]) => ({ word, count }));
-}, [journalEntries, moodData]);
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([word, count]) => ({ word, count }));
+  }, [journalEntries, moodData]);
 
   const todayEmotion = useMemo(() => {
-    const dayOfYear = Math.floor(
-      (new Date().getTime() -
-        new Date(new Date().getFullYear(), 0, 0).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    return EMOTION_GUIDES[dayOfYear % EMOTION_GUIDES.length];
-  }, []);
+    // Ambil kunci emosi dominan dari analisis 7 hari
+    if (moodAnalysis && moodAnalysis.dominantMoodKey) {
+        return EMOTION_GUIDES[moodAnalysis.dominantMoodKey];
+    }
+    // Default jika tidak ada data/analisis
+    return EMOTION_GUIDES['neutral'];
+  }, [moodAnalysis]);
 
+
+  const analyzeEmotionTriggers = async () => {
+    if (journalEntries.length < 5) {
+      Swal.fire('Peringatan', 'Minimal diperlukan 5 entri jurnal untuk analisis pola yang akurat. Saat ini Anda memiliki ' + journalEntries.length + ' entri.', 'warning');
+      return;
+    }
+
+    setIsTriggerLoading(true);
+    setAiTriggerAnalysis(null);
+
+    // Ambil 8 entri jurnal terbaru (memenuhi permintaan 5-8)
+    const recentJournals = journalEntries.slice(0, 8);
+
+    const journalText = recentJournals.map(entry =>
+      `[${new Date(entry.date).toLocaleDateString('id-ID')}] ${entry.content}`
+    ).join('\n---\n');
+
+    const prompt = `Anda adalah psikolog AI yang suportif. Tugas Anda adalah menganalisis 5-8 entri jurnal terbaru ini untuk menemukan akar masalah emosi (pemicu utama). Buat hasilnya ringkas, mudah dibaca, dan berfokus pada langkah-langkah praktis.
+
+Format output Anda harus berupa Markdown, dan harus sangat singkat (maksimal 2 paragraf total untuk Insight dan Saran):
+
+## Pemicu Emosi Utama (Dari Jurnal Terbaru)
+
+**Pola Utama yang Ditemukan:**
+* [Pemicu 1 (Frasa atau Kata Kunci Jelas)]
+* [Pemicu 2 (Frasa atau Kata Kunci Jelas)]
+* [Pemicu 3 (Frasa atau Kata Kunci Jelas)]
+* [Pemicu 4 (Jika ada, maksimal 5)]
+
+**Wawasan Singkat:**
+[Tuliskan 1 paragraf, maksimal 3 kalimat, yang merangkum tema emosional dan korelasi antar pemicu. Gunakan bahasa yang memberdayakan dan positif.]
+
+**Langkah Praktis:**
+[Tuliskan 1 paragraf, maksimal 3 kalimat, yang berisi 2-3 saran langkah nyata dan langsung yang bisa dilakukan pengguna untuk mengelola pemicu ini. Misalnya: Terapkan teknik grounding, batasi waktu kerja, atau komunikasikan kebutuhan.]
+
+---
+
+Berikut adalah data jurnal yang harus dianalisis:
+
+--- DATA JURNAL ---
+${journalText}
+---
+`;
+
+    try {
+      const response = await ai.models.generateContent({
+        model: model,
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+      });
+
+      setAiTriggerAnalysis(response.text);
+
+      // Opsi: Simpan Analisis ke Journal
+      const newEntry: JournalEntry = {
+        id: Date.now().toString(),
+        date: new Date().toISOString(),
+        content: `[AI Pola Emosi] Analisis ${recentJournals.length} Jurnal Terbaru:\n${response.text}`,
+      };
+      const currentEntries = JSON.parse(
+        localStorage.getItem("journalEntries") || "[]"
+      );
+      localStorage.setItem(
+        "journalEntries",
+        JSON.stringify([newEntry, ...currentEntries])
+      );
+
+      Swal.fire('Sukses', '✅ Analisis pola emosi AI selesai! Cek hasilnya di bawah.', 'success');
+
+    } catch (error) {
+      console.error("AI Pattern Analysis Error:", error);
+      setAiTriggerAnalysis("Gagal mendapatkan analisis pola emosi. Silakan coba lagi.");
+      Swal.fire('Error', 'Gagal memuat analisis AI. Silakan coba lagi.', 'error');
+    } finally {
+      setIsTriggerLoading(false);
+    }
+  };
   // ==================== FUNGSI INTERAKTIF ====================
 
   // Fungsi Audio Player (BARU)
@@ -753,9 +962,8 @@ const Insight = () => {
       Swal.fire('Sukses', '🔒 Kekhawatiran berhasil dikunci! Cek insight AI di bawah.', 'success');
 
       // Save to Journal
-      const journalContent = `[Worry Vault - ${typeLabel}]\nKekhawatiran: ${worryText}${
-        actionPlan ? `\nRencana Aksi: ${actionPlan}` : ""
-      }\nAI Insight: ${aiResult}`;
+      const journalContent = `[Worry Vault - ${typeLabel}]\nKekhawatiran: ${worryText}${actionPlan ? `\nRencana Aksi: ${actionPlan}` : ""
+        }\nAI Insight: ${aiResult}`;
       const newEntry: JournalEntry = {
         id: Date.now().toString(),
         date: new Date().toISOString(),
@@ -929,7 +1137,7 @@ const Insight = () => {
               className="w-14 h-14 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
               rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/50"
             >
-              <Brain className="w-7 h-7 text-teal-600 dark:text-teal-400" /> 
+              <Brain className="w-7 h-7 text-teal-600 dark:text-teal-400" />
             </div>
             <h1 className="leading-normal text-4xl md:text-5xl md:leading-relaxed font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
               <GradientText
@@ -946,7 +1154,7 @@ const Insight = () => {
                 Insight
               </GradientText>
             </h1>
-         </div>
+          </div>
 
           <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg">
             Wawasan mendalam untuk kesehatan mentalmu
@@ -972,11 +1180,10 @@ const Insight = () => {
                 onClick={() => setActiveTab(tab.id as any)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`flex items-center space-x-2 px-5 py-3 sm:px-6 rounded-2xl font-semibold transition-all transform ${
-                  activeTab === tab.id
-                    ? "bg-gradient-to-r from-[#1ff498] to-[#50b7f7] text-white shadow-lg"
-                    : "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white dark:bg-gray-900 dark:hover:bg-gray-700 border-2 border-[#72e4f8] dark:border-teal-500"
-                }`}
+                className={`flex items-center space-x-2 px-5 py-3 sm:px-6 rounded-2xl font-semibold transition-all transform ${activeTab === tab.id
+                  ? "bg-gradient-to-r from-[#1ff498] to-[#50b7f7] text-white shadow-lg"
+                  : "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white dark:bg-gray-900 dark:hover:bg-gray-700 border-2 border-[#72e4f8] dark:border-teal-500"
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 <span className="whitespace-nowrap text-sm sm:text-base">
@@ -1047,19 +1254,18 @@ const Insight = () => {
                           Tren Mood Kamu
                         </p>
                         <p
-                          className={`text-2xl sm:text-3xl font-bold ${
-                            moodAnalysis.trend === "positive"
-                              ? "text-green-600"
-                              : moodAnalysis.trend === "negative"
+                          className={`text-2xl sm:text-3xl font-bold ${moodAnalysis.trend === "positive"
+                            ? "text-green-600"
+                            : moodAnalysis.trend === "negative"
                               ? "text-red-600"
                               : "text-yellow-600"
-                          }`}
+                            }`}
                         >
                           {moodAnalysis.trend === "positive"
                             ? "📈 Membaik"
                             : moodAnalysis.trend === "negative"
-                            ? "📉 Menurun"
-                            : "➡️ Stabil"}
+                              ? "📉 Menurun"
+                              : "➡️ Stabil"}
                         </p>
                       </motion.div>
                     </div>
@@ -1084,20 +1290,19 @@ const Insight = () => {
                                 {mood === "very-happy"
                                   ? "😄"
                                   : mood === "happy"
-                                  ? "😊"
-                                  : mood === "neutral"
-                                  ? "😐"
-                                  : mood === "sad"
-                                  ? "😔"
-                                  : "😢"}
+                                    ? "😊"
+                                    : mood === "neutral"
+                                      ? "😐"
+                                      : mood === "sad"
+                                        ? "😔"
+                                        : "😢"}
                               </span>
                               <div className="flex-grow h-4 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700 rounded-full overflow-hidden">
                                 <motion.div
                                   initial={{ width: 0 }}
                                   animate={{
-                                    width: `${
-                                      (count / moodAnalysis.totalDays) * 100
-                                    }%`,
+                                    width: `${(count / moodAnalysis.totalDays) * 100
+                                      }%`,
                                   }}
                                   transition={{
                                     duration: 0.8,
@@ -1125,7 +1330,7 @@ const Insight = () => {
                 )}
               </motion.div>
 
-                            <motion.div
+              <motion.div
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
@@ -1136,7 +1341,7 @@ const Insight = () => {
                     {todayEmotion.icon}
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-bold">
-                    Emosi Fokus: {todayEmotion.name}
+                    Emosi Dominan: {todayEmotion.name}
                   </h2>
                 </div>
                 <p className="text-lg sm:text-xl mb-6 opacity-95 leading-relaxed">
@@ -1173,60 +1378,86 @@ const Insight = () => {
               </motion.div>
 
               <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border-2 border-[#72e4f8] dark:border-gray-600 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                // Mengubah sedikit warna border untuk kesan lebih modern/analisis
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-indigo-300 dark:border-indigo-600 hover:border-fuchsia-400 dark:hover:border-fuchsia-500 transition-all duration-300"
               >
                 <div className="flex items-center space-x-3 mb-6">
-                  <AlertCircle className="w-6 h-6 sm:w-7 sm:h-7 text-rose-500" />
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Pemicu Emosi Utama
+                  <Lightbulb className="w-7 h-7 text-fuchsia-600 dark:text-fuchsia-400" />
+                  <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                    Pemicu Emosi Utama <span className="text-sm font-medium">(AI Insight)</span>
                   </h2>
                 </div>
-                {topTriggers.length > 0 ? (
-                  <div className="space-y-4">
-                    {topTriggers.map((trigger, index) => (
-                      <motion.div
-                        key={trigger.word}
-                        initial={{ x: -50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
-                        whileHover={{ scale: 1.01 }}
-                        className="flex items-center space-x-4 sm:space-x-5 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/30 dark:to-pink-900/30 rounded-2xl p-4 sm:p-5 border-2 border-rose-200 dark:border-rose-700 hover:border-rose-300 dark:hover:border-rose-600 transition-all"
-                      >
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-rose-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg flex-shrink-0">
-                          {index + 1}
-                        </div>
-                        <div className="flex-grow">
-                          <p className="font-bold text-gray-900 dark:text-white capitalize text-base sm:text-lg">
-                            {trigger.word}
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Muncul {trigger.count}x dalam jurnal mood rendah
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 dark:border-blue-700 mt-6">
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                        💡{" "}
-                        <strong className="text-blue-700 dark:text-blue-400">
-                          Insight:
-                        </strong>{" "}
-                        Kata-kata ini sering muncul saat mood-mu rendah. Coba
-                        refleksikan pola ini.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-rose-50 dark:from-gray-900/50 dark:to-rose-900/30 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600">
-                    <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">
-                      Belum cukup data jurnal untuk analisis. Tulis lebih banyak
-                      di Journal Mood! ✍️
-                    </p>
-                  </div>
+
+                <p className="text-gray-600 dark:text-gray-400 mb-6 border-l-4 border-indigo-400 pl-4 py-1">
+                  Analisis mendalam dari AI untuk mengidentifikasi pola pemicu emosi dari <span className="font-bold">jurnal mood terbaru</span> Anda.
+                </p>
+
+                {/* Tombol Analisis */}
+                <motion.button
+                  onClick={analyzeEmotionTriggers}
+                  disabled={isTriggerLoading || journalEntries.length < 5}
+                  whileHover={{ scale: isTriggerLoading ? 1 : 1.05, boxShadow: isTriggerLoading ? 'none' : '0 10px 15px rgba(232, 62, 140, 0.4)' }}
+                  whileTap={{ scale: isTriggerLoading ? 1 : 0.98 }}
+                  className={`w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-xl font-bold transition-all transform text-white shadow-xl ${isTriggerLoading
+                    ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                    : "bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-600 hover:to-purple-700"
+                    }`}
+                >
+                  {isTriggerLoading ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      <span>Memproses Wawasan Emosi...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Brain className="w-5 h-5" />
+                      <span>Mulai Analisis Pola Journal ({journalEntries.length < 5 ? `Min. 5 Entri` : `5-${Math.min(journalEntries.length, 8)} Entri Terbaru`})</span>
+                    </>
+                  )}
+                </motion.button>
+
+                {journalEntries.length < 5 && (
+                  <p className="text-sm text-center text-rose-500 dark:text-rose-400 mt-3 p-2 bg-rose-50/50 dark:bg-rose-900/20 rounded-lg">
+                    ⚠️ Diperlukan minimal 5 entri jurnal untuk memulai analisis AI. (Anda punya: {journalEntries.length}).
+                  </p>
                 )}
+
+
+                {/* Area Hasil Analisis AI dengan ReactMarkdown */}
+                <AnimatePresence>
+                  {aiTriggerAnalysis && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+                      className="mt-8 p-6 bg-fuchsia-50/70 dark:bg-gray-900/80 rounded-2xl border-2 border-fuchsia-300 dark:border-fuchsia-700 shadow-inner overflow-hidden"
+                    >
+                      <h3 className="text-xl font-extrabold text-fuchsia-800 dark:text-fuchsia-400 mb-4 flex items-center space-x-2 border-b border-fuchsia-300 pb-2">
+                        <Brain className="w-6 h-6" />
+                        <span>Hasil Analisis Dengan AI:</span>
+                      </h3>
+
+                      {/* Perbaikan: ClassName untuk styling 'prose' dipindahkan ke elemen div PENGGANTINYA.
+                    Ini menyelesaikan error 'Unexpected className prop'. 
+                */}
+                      <div
+                        className="prose prose-fuchsia dark:prose-invert max-w-none 
+                               prose-headings:font-extrabold prose-li:my-1 prose-strong:text-fuchsia-700 dark:prose-strong:text-fuchsia-300 
+                               text-gray-800 dark:text-gray-200"
+                      >
+                        <ReactMarkdown
+                        // Catatan: Prop className pada <ReactMarkdown> telah dihapus.
+                        >
+                          {aiTriggerAnalysis}
+                        </ReactMarkdown>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             </motion.div>
           )}
@@ -1242,181 +1473,181 @@ const Insight = () => {
               className="space-y-6 md:space-y-8"
             >
               {/* The Gratitude Garden */}
-<motion.div
-    initial={{ scale: 0.95 }}
-    animate={{ scale: 1 }}
-    transition={{ duration: 0.5, delay: 0.1 }}
-    // Shadow dipertebal, border dipertebal, background sedikit lebih transparan
-    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-emerald-300 dark:border-emerald-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
->
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2 border-b pb-4 border-emerald-100 dark:border-gray-700">
-        <div className="flex items-center space-x-3">
-            <Flower className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600 dark:text-emerald-400" />
-            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-                The Gratitude Garden
-            </h2>
-        </div>
-        <div className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
-            {gardenSeeds} Benih Ditanam 🌳
-        </div>
-    </div>
-
-    <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
-        Tumbuhkan taman syukurmu! Setiap kali kamu menuliskan hal yang
-        kamu syukuri, sebuah bunga indah akan mekar di tamanmu.
-        Maksimal satu benih per hari.
-    </p>
-
-    {/* === VISUAL TAMAN YANG LEBIH ESTETIK & DINAMIS === */}
-    <div
-        // Latar belakang diubah untuk kesan langit/horizon
-        className="bg-gradient-to-b from-sky-50 to-emerald-100 dark:from-gray-900 dark:to-green-950 rounded-3xl p-4 sm:p-8 mb-6 min-h-[250px] sm:min-h-[300px] border-4 border-emerald-400 dark:border-emerald-700 relative overflow-hidden flex flex-col justify-end shadow-inner shadow-green-900/10"
-    >
-
-        {/* SUN / MOON (dengan Framer Motion dan deteksi dark mode) */}
-        <AnimatePresence mode="wait">
-            {/* Ganti 'isDarkMode' dengan variabel deteksi tema Anda yang sebenarnya */}
-            {isDark ? (
-                <motion.div
-                    key="moon"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.5 }}
-                    className='absolute top-4 right-4 text-4xl text-blue-300 animate-pulse'
-                >
-                    🌙
-                </motion.div>
-            ) : (
-                <motion.div
-                    key="sun"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.5 }}
-                    className='absolute top-4 right-4 text-4xl text-yellow-500 animate-pulse'
-                >
-                    ☀️
-                </motion.div>
-            )}
-        </AnimatePresence>
-        
-        {/* Lapisan 1: Jaring-jaring rumput/tanah (z-index rendah) */}
-        <div className="absolute inset-0 bg-repeat bg-center opacity-30 dark:opacity-20 z-0" 
-             style={{ 
-                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 20 20'%3E%3Cpath fill='%2365a30d' d='M0 0h10v10H0zm10 10h10v10H10z' opacity='0.05'/%3E%3C/svg%3E")`
-             }}>
-        </div>
-
-        {/* --- Area Bunga (Z-index 30, selalu di depan rumput) --- */}
-        <div className="flex-grow w-full grid grid-cols-6 md:grid-cols-10 gap-x-2 gap-y-1 items-end justify-center z-30">
-            {gardenFlowers.length === 0 ? (
-                <div className="col-span-10 text-center py-10 sm:py-12">
-                    <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2 animate-bounce">
-                        Tamanmu masih kosong 🌱
-                    </p>
-                    <p className="text-gray-400 dark:text-gray-500 text-sm sm:text-base">
-                        Mulai tanam benih syukur pertamamu!
-                    </p>
+              <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                // Shadow dipertebal, border dipertebal, background sedikit lebih transparan
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-emerald-300 dark:border-emerald-700 hover:border-[#1ff498] dark:hover:border-teal-500 transition-all"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2 border-b pb-4 border-emerald-100 dark:border-gray-700">
+                  <div className="flex items-center space-x-3">
+                    <Flower className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600 dark:text-emerald-400" />
+                    <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                      The Gratitude Garden
+                    </h2>
+                  </div>
+                  <div className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+                    {gardenSeeds} Benih Ditanam 🌳
+                  </div>
                 </div>
-            ) : (
-                gardenFlowers.map((flower, index) => (
-                    <motion.div
-                        key={index}
-                        initial={{ scale: 0, opacity: 0, y: 50 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        transition={{
+
+                <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
+                  Tumbuhkan taman syukurmu! Setiap kali kamu menuliskan hal yang
+                  kamu syukuri, sebuah bunga indah akan mekar di tamanmu.
+                  Maksimal satu benih per hari.
+                </p>
+
+                {/* === VISUAL TAMAN YANG LEBIH ESTETIK & DINAMIS === */}
+                <div
+                  // Latar belakang diubah untuk kesan langit/horizon
+                  className="bg-gradient-to-b from-sky-50 to-emerald-100 dark:from-gray-900 dark:to-green-950 rounded-3xl p-4 sm:p-8 mb-6 min-h-[250px] sm:min-h-[300px] border-4 border-emerald-400 dark:border-emerald-700 relative overflow-hidden flex flex-col justify-end shadow-inner shadow-green-900/10"
+                >
+
+                  {/* SUN / MOON (dengan Framer Motion dan deteksi dark mode) */}
+                  <AnimatePresence mode="wait">
+                    {/* Ganti 'isDarkMode' dengan variabel deteksi tema Anda yang sebenarnya */}
+                    {isDark ? (
+                      <motion.div
+                        key="moon"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.5 }}
+                        className='absolute top-4 right-4 text-4xl text-blue-300 animate-pulse'
+                      >
+                        🌙
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="sun"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.5 }}
+                        className='absolute top-4 right-4 text-4xl text-yellow-500 animate-pulse'
+                      >
+                        ☀️
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Lapisan 1: Jaring-jaring rumput/tanah (z-index rendah) */}
+                  <div className="absolute inset-0 bg-repeat bg-center opacity-30 dark:opacity-20 z-0"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 20 20'%3E%3Cpath fill='%2365a30d' d='M0 0h10v10H0zm10 10h10v10H10z' opacity='0.05'/%3E%3C/svg%3E")`
+                    }}>
+                  </div>
+
+                  {/* --- Area Bunga (Z-index 30, selalu di depan rumput) --- */}
+                  <div className="flex-grow w-full grid grid-cols-6 md:grid-cols-10 gap-x-2 gap-y-1 items-end justify-center z-30">
+                    {gardenFlowers.length === 0 ? (
+                      <div className="col-span-10 text-center py-10 sm:py-12">
+                        <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2 animate-bounce">
+                          Tamanmu masih kosong 🌱
+                        </p>
+                        <p className="text-gray-400 dark:text-gray-500 text-sm sm:text-base">
+                          Mulai tanam benih syukur pertamamu!
+                        </p>
+                      </div>
+                    ) : (
+                      gardenFlowers.map((flower, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ scale: 0, opacity: 0, y: 50 }}
+                          animate={{ scale: 1, opacity: 1, y: 0 }}
+                          transition={{
                             type: "spring",
                             stiffness: 150,
                             damping: 10,
                             delay: index * 0.05,
-                        }}
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        // Z-index 30 agar bunga di atas rumput
-                        className="text-4xl sm:text-5xl text-center cursor-pointer relative z-30"
-                        style={{
+                          }}
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          // Z-index 30 agar bunga di atas rumput
+                          className="text-4xl sm:text-5xl text-center cursor-pointer relative z-30"
+                          style={{
                             alignSelf: "flex-end",
                             transform: `translateX(${Math.floor(Math.random() * 10 - 5)}px)`
-                        }}
+                          }}
+                        >
+                          {flower}
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* --- Lapisan Rumput & Tanah (z-index 10) --- */}
+                  <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-green-700 to-green-600 dark:from-green-900 dark:to-green-800 rounded-b-3xl z-10">
+                    {/* Tekstur rumput dengan SVG */}
+                    <div className="absolute inset-0 bg-repeat opacity-20"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 20 20'%3E%3Cpath fill='%2322c55e' d='M0 0h10v10H0zm10 10h10v10H10z' opacity='0.1'/%3E%3C/svg%3E")`
+                      }}>
+                    </div>
+                  </div>
+
+                  {/* Garis Tanah Paling Bawah (z-index 20, menutupi rumput) */}
+                  <div className="absolute bottom-0 left-0 right-0 h-4 bg-green-800 dark:bg-green-950 rounded-b-[22px] shadow-xl z-20"></div>
+
+                </div>
+                {/* === AKHIR VISUAL TAMAN === */}
+
+                <div className="space-y-4">
+                  <textarea
+                    value={gratitudeText}
+                    onChange={(e) => {
+                      setGratitudeText(e.target.value);
+                      setAiGratitudeAnalysis(null);
+                    }}
+                    className="w-full h-24 px-5 py-4 bg-white dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 dark:focus:ring-emerald-500/50 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base shadow-inner"
+                    placeholder="Apa yang kamu syukuri hari ini?"
+                    disabled={isGratitudeLoading}
+                  />
+                  <motion.button
+                    onClick={plantGratitudeSeed}
+                    disabled={
+                      !canPlantToday ||
+                      !gratitudeText.trim() ||
+                      isGratitudeLoading
+                    }
+                    whileHover={{ scale: 1.02, boxShadow: "0 10px 15px -3px rgba(16, 185, 129, 0.5)" }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base sm:text-lg flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  >
+                    {isGratitudeLoading ? (
+                      <>
+                        <Loader className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
+                        <span>Menganalisis...</span>
+                      </>
+                    ) : (
+                      <span>
+                        {canPlantToday
+                          ? " Tanam Benih Syukur"
+                          : " Sudah Menanam Hari Ini"}
+                      </span>
+                    )}
+                  </motion.button>
+                </div>
+
+                <AnimatePresence>
+                  {aiGratitudeAnalysis && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 dark:border-blue-700 shadow-md"
                     >
-                        {flower}
+                      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                        <strong className="text-blue-700 dark:text-blue-400">
+                          Wawasan AI:
+                        </strong>{" "}
+                        {aiGratitudeAnalysis}
+                      </p>
                     </motion.div>
-                ))
-            )}
-        </div>
-
-        {/* --- Lapisan Rumput & Tanah (z-index 10) --- */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-green-700 to-green-600 dark:from-green-900 dark:to-green-800 rounded-b-3xl z-10">
-            {/* Tekstur rumput dengan SVG */}
-            <div className="absolute inset-0 bg-repeat opacity-20" 
-                 style={{ 
-                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 20 20'%3E%3Cpath fill='%2322c55e' d='M0 0h10v10H0zm10 10h10v10H10z' opacity='0.1'/%3E%3C/svg%3E")`
-                 }}>
-            </div>
-        </div>
-
-        {/* Garis Tanah Paling Bawah (z-index 20, menutupi rumput) */}
-        <div className="absolute bottom-0 left-0 right-0 h-4 bg-green-800 dark:bg-green-950 rounded-b-[22px] shadow-xl z-20"></div>
-
-    </div>
-    {/* === AKHIR VISUAL TAMAN === */}
-
-    <div className="space-y-4">
-        <textarea
-            value={gratitudeText}
-            onChange={(e) => {
-                setGratitudeText(e.target.value);
-                setAiGratitudeAnalysis(null);
-            }}
-            className="w-full h-24 px-5 py-4 bg-white dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 dark:focus:ring-emerald-500/50 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base shadow-inner"
-            placeholder="Apa yang kamu syukuri hari ini?"
-            disabled={isGratitudeLoading}
-        />
-        <motion.button
-            onClick={plantGratitudeSeed}
-            disabled={
-                !canPlantToday ||
-                !gratitudeText.trim() ||
-                isGratitudeLoading
-            }
-            whileHover={{ scale: 1.02, boxShadow: "0 10px 15px -3px rgba(16, 185, 129, 0.5)" }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base sm:text-lg flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
-        >
-            {isGratitudeLoading ? (
-                <>
-                    <Loader className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
-                    <span>Menganalisis...</span>
-                </>
-            ) : (
-                <span>
-                    {canPlantToday
-                        ? " Tanam Benih Syukur"
-                        : " Sudah Menanam Hari Ini"}
-                </span>
-            )}
-        </motion.button>
-    </div>
-
-    <AnimatePresence>
-        {aiGratitudeAnalysis && (
-            <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl p-4 sm:p-5 border-2 border-blue-200 dark:border-blue-700 shadow-md"
-            >
-                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                    <strong className="text-blue-700 dark:text-blue-400">
-                        Wawasan AI:
-                    </strong>{" "}
-                    {aiGratitudeAnalysis}
-                </p>
-            </motion.div>
-        )}
-    </AnimatePresence>
-</motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* Worry Vault */}
               <motion.div
@@ -1429,7 +1660,7 @@ const Insight = () => {
                   <div className="flex items-center space-x-3">
                     <BookLock className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                      Worry Vault 
+                      Worry Vault
                     </h2>
                   </div>
                   <div className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
@@ -1440,7 +1671,7 @@ const Insight = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
                   Tulis kekhawatiranmu dan kunci di brankas mental. Pisahkan
                   mana yang bisa kamu kontrol dan mana yang harus kamu lepaskan.
-                  
+
                 </p>
 
                 <AnimatePresence mode="wait">
@@ -1456,7 +1687,7 @@ const Insight = () => {
                       whileTap={{ scale: 0.98 }}
                       className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl hover:shadow-lg transition-all text-base sm:text-lg"
                     >
-                       Buka Worry Vault
+                      Buka Worry Vault
                     </motion.button>
                   ) : (
                     <motion.div
@@ -1482,11 +1713,10 @@ const Insight = () => {
                             disabled={isWorryLoading}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
-                            className={`p-5 rounded-2xl border-2 transition-all  ${
-                              worryType === "controllable"
-                                ? " border-blue-400 shadow-lg scale-105"
-                                : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-600 hover:border-blue-300"
-                            } disabled:opacity-50 text-left sm:text-center`}
+                            className={`p-5 rounded-2xl border-2 transition-all  ${worryType === "controllable"
+                              ? " border-blue-400 shadow-lg scale-105"
+                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-600 hover:border-blue-300"
+                              } disabled:opacity-50 text-left sm:text-center`}
                           >
                             <Target className="w-6 h-6 text-blue-600 mb-2 sm:mx-auto" />
                             <p className="font-bold text-gray-900 mb-1 dark:text-white">
@@ -1502,11 +1732,10 @@ const Insight = () => {
                             disabled={isWorryLoading}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
-                            className={`p-5 rounded-2xl border-2 transition-all  ${
-                              worryType === "uncontrollable"
-                                ? " border-purple-400 shadow-lg scale-105"
-                                : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-600 hover:border-purple-300"
-                            } disabled:opacity-50 text-left sm:text-center`}
+                            className={`p-5 rounded-2xl border-2 transition-all  ${worryType === "uncontrollable"
+                              ? " border-purple-400 shadow-lg scale-105"
+                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-600 hover:border-purple-300"
+                              } disabled:opacity-50 text-left sm:text-center`}
                           >
                             <Heart className="w-6 h-6 text-purple-600 mb-2 sm:mx-auto" />
                             <p className="font-bold text-gray-900 mb-1  dark:text-white">
@@ -1550,7 +1779,7 @@ const Insight = () => {
                             className="bg-white dark:bg-gray-900 dark:border-gray-600 rounded-2xl p-4 sm:p-5 border-2 border-purple-200"
                           >
                             <p className="text-sm text-gray-700 dark:text-gray-400">
-                               <strong>Reminder:</strong> Karena ini di luar
+                              <strong>Reminder:</strong> Karena ini di luar
                               kontrolmu, fokus pada menerima dan melepaskan.
                             </p>
                           </motion.div>
@@ -1603,7 +1832,7 @@ const Insight = () => {
                 {lockedWorries.length > 0 && (
                   <div className="mt-6 space-y-3">
                     <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-4 dark:text-white">
-                       Kekhawatiran Terkunci Terbaru:
+                      Kekhawatiran Terkunci Terbaru:
                     </h3>
                     {lockedWorries
                       .slice(-3)
@@ -1621,11 +1850,10 @@ const Insight = () => {
                               {worry.text}
                             </p>
                             <span
-                              className={`text-xs px-3 py-1 rounded-full font-semibold flex-shrink-0 w-fit ${
-                                worry.type === "Dapat Dikontrol"
-                                  ? "bg-blue-100 text-blue-700"
-                                  : "bg-transparent text-purple-700 dark:text-purple-200"
-                              }`}
+                              className={`text-xs px-3 py-1 rounded-full font-semibold flex-shrink-0 w-fit ${worry.type === "Dapat Dikontrol"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-transparent text-purple-700 dark:text-purple-200"
+                                }`}
                             >
                               {worry.type}
                             </span>
@@ -1676,11 +1904,10 @@ const Insight = () => {
                         width: index <= worksheetStep ? "100%" : "0%",
                       }}
                       transition={{ duration: 0.5 }}
-                      className={`h-2 sm:h-3 flex-grow rounded-full transition-all ${
-                        index <= worksheetStep
-                          ? "bg-gradient-to-r from-purple-500 to-indigo-500"
-                          : "bg-gray-200"
-                      }`}
+                      className={`h-2 sm:h-3 flex-grow rounded-full transition-all ${index <= worksheetStep
+                        ? "bg-gradient-to-r from-purple-500 to-indigo-500"
+                        : "bg-gray-200"
+                        }`}
                     />
                   ))}
                 </div>
@@ -1707,8 +1934,8 @@ const Insight = () => {
                       <textarea
                         value={
                           worksheetData[
-                            worksheetSteps[worksheetStep]
-                              .field as keyof typeof worksheetData
+                          worksheetSteps[worksheetStep]
+                            .field as keyof typeof worksheetData
                           ]
                         }
                         onChange={(e) =>
@@ -1748,7 +1975,7 @@ const Insight = () => {
                           className="w-full sm:flex-grow px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all flex items-center justify-center space-x-2"
                         >
                           {isCBTLoading &&
-                          worksheetStep === worksheetSteps.length - 1 ? (
+                            worksheetStep === worksheetSteps.length - 1 ? (
                             <>
                               <Loader className="w-5 h-5 animate-spin" />
                               <span>Menganalisis...</span>
@@ -1774,7 +2001,7 @@ const Insight = () => {
                     >
                       <div className=" rounded-2xl p-5 sm:p-6 border-2 border-purple-200">
                         <h3 className="text-lg sm:text-xl font-bold text-purple-500 mb-4">
-                           Rangkuman & Analisis CBT
+                          Rangkuman & Analisis CBT
                         </h3>
                         <div className="space-y-4 text-sm">
                           <div className="bg-white dark:bg-gray-900 rounded-xl p-4">
@@ -1803,7 +2030,7 @@ const Insight = () => {
                           </div>
                           <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
                             <p className="font-semibold text-yellow-800 mb-1">
-                              Analisis AI (Gemini):
+                              Analisis AI
                             </p>
                             <p className="text-gray-700">
                               {worksheetData.aiAnalysis ||
@@ -1855,7 +2082,7 @@ const Insight = () => {
                 <div className="flex items-center space-x-3 mb-6">
                   <PlayCircle className="w-6 h-6 sm:w-7 sm:h-7 text-teal-600" />
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Panduan Audio Fokus 
+                    Panduan Audio Fokus
                   </h2>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
@@ -1877,13 +2104,11 @@ const Insight = () => {
                             "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
                         }}
                         whileTap={{ scale: 0.98 }}
-                        className={`bg-gradient-to-br ${
-                          audio.color
-                        } rounded-2xl p-5 sm:p-6 text-white text-left transition-all group border-2 ${
-                          isPlayingThis
+                        className={`bg-gradient-to-br ${audio.color
+                          } rounded-2xl p-5 sm:p-6 text-white text-left transition-all group border-2 ${isPlayingThis
                             ? "border-4 border-white shadow-2xl"
                             : "border-white/20"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-3xl sm:text-4xl">
@@ -2015,83 +2240,82 @@ const Insight = () => {
                 </div>
               </motion.div>
 
-             <motion.div
-    initial={{ scale: 0.95 }}
-    animate={{ scale: 1 }}
-    transition={{ duration: 0.5, delay: 0.4 }}
-    // DARK MODE: Ubah gradien latar belakang dan border kontainer utama
-    className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900 dark:to-rose-900 border-2 border-red-300 dark:border-red-700 rounded-3xl p-6 md:p-8 shadow-xl"
->
-    <div className="flex items-center space-x-3 mb-6">
-        <Phone className="w-6 h-6 sm:w-7 sm:h-7 text-red-600" />
-        {/* DARK MODE: Kelas dark:text-red-200 sudah ada di kode asli */}
-        <h2 className="text-xl sm:text-2xl font-bold text-red-900 dark:text-red-200">
-            Pusat Bantuan Krisis
-        </h2>
-    </div>
-    {/* DARK MODE: Ubah warna teks paragraf */}
-    <p className="text-gray-700 dark:text-gray-300 mb-8 text-base sm:text-lg leading-relaxed">
-        Jika kamu atau seseorang yang kamu kenal dalam keadaan
-        darurat, segera hubungi layanan berikut:
-    </p>
-    <div className="space-y-4">
-        {CRISIS_RESOURCES.map((resource, index) => (
-            <motion.div
-                key={index}
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
-                className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6 rounded-2xl border-2 ${
-                    // DARK MODE: Ubah latar belakang dan border dinamis untuk setiap jenis sumber daya
-                    resource.type === "danger"
-                        ? "bg-red-100 border-red-400 dark:bg-red-950 dark:border-red-700"
-                        : resource.type === "emergency"
-                        ? "bg-yellow-100 border-yellow-400 dark:bg-yellow-950 dark:border-yellow-700"
-                        : "bg-blue-100 border-blue-400 dark:bg-blue-950 dark:border-blue-700"
-                }`}
-            >
-                <div className="sm:flex-grow">
-                    {/* DARK MODE: Ubah warna teks judul kartu */}
-                    <p className="font-bold text-gray-900 dark:text-white text-base sm:text-lg">
-                        {resource.title}
-                    </p>
-                    {/* DARK MODE: Kelas dark:text-gray-400 sudah ada di kode asli */}
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        Tersedia 24/7
-                    </p>
+              <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                // DARK MODE: Ubah gradien latar belakang dan border kontainer utama
+                className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900 dark:to-rose-900 border-2 border-red-300 dark:border-red-700 rounded-3xl p-6 md:p-8 shadow-xl"
+              >
+                <div className="flex items-center space-x-3 mb-6">
+                  <Phone className="w-6 h-6 sm:w-7 sm:h-7 text-red-600" />
+                  {/* DARK MODE: Kelas dark:text-red-200 sudah ada di kode asli */}
+                  <h2 className="text-xl sm:text-2xl font-bold text-red-900 dark:text-red-200">
+                    Pusat Bantuan Krisis
+                  </h2>
                 </div>
-                <motion.a
-                    href={`tel:${resource.number.split("/")[0].trim()}`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    // Tombol dibuat full-width di mobile
-                    className={`w-full sm:w-auto text-center px-6 py-3 sm:px-8 sm:py-4 rounded-2xl font-bold text-white ${
+                {/* DARK MODE: Ubah warna teks paragraf */}
+                <p className="text-gray-700 dark:text-gray-300 mb-8 text-base sm:text-lg leading-relaxed">
+                  Jika kamu atau seseorang yang kamu kenal dalam keadaan
+                  darurat, segera hubungi layanan berikut:
+                </p>
+                <div className="space-y-4">
+                  {CRISIS_RESOURCES.map((resource, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
+                      className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6 rounded-2xl border-2 ${
+                        // DARK MODE: Ubah latar belakang dan border dinamis untuk setiap jenis sumber daya
                         resource.type === "danger"
-                            ? "bg-red-600 hover:bg-red-700"
-                            : resource.type === "emergency"
+                          ? "bg-red-100 border-red-400 dark:bg-red-950 dark:border-red-700"
+                          : resource.type === "emergency"
+                            ? "bg-yellow-100 border-yellow-400 dark:bg-yellow-950 dark:border-yellow-700"
+                            : "bg-blue-100 border-blue-400 dark:bg-blue-950 dark:border-blue-700"
+                        }`}
+                    >
+                      <div className="sm:flex-grow">
+                        {/* DARK MODE: Ubah warna teks judul kartu */}
+                        <p className="font-bold text-gray-900 dark:text-white text-base sm:text-lg">
+                          {resource.title}
+                        </p>
+                        {/* DARK MODE: Kelas dark:text-gray-400 sudah ada di kode asli */}
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          Tersedia 24/7
+                        </p>
+                      </div>
+                      <motion.a
+                        href={`tel:${resource.number.split("/")[0].trim()}`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        // Tombol dibuat full-width di mobile
+                        className={`w-full sm:w-auto text-center px-6 py-3 sm:px-8 sm:py-4 rounded-2xl font-bold text-white ${resource.type === "danger"
+                          ? "bg-red-600 hover:bg-red-700"
+                          : resource.type === "emergency"
                             ? "bg-yellow-600 hover:bg-yellow-700"
                             : "bg-blue-600 hover:bg-blue-700"
-                    } transition-all hover:shadow-lg`}
-                >
-                    📞 {resource.number}
-                </motion.a>
-            </motion.div>
-        ))}
-    </div>
-    {/* Catatan Penting */}
-    <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 border-2 border-red-200 dark:border-red-700">
-        {/* DARK MODE: Ubah warna latar belakang dan border. Menggunakan dark:bg-gray-800 untuk konsistensi kontras */}
-        <p className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
-            ⚠️{" "}
-            <strong className="text-red-700 dark:text-red-400">
-                Penting:
-            </strong>{" "}
-            Jika kamu merasa dalam bahaya, segera hubungi nomor darurat
-            di atas atau cari bantuan dari orang terdekat. Kamu tidak
-            sendirian. 💙
-        </p>
-    </div>
-</motion.div>
+                          } transition-all hover:shadow-lg`}
+                      >
+                        📞 {resource.number}
+                      </motion.a>
+                    </motion.div>
+                  ))}
+                </div>
+                {/* Catatan Penting */}
+                <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 border-2 border-red-200 dark:border-red-700">
+                  {/* DARK MODE: Ubah warna latar belakang dan border. Menggunakan dark:bg-gray-800 untuk konsistensi kontras */}
+                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
+                    ⚠️{" "}
+                    <strong className="text-red-700 dark:text-red-400">
+                      Penting:
+                    </strong>{" "}
+                    Jika kamu merasa dalam bahaya, segera hubungi nomor darurat
+                    di atas atau cari bantuan dari orang terdekat. Kamu tidak
+                    sendirian. 💙
+                  </p>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -2100,72 +2324,72 @@ const Insight = () => {
       {/* Mini Audio Player (Di luar AnimatePresence utama) */}
       <AnimatePresence>{currentAudio && <MiniAudioPlayer />}</AnimatePresence>
 
-            <div className="relative h-32 w-full overflow-hidden ">
-              <motion.svg
-                viewBox="0 0 1200 120"
-                preserveAspectRatio="none"
-                className="absolute top-0 w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  transition: { duration: 1, delay: 0.5 },
-                }}
-              >
-                {/* Path 1: Biru terang dengan opacity rendah */}
-                <motion.path
-                  fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
-                  fillOpacity="0.1"
-                  d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
-                  initial={{ pathLength: 0, pathOffset: 1 }}
-                  animate={{
-                    pathLength: 1,
-                    pathOffset: 0,
-                    transition: {
-                      duration: 3,
-                      ease: "linear",
-                      repeat: Infinity,
-                      repeatType: "loop",
-                    },
-                  }}
-                />
-                {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
-                <motion.path
-                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
-                  fillOpacity="0.2"
-                  d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
-                  initial={{ pathLength: 0, pathOffset: 1 }}
-                  animate={{
-                    pathLength: 1,
-                    pathOffset: 0,
-                    transition: {
-                      duration: 3.5,
-                      ease: "linear",
-                      repeat: Infinity,
-                      repeatType: "loop",
-                      delay: 0.2,
-                    },
-                  }}
-                />
-                {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
-                <motion.path
-                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
-                  fillOpacity="0.3"
-                  d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
-                  initial={{ pathLength: 0, pathOffset: 1 }}
-                  animate={{
-                    pathLength: 1,
-                    pathOffset: 0,
-                    transition: {
-                      duration: 4,
-                      ease: "linear",
-                      repeat: Infinity,
-                      repeatType: "loop",
-                      delay: 0.4,
-                    },
-                  }}
-                />
-              </motion.svg>
-            </div>
+      <div className="relative h-32 w-full overflow-hidden ">
+        <motion.svg
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+          className="absolute top-0 w-full h-full"
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: 1,
+            transition: { duration: 1, delay: 0.5 },
+          }}
+        >
+          {/* Path 1: Biru terang dengan opacity rendah */}
+          <motion.path
+            fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
+            fillOpacity="0.1"
+            d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
+            initial={{ pathLength: 0, pathOffset: 1 }}
+            animate={{
+              pathLength: 1,
+              pathOffset: 0,
+              transition: {
+                duration: 3,
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "loop",
+              },
+            }}
+          />
+          {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
+          <motion.path
+            fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+            fillOpacity="0.2"
+            d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
+            initial={{ pathLength: 0, pathOffset: 1 }}
+            animate={{
+              pathLength: 1,
+              pathOffset: 0,
+              transition: {
+                duration: 3.5,
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "loop",
+                delay: 0.2,
+              },
+            }}
+          />
+          {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
+          <motion.path
+            fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+            fillOpacity="0.3"
+            d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
+            initial={{ pathLength: 0, pathOffset: 1 }}
+            animate={{
+              pathLength: 1,
+              pathOffset: 0,
+              transition: {
+                duration: 4,
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "loop",
+                delay: 0.4,
+              },
+            }}
+          />
+        </motion.svg>
+      </div>
     </div>
   );
 };

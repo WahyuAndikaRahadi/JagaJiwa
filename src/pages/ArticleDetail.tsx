@@ -1,4 +1,4 @@
-import  { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 // Hapus Sun dan Moon karena tidak ada toggle
 import { ChevronLeft, Clock, BookOpen, AlertCircle } from 'lucide-react';
@@ -114,6 +114,249 @@ Langkah ketiga: **Dengar 3 suara**. Mungkin suara AC, kicau burung, atau napasmu
 Langkah keempat: **Cium 2 aroma**. Jika tidak ada bau jelas, ingat bau favoritmu—kopi pagi, sabun mandi, atau hujan. Langkah kelima: **Rasakan 1 rasa** di mulutmu—minum seteguk air, atau ingat rasa permen terakhir yang kamu makan.
 
 Latihan ini hanya butuh 1–2 menit, tapi efeknya bisa sangat kuat. Ia tidak menghilangkan penyebab kecemasan, tapi memberimu **ruang napas** untuk merespons dengan tenang, bukan bereaksi panik. Simpan teknik ini di "kotak peralatan mental"mu—kapan pun kamu merasa terombang-ambing, indramu akan selalu membawamu pulang ke saat ini. *Kamu aman. Kamu di sini. Dan ini akan berlalu.*`
+  },
+  {
+    id: 7,
+    title: 'Mengatur Ekspektasi Diri Sendiri',
+    summary: 'Belajar membedakan antara ambisi sehat dan perfeksionisme yang merusak.',
+    category: 'Pengembangan Diri',
+    readTime: '5 menit',
+    fullContent: `Kita sering mengira bahwa menuntut diri sendiri untuk "selalu terbaik" adalah tanda disiplin. Tapi batas antara ambisi sehat dan perfeksionisme toksik sangat tipis—dan sering kali, kita sudah melewatinya tanpa sadar. Perfeksionisme bukan tentang keunggulan, melainkan tentang takut gagal, takut dihakimi, dan keyakinan bahwa nilai diri bergantung pada pencapaian.
+
+Tanda-tandanya? Kamu merasa bersalah saat beristirahat, menunda memulai karena takut hasilnya tidak sempurna, atau merasa "belum cukup" meski sudah berhasil. Ini melelahkan—dan ironisnya, justru menghambat produktivitas jangka panjang.
+
+Langkah pertama adalah **mengganti standar "sempurna" dengan "cukup baik"**. Tanyakan: *"Apa tujuan utama dari tugas ini? Apakah 'cukup baik' sudah memenuhinya?"* Sering kali, jawabannya ya. Belajar menerima ketidaksempurnaan bukan kegagalan—itu kebijaksanaan.
+
+Latih juga **self-talk yang mendukung**, bukan menghukum. Alih-alih, *"Kalau nilaiku bukan A, aku gagal,"* coba, *"Aku sudah berusaha sesuai kapasitasku hari ini—itu layak dihargai."* Perlakuan ini membangun hubungan yang sehat dengan diri sendiri.
+
+Ingat: kamu bukan mesin. Kamu manusia—yang punya hari baik, hari buruk, dan hari di mana sekadar bangun dari tempat tidur saja sudah merupakan kemenangan. *Kebaikan pada diri sendiri bukan kemewahan—itu prasyarat untuk tumbuh.*`
+  },
+  {
+    id: 8,
+    title: 'Digital Detox untuk Kesehatan Mental',
+    summary: 'Cara melepaskan ketergantungan pada layar dan kembali ke kehidupan nyata.',
+    category: 'Kesehatan',
+    readTime: '6 menit',
+    fullContent: `Di era hiperkoneksi, notifikasi terus-menerus, scroll tanpa akhir, dan perbandingan sosial di media bisa menciptakan kelelahan mental yang tak kasatmata. Otak kita tidak dirancang untuk memproses begitu banyak informasi sekaligus—apalagi informasi yang memicu rasa iri, cemas, atau FOMO (fear of missing out).
+
+Digital detox bukan berarti menghapus semua akun media sosial selamanya. Ini tentang **membangun batas sadar** antara dunia digital dan kehidupan nyata. Mulailah dengan audit kecil: berapa jam sehari kamu menghabiskan waktu di layar? Apa emosi yang muncul setelah scroll Instagram selama 30 menit?
+
+Cobalah aturan sederhana: **tidak ada HP di meja makan**, **tidak mengecek notifikasi 1 jam pertama setelah bangun**, dan **HP di luar kamar tidur saat malam**. Ganti waktu layar dengan aktivitas yang melibatkan tubuh dan indera: jalan kaki tanpa earphone, menulis jurnal tangan, atau memasak sambil mendengarkan musik.
+
+Kamu juga bisa coba "detoks mingguan"—misalnya, Sabtu pagi tanpa layar sama sekali. Awalnya mungkin terasa gelisah, tapi itu justru tanda otakmu mulai "membersihkan" kebisingan digital. Dalam keheningan itu, kamu mungkin menemukan kembali suara batin yang selama ini tenggelam dalam notifikasi.
+
+Ingat: teknologi seharusnya melayanimu—bukan menguasaimu. *Kehidupan nyata terjadi di luar layar. Dan kamu layak hadir sepenuhnya di dalamnya.*`
+  },
+  {
+    id: 9,
+    title: 'Menulis Jurnal sebagai Terapi Diri',
+    summary: 'Manfaat menulis harian untuk mengelola emosi dan meningkatkan kesadaran diri.',
+    category: 'Teknik',
+    readTime: '4 menit',
+    fullContent: `Menulis jurnal bukan hanya untuk penyair atau remaja patah hati. Ini adalah alat terapi yang kuat—dan gratis—untuk memahami emosi, mengurangi stres, dan menemukan pola pikir yang tidak sehat. Penelitian menunjukkan bahwa menulis ekspresif selama 15–20 menit sehari selama beberapa hari dapat meningkatkan kesejahteraan psikologis dan bahkan fungsi imun.
+
+Kamu tidak perlu menulis indah atau terstruktur. Cukup ambil kertas dan pena, lalu tulis apa pun yang muncul di kepalamu: *"Aku marah karena dosen tidak menghargai usahaku,"* atau *"Aku takut besok presentasi akan kacau."* Biarkan tinta mengalir tanpa sensor.
+
+Teknik sederhana yang bisa dicoba: **"3 hal yang kurasakan hari ini"**, **"Apa yang membuatku bersyukur?"**, atau **"Apa yang ingin kulepaskan malam ini?"** Pertanyaan-pertanyaan ini membimbingmu ke dalam diri sendiri dengan lembut.
+
+Yang penting bukan hasil tulisannya, tapi prosesnya. Saat kamu menuliskan kekacauan batin, kamu memberinya bentuk—dan sesuatu yang berbentuk lebih mudah dipahami, diatur, bahkan dilepaskan. *Kertas tidak menghakimi. Ia hanya mendengar—dan menyimpan rahasia dengan setia.*`
+  },
+  {
+    id: 10,
+    title: 'Mengenali dan Mengatasi Prokrastinasi',
+    summary: 'Memahami akar prokrastinasi dan cara mengubahnya menjadi aksi.',
+    category: 'Akademik',
+    readTime: '6 menit',
+    fullContent: `Prokrastinasi bukan soal kemalasan—ini sering kali respons emosional terhadap tugas yang terasa mengancam, membosankan, atau terlalu besar. Otak kita secara alami menghindari ketidaknyamanan, jadi kita memilih aktivitas yang memberi kepuasan instan (scroll media, nonton video) sebagai pelarian.
+
+Tapi menyalahkan diri sendiri hanya memperparah siklus: prokrastinasi → rasa bersalah → stres → prokrastinasi lagi. Alih-alih, cobalah **berempati pada dirimu sendiri**. Tanyakan: *"Apa yang membuatku takut atau enggan memulai tugas ini?"* Apakah takut gagal? Bingung dari mana memulai? Atau merasa tugasnya tidak bermakna?
+
+Setelah mengenali akarnya, gunakan strategi kecil: **"aturan 2 menit"**—jika tugas bisa diselesaikan dalam 2 menit, lakukan sekarang. Jika tidak, lakukan hanya selama 2 menit. Sering kali, memulai adalah bagian tersulit—setelah itu, momentum akan membawamu lebih jauh.
+
+Pecah tugas besar menjadi langkah-langkah mikro. Daripada "menulis makalah", tulis: "buka dokumen → tulis judul → cari 3 referensi". Setiap centimeter kemajuan layak dirayakan.
+
+Ingat: kamu tidak perlu merasa siap untuk memulai. Kamu memulai agar merasa siap. *Aksi kecil hari ini lebih berharga daripada rencana sempurna yang tak pernah dimulai.*`
+  },
+  {
+    id: 11,
+    title: 'Menjaga Motivasi Jangka Panjang',
+    summary: 'Strategi mempertahankan semangat saat tujuan terasa jauh.',
+    category: 'Pengembangan Diri',
+    readTime: '5 menit',
+    fullContent: `Motivasi awal—saat semuanya terasa mungkin dan penuh semangat—itu mudah. Tapi bagaimana saat minggu ke-12, kelelahan datang, hasil belum terlihat, dan keraguan mulai menggerogoti? Di sinilah **disiplin dan sistem** menggantikan motivasi sesaat.
+
+Alih-alih hanya fokus pada tujuan akhir ("lulus dengan IPK 3.8"), bangun **ritual harian** yang mendukungnya: belajar 45 menit setiap pagi, review catatan setiap Jumat, atau istirahat cukup setiap malam. Sistem ini membuatmu tetap bergerak, bahkan saat motivasi sedang turun.
+
+Rayakan **kemajuan mikro**. Menyelesaikan satu bab buku? Itu layak diakui. Tidak menunda tugas hari ini? Itu kemenangan. Otak kita termotivasi oleh penghargaan—jadi beri ia umpan balik positif secara konsisten.
+
+Selain itu, ingatkan dirimu pada **"mengapa"** yang lebih dalam. Bukan hanya "aku ingin lulus", tapi "aku ingin lulus agar bisa membantu keluargaku" atau "agar suatu hari nanti aku bisa mengajar anak-anak yang kurang beruntung". Nilai-nilai ini adalah bahan bakar jangka panjang.
+
+Dan saat semuanya terasa berat, izinkan dirimu **beristirahat tanpa rasa bersalah**. Motivasi bukan api yang harus terus menyala—kadang, ia perlu ditiup pelan agar bara tetap hidup. *Perjalanan panjang dimenangkan oleh mereka yang tahu kapan harus berlari—dan kapan harus duduk sejenak.*`
+  },
+  {
+    id: 12,
+    title: 'Menghadapi Kegagalan dengan Bijak',
+    summary: 'Mengubah kegagalan dari akhir menjadi awal yang baru.',
+    category: 'Pengembangan Diri',
+    readTime: '5 menit',
+    fullContent: `Kegagalan terasa seperti pukulan—terutama saat kamu sudah berusaha keras. Tapi bagaimana jika kegagalan bukan akhir, melainkan **data**? Bukan bukti ketidakmampuan, tapi petunjuk tentang apa yang perlu disesuaikan?
+
+Orang yang tumbuh dengan pola pikir berkembang (*growth mindset*) tidak melihat kegagalan sebagai identitas ("Aku gagal" → "Aku orang gagal"), tapi sebagai proses ("Aku gagal" → "Aku sedang belajar"). Perbedaan kecil ini mengubah seluruh narasi.
+
+Setelah kegagalan, tanyakan tiga pertanyaan reflektif:  
+1. *Apa yang bisa kubelajar dari ini?*  
+2. *Apa yang masih bisa kuperbaiki?*  
+3. *Apa langkah kecil berikutnya?*
+
+Jangan biarkan kegagalan mendefinisikanmu. Kamu adalah kumpulan dari semua usaha, keberanian, dan keinginan untuk terus mencoba—bukan hanya hasil akhirnya.
+
+Dan ingat: hampir semua orang sukses pernah gagal berkali-kali. Yang membedakan mereka bukan keberuntungan, tapi **kegigihan untuk bangkit**. *Kegagalan bukan lawanmu—ia guru yang keras, tapi jujur.*`
+  },
+  {
+    id: 13,
+    title: 'Membangun Rutinitas Pagi yang Menenangkan',
+    summary: 'Cara memulai hari dengan tenang dan penuh energi positif.',
+    category: 'Kesehatan',
+    readTime: '4 menit',
+    fullContent: `Jam-jam pertama setelah bangun tidur menentukan arah seluruh harimu. Jika kamu langsung mengecek notifikasi, buru-buru mandi, lalu lari ke kelas sambil sarapan di jalan, otakmu masuk mode "bertahan"—bukan "berkembang".
+
+Rutinitas pagi yang menenangkan bukan tentang bangun jam 4 pagi atau yoga selama 1 jam. Ini tentang **menciptakan 15–30 menit pertama yang milikmu sendiri**—tanpa tuntutan eksternal.
+
+Cobalah: bangun 15 menit lebih awal, minum segelas air, lalu duduk diam sambil menarik napas dalam. Kamu bisa menambahkan peregangan ringan, menulis 1 hal yang kamu syukuri, atau membaca satu halaman buku inspiratif.
+
+Hindari layar selama 30–60 menit pertama. Biarkan pikiranmu bangun secara alami, bukan dipaksa masuk ke dunia digital yang penuh tekanan.
+
+Rutinitas ini bukan kemewahan—ini investasi. Dengan memulai hari dalam keadaan tenang, kamu membawa ketenangan itu ke setiap interaksi, keputusan, dan tugas yang mengikutinya. *Hari yang baik tidak dimulai dengan daftar tugas—tapi dengan kehadiran diri sendiri.*`
+  },
+  {
+    id: 14,
+    title: 'Mengelola Konflik dengan Teman atau Rekan',
+    summary: 'Cara berkomunikasi asertif tanpa merusak hubungan.',
+    category: 'Sosial',
+    readTime: '6 menit',
+    fullContent: `Konflik adalah bagian alami dari hubungan manusia—tapi cara kita menghadapinya menentukan apakah ia merusak atau memperkuat ikatan. Banyak orang menghindari konflik karena takut dianggap "kasar" atau "egois". Padahal, menghindar justru menumpuk dendam dan salah paham.
+
+Kunci komunikasi asertif adalah: **jujur tanpa menyerang, tegas tanpa menghakimi**. Gunakan kalimat "aku", bukan "kamu". Alih-alih, *"Kamu selalu telat!"*, coba, *"Aku merasa cemas saat janji tidak ditepati—bisa kita diskusikan cara mengatasinya?"*
+
+Sebelum bicara, pastikan emosimu sudah cukup tenang. Jika masih marah, katakan: *"Aku butuh waktu sebentar untuk menenangkan diri—nanti kita lanjutkan, ya?"* Ini bukan penundaan, tapi bentuk penghormatan pada hubungan.
+
+Dengarkan juga dengan niat memahami, bukan memenangkan argumen. Tanyakan: *"Apa maksudmu saat mengatakan itu?"* atau *"Bagaimana perasaanmu saat itu?"* Sering kali, konflik lahir dari asumsi yang salah—bukan niat jahat.
+
+Ingat: hubungan yang sehat bukan yang tanpa konflik, tapi yang mampu **menyelesaikan konflik dengan empati dan kejujuran**. *Kedewasaan sosial bukan soal menghindari gesekan—tapi mengubahnya menjadi pemahaman.*`
+  },
+  {
+    id: 15,
+    title: 'Mengatasi Rasa Tidak Cukup (Impostor Syndrome)',
+    summary: 'Mengenali dan melawan perasaan sebagai "penipu" meski sudah berprestasi.',
+    category: 'Pengembangan Diri',
+    readTime: '5 menit',
+    fullContent: `Pernah merasa seperti "penipu"—bahwa suatu hari nanti orang akan sadar kamu sebenarnya tidak sehebat yang mereka kira? Itu disebut *impostor syndrome*, dan ia menyerang bahkan orang-orang paling kompeten sekalipun.
+
+Gejalanya: meremehkan pencapaian sendiri ("Aku hanya beruntung"), takut dinilai, atau merasa harus bekerja dua kali lebih keras agar "layak". Ironisnya, semakin sukses kamu, semakin kuat perasaan ini—karena standar internalmu terus naik.
+
+Langkah pertama: **namai perasaan itu**. Katakan pada dirimu, *"Ini impostor syndrome bicara—bukan kenyataan."* Ini menciptakan jarak antara emosi dan identitasmu.
+
+Kedua, **kumpulkan bukti nyata**. Buat daftar pencapaian, pujian dari orang lain, atau proyek yang berhasil kamu selesaikan. Saat keraguan datang, baca daftar itu—bukan sebagai pamer, tapi sebagai pengingat objektif.
+
+Ketiga, bicarakan dengan orang tepercaya. Kamu akan terkejut betapa banyak orang merasakan hal yang sama. Berbagi keraguan justru memperkuat rasa koneksi—dan mengurangi rasa "sendirian".
+
+Ingat: kamu tidak perlu merasa 100% layak untuk berada di tempatmu sekarang. Kamu **sudah** layak—karena kamu ada di sana. *Kehadiranmu bukan kesalahan. Itu konfirmasi bahwa kamu cukup.*`
+  },
+  {
+    id: 16,
+    title: 'Latihan Pernapasan untuk Menenangkan Pikiran',
+    summary: 'Teknik pernapasan sederhana yang bisa dilakukan di mana saja.',
+    category: 'Teknik',
+    readTime: '3 menit',
+    fullContent: `Napas adalah jembatan antara tubuh dan pikiran. Saat cemas, napas menjadi cepat dan dangkal—yang justru memperkuat sinyal "bahaya" ke otak. Tapi dengan mengatur napas, kamu bisa mengirim sinyal sebaliknya: *"Kita aman. Kita tenang."*
+
+Salah satu teknik paling efektif adalah **pernapasan kotak (box breathing)**:  
+- Tarik napas melalui hidung selama 4 detik  
+- Tahan napas selama 4 detik  
+- Buang napas perlahan lewat mulut selama 4 detik  
+- Tahan lagi selama 4 detik  
+Ulangi 3–5 kali.
+
+Teknik ini digunakan oleh pilot, atlet, dan tentara untuk tetap tenang di bawah tekanan. Kamu bisa melakukannya di kelas sebelum ujian, di kamar saat merasa overwhelmed, atau bahkan di toilet kampus selama 1 menit.
+
+Kuncinya: fokus penuh pada sensasi napas—udara masuk, dada mengembang, udara keluar. Saat pikiran melayang, lembut bawa kembali ke hitungan.
+
+Latihan ini tidak menghilangkan masalah, tapi memberimu **ruang mental** untuk merespons dengan jernih, bukan bereaksi impulsif. *Ketenangan selalu tersedia—cukup tarik napas, dan kembalilah ke pusat dirimu.*`
+  },
+  {
+    id: 17,
+    title: 'Menjaga Keseimbangan Hidup Mahasiswa',
+    summary: 'Tips mengelola waktu antara kuliah, organisasi, dan kehidupan pribadi.',
+    category: 'Akademik',
+    readTime: '6 menit',
+    fullContent: `Menjadi mahasiswa bukan hanya soal kuliah—ada organisasi, tugas kelompok, kerja paruh waktu, hubungan sosial, dan kebutuhan pribadi. Tanpa batas yang jelas, mudah terjebak dalam "ya" untuk semua hal—lalu kehabisan energi untuk diri sendiri.
+
+Keseimbangan bukan berarti melakukan semuanya dengan sempurna setiap hari. Ini tentang **prioritas yang sadar dan fleksibel**. Tanyakan setiap minggu: *"Apa yang paling penting minggu ini?"* Mungkin minggu ini fokus pada ujian tengah semester, jadi organisasi bisa dikurangi sementara.
+
+Gunakan prinsip **"kalender > to-do list"**. Masukkan waktu untuk belajar, tidur, makan, dan istirahat ke kalender—seperti janji dengan orang lain. Jika tidak masuk jadwal, kemungkinan besar tidak akan terjadi.
+
+Belajar berkata **"tidak" dengan sopan tapi tegas**. Kamu tidak wajib ikut semua rapat, acara, atau proyek. Menolak satu hal berarti mengatakan "ya" pada kesehatan mentalmu.
+
+Dan jangan lupa: **istirahat bukan hadiah setelah selesai semua—ia bagian dari proses**. Tubuh dan pikiran yang dirawat akan memberimu energi lebih untuk menjalani semua peran itu—tanpa kehilangan dirimu sendiri. *Keseimbangan bukan tujuan akhir, tapi pilihan harian yang penuh kesadaran.*`
+  },
+  {
+    id: 18,
+    title: 'Mengelola Emosi Negatif dengan Sehat',
+    summary: 'Cara mengakui, memahami, dan menyalurkan emosi seperti marah, sedih, atau kecewa.',
+    category: 'Kesehatan',
+    readTime: '5 menit',
+    fullContent: `Emosi negatif—marah, sedih, frustrasi—sering dianggap "buruk" dan harus dihindari. Tapi sebenarnya, semua emosi adalah sinyal penting dari dalam diri. Marah menunjukkan batas dilanggar. Sedih menunjukkan kehilangan yang perlu diakui. Frustrasi menunjukkan harapan yang tidak terpenuhi.
+
+Masalah bukan pada emosinya, tapi pada **cara kita menanggapinya**. Menekan emosi membuatnya meledak di waktu yang salah. Mengumbar emosi tanpa filter melukai orang lain.
+
+Langkah pertama: **beri nama emosimu**. *"Aku merasa kecewa karena ekspektasiku tidak dipenuhi."* Penamaan ini mengaktifkan korteks prefrontal—bagian otak yang membantu mengatur respons.
+
+Kedua, **tunda reaksi**. Saat emosi memuncak, tunggu 10–15 menit sebelum merespons. Gunakan waktu itu untuk napas dalam, jalan kaki, atau menulis perasaanmu.
+
+Ketiga, **salurkan dengan cara sehat**: olahraga, menulis, berbicara dengan teman, atau menangis jika perlu. Emosi butuh jalan keluar—bukan penjara.
+
+Ingat: merasa tidak nyaman bukan berarti ada yang salah denganmu. Itu berarti kamu manusia—dan kamu sedang belajar mengelola kompleksitas hidup dengan lebih bijak. *Emosi bukan musuh. Mereka utusan dari jiwamu yang ingin didengar.*`
+  },
+  {
+    id: 19,
+    title: 'Membangun Kebiasaan Belajar yang Efektif',
+    summary: 'Strategi berbasis sains untuk belajar lebih cerdas, bukan lebih lama.',
+    category: 'Akademik',
+    readTime: '7 menit',
+    fullContent: `Belajar 8 jam sehari tanpa hasil? Mungkin bukan soal usaha—tapi metode. Otak kita belajar paling baik melalui **pengulangan terdistribusi**, **pengujian aktif**, dan **koneksi makna**—bukan menghafal maraton semalam sebelum ujian.
+
+Alih-alih membaca ulang catatan berjam-jam, coba **teknik recall aktif**: tutup buku, lalu tulis atau jelaskan sebanyak mungkin dari ingatan. Ini memperkuat jalur saraf jauh lebih efektif daripada sekadar mengenali informasi.
+
+Gunakan **spaced repetition**: ulangi materi pada hari ke-1, ke-3, ke-7, lalu ke-14. Aplikasi seperti Anki bisa membantu, tapi bahkan jadwal sederhana di kalender pun cukup.
+
+Saat belajar, **ajukan pertanyaan** pada dirimu: *"Mengapa ini terjadi?"*, *"Bagaimana ini terkait dengan yang sudah kumengerti?"* Menghubungkan informasi baru dengan pengetahuan lama membuatnya lebih mudah diingat.
+
+Jangan lupa: **tidur setelah belajar** sangat penting. Saat tidur, otak mengkonsolidasi memori—jadi begadang justru menghapus sebagian usahamu.
+
+Dan yang terpenting: **istirahat terjadwal**. Otak butuh waktu untuk mencerna informasi. Belajar 50 menit + istirahat 10 menit lebih efektif daripada 3 jam nonstop.
+
+Belajar bukan lomba ketahanan—ini seni memahami cara otakmu bekerja. *Kecerdasan bukan soal berapa lama kamu duduk, tapi seberapa dalam kamu terlibat.*`
+  },
+  {
+    id: 20,
+    title: 'Menemukan Makna dalam Perjalanan Akademik',
+    summary: 'Menghubungkan studi dengan nilai dan tujuan hidup yang lebih besar.',
+    category: 'Pengembangan Diri',
+    readTime: '5 menit',
+    fullContent: `Ada saat-saat ketika tugas, ujian, dan deadline terasa hampa—seperti roda yang berputar tanpa arah. Di sinilah pentingnya **menghubungkan studimu dengan "mengapa" yang lebih dalam**.
+
+Tanyakan pada dirimu:  
+- *Mengapa aku memilih jurusan ini?*  
+- *Apa dampak yang ingin kuberikan lewat ilmu ini?*  
+- *Nilai apa yang ingin kuhidupi—dan bagaimana studiku mendukung itu?*
+
+Jawaban-jawaban ini bukan harus muluk-muluk. Mungkin kamu belajar teknik sipil karena ingin membangun jembatan yang aman bagi desa asalmu. Atau belajar psikologi karena pernah merasakan betapa pentingnya dukungan mental.
+
+Saat makna ini jelas, tugas yang membosankan berubah menjadi bagian dari sesuatu yang lebih besar. Ujian bukan hanya angka—tapi batu loncatan menuju kontribusimu.
+
+Dan jika kamu belum tahu "mengapa"-mu, itu juga oke. Gunakan masa studi ini untuk **menjelajahi**, bukan hanya mengejar. Ikut proyek sosial, magang di bidang berbeda, atau ajak dosen ngobrol tentang passion mereka.
+
+Ingat: pendidikan bukan hanya tentang gelar—tapi tentang **menjadi versi dirimu yang paling utuh dan bermakna**. *Ketika belajar terhubung dengan hati, lelah pun terasa ringan.*`
   }
 ];
 
@@ -127,7 +370,7 @@ const ArticleDetail = () => {
   // Styling untuk dark mode pada 404
   if (!article) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         // Tambahkan dark:bg-gray-900 untuk background
@@ -137,9 +380,9 @@ const ArticleDetail = () => {
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">404 Artikel Tidak Ditemukan</h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">Maaf, artikel dengan ID **{id}** tidak tersedia atau telah dihapus.</p>
-          
-          <Link 
-            to="/insight" 
+
+          <Link
+            to="/insight"
             className="inline-flex items-center justify-center px-6 py-3 border-2 border-red-400 text-red-600 hover:text-white hover:bg-red-500 dark:text-red-400 dark:hover:text-white dark:hover:bg-red-600 rounded-full font-semibold transition-colors shadow-md hover:shadow-lg"
           >
             <ChevronLeft className="w-5 h-5 mr-1" /> Kembali ke Daftar Insight
@@ -161,22 +404,22 @@ const ArticleDetail = () => {
       dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950 p-4 sm:p-8"
     >
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 md:p-10 border-t-8 border-teal-500 dark:border-teal-400">
-        
-        <motion.div 
+
+        <motion.div
           whileHover={{ x: -10, scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
           className="mb-8"
         >
-          <Link 
-            to="/insight" 
+          <Link
+            to="/insight"
             // Tambahkan dark:text-teal-400 / dark:bg-teal-900
             className="inline-flex items-center text-teal-600 bg-teal-50 hover:bg-teal-100 dark:text-teal-400 dark:bg-teal-900 dark:hover:bg-teal-700 px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
           >
-            <ChevronLeft className="w-5 h-5 mr-2" /> 
+            <ChevronLeft className="w-5 h-5 mr-2" />
             Kembali ke Daftar Insight
           </Link>
         </motion.div>
-        
+
         <motion.header
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

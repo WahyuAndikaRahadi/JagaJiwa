@@ -204,7 +204,7 @@ const About: React.FC = () => {
   const teamMembers: TeamMember[] = [
     {
       name: "Muhammad Bintang",
-      role: "Front-Rnd",
+      role: "Front-End",
       bio: "Saya seorang Front-End Developer yang berfokus pada pembuatan antarmuka web modern dan responsif.menggunakan React dan Tailwind CSS untuk pengalaman pengguna yang cepat dan menarik.",
       avatar: "/img/Bintang.jpeg",
       github: "https://github.com/Ktune-kpop",
@@ -223,7 +223,7 @@ const About: React.FC = () => {
       role: "Front-End",
       bio: "Saya adalah Front-End Developer. Berfokus pada arsitektur komponen React dan desain responsif Tailwind CSS. Menciptakan pengalaman web mulus dan berkinerja tinggi.",
       avatar: "/img/Bagus.jpeg",
-      github: "https://github.com/Zyenmax",
+      github: "https://github.com/Zyzenmax",
       instagram: "https://instagram.com/bagushsnali",
     },
   ];
