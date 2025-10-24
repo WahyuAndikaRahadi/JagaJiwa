@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// Hapus Sun dan Moon karena tidak ada toggle
 import { ChevronLeft, Clock, BookOpen, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-// --- Data Artikel (Tidak Berubah) ---
 interface FullArticle {
   id: number;
   title: string;
@@ -360,20 +358,17 @@ Ingat: pendidikan bukan hanya tentang gelar—tapi tentang **menjadi versi dirim
   }
 ];
 
-// --- Komponen ArticleDetail yang Dimodifikasi ---
 const ArticleDetail = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const id = parseInt(articleId || '0');
 
   const article = useMemo(() => ARTICLES.find(a => a.id === id), [id]);
 
-  // Styling untuk dark mode pada 404
   if (!article) {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        // Tambahkan dark:bg-gray-900 untuk background
         className="min-h-screen bg-red-50 dark:bg-gray-900 flex items-center justify-center p-4"
       >
         <div className="text-center max-w-lg bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl border-t-4 border-red-500">
@@ -382,7 +377,7 @@ const ArticleDetail = () => {
           <p className="text-gray-600 dark:text-gray-300 mb-6">Maaf, artikel dengan ID **{id}** tidak tersedia atau telah dihapus.</p>
 
           <Link
-            to="/insight"
+            to="/insight#artikel"
             className="inline-flex items-center justify-center px-6 py-3 border-2 border-red-400 text-red-600 hover:text-white hover:bg-red-500 dark:text-red-400 dark:hover:text-white dark:hover:bg-red-600 rounded-full font-semibold transition-colors shadow-md hover:shadow-lg"
           >
             <ChevronLeft className="w-5 h-5 mr-1" /> Kembali ke Daftar Insight
@@ -392,13 +387,11 @@ const ArticleDetail = () => {
     );
   }
 
-  // Styling untuk dark mode pada konten utama
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      // Tambahkan dark:from-gray-900 / dark:to-teal-900 untuk background
       className="min-h-screen relative overflow-hidden transition-colors duration-500 
       bg-gradient-to-br from-indigo-50/70 via-white to-teal-50/70 
       dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950 p-4 sm:p-8"
@@ -412,7 +405,6 @@ const ArticleDetail = () => {
         >
           <Link
             to="/insight"
-            // Tambahkan dark:text-teal-400 / dark:bg-teal-900
             className="inline-flex items-center text-teal-600 bg-teal-50 hover:bg-teal-100 dark:text-teal-400 dark:bg-teal-900 dark:hover:bg-teal-700 px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
           >
             <ChevronLeft className="w-5 h-5 mr-2" />
@@ -424,17 +416,14 @@ const ArticleDetail = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          // Tambahkan dark:border-gray-700
           className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-700"
         >
           <span className="text-sm font-semibold px-4 py-1 bg-teal-100 text-teal-700 dark:bg-teal-600 dark:text-white rounded-full inline-block mb-3 shadow-md">
             {article.category}
           </span>
-          {/* Tambahkan dark:text-white */}
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-4">
             {article.title}
           </h1>
-          {/* Tambahkan dark:text-gray-400 */}
           <div className="flex items-center space-x-6 text-gray-500 dark:text-gray-400 text-sm md:text-base mt-4">
             <div className="flex items-center font-medium">
               <Clock className="w-5 h-5 mr-1 text-teal-500 dark:text-teal-400" />
@@ -451,33 +440,26 @@ const ArticleDetail = () => {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          // Tambahkan dark:bg-indigo-900 / dark:border-indigo-600
           className="mb-10 p-6 bg-indigo-50 border-l-8 border-indigo-400 rounded-xl shadow-inner dark:bg-indigo-900 dark:border-indigo-600"
         >
           <p className="italic text-gray-800 dark:text-gray-200 text-lg md:text-xl">"{article.summary}"</p>
         </motion.div>
 
-        {/* Gunakan ReactMarkdown untuk merender fullContent */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          // Tambahkan dark:prose-invert untuk styling markdown dark mode
           className="prose prose-lg max-w-none text-gray-800 dark:prose-invert dark:text-gray-200"
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
               p: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
-              // Atur warna teks bold
               strong: ({ children }) => <strong className="font-bold text-gray-900 dark:text-white">{children}</strong>,
-              // Atur warna teks italic
               em: ({ children }) => <em className="italic text-gray-700 dark:text-gray-300">{children}</em>,
-              // Atur style list untuk dark mode
               ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-2 prose-li:text-gray-800 dark:prose-li:text-gray-200">{children}</ul>,
               ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-2 prose-li:text-gray-800 dark:prose-li:text-gray-200">{children}</ol>,
               li: ({ children }) => <li className="text-gray-800 dark:text-gray-200">{children}</li>,
-              // Atur warna heading
               h1: ({ children }) => <h1 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">{children}</h1>,
               h2: ({ children }) => <h2 className="text-xl font-semibold mt-6 mb-3 text-gray-900 dark:text-white">{children}</h2>,
             }}
