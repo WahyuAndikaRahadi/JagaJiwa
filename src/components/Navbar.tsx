@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
-  BarChart3,
   BookA,
   BookHeart,
   MessageCircleHeart,
@@ -12,6 +11,7 @@ import {
   Menu,
   X,
   Brain,
+  Smile,
 } from 'lucide-react';
 
 // === Brand Component ===
@@ -76,7 +76,7 @@ function Navbar() {
     { path: '/', icon: Home, label: 'Home' },
     { path: '/about', icon: BookA, label: 'About' },
     { path: '/insight', icon: Brain, label: 'Insight' },
-    { path: '/tracker', icon: BarChart3, label: 'Tracker' },
+    { path: '/tracker', icon: Smile, label: 'Tracker' },
     { path: '/journal', icon: BookHeart, label: 'Journal' },
     { path: '/talkroom', icon: MessageCircleHeart, label: 'Talk' },
   ];

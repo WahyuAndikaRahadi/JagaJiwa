@@ -167,7 +167,7 @@ function ChatWindow({ conversation, onSendMessage, isDisabled }: ChatWindowProps
       resetTranscript();
       SpeechRecognition.startListening({
         continuous: true,
-        language: 'id-ID',
+        // language: 'id-ID',
       });
       setIsVoiceMode(true);
     }
