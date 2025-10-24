@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Calendar from '../components/Calendar'; // Pastikan komponen ini sudah ada
 import MoodChart from '../components/MoodChart'; // Pastikan komponen ini sudah ada
-import { Smile, Meh, ChevronLeft, ChevronRight, BarChart3, CalendarDays } from 'lucide-react';
+import { Smile, Meh, ChevronLeft, CalendarDays } from 'lucide-react';
 import { motion, useInView } from 'framer-motion'; // Import Framer Motion
 import Swal from 'sweetalert2' // Sudah diimpor dengan benar
 import GradientText from '../components/GradientText';

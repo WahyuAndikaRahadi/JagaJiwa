@@ -12,12 +12,12 @@
     --primary: #1ff498;
     --secondary: #72e4f8;
     --accent: #50b7f7;
-    --primary-rgb: 31, 244, 152; /* RGB untuk #1ff498 */
-  --secondary-rgb: 80, 183, 247; /* RGB untuk #50b7f7 */
+    --primary-rgb: 31, 244, 152; 
+  --secondary-rgb: 80, 183, 247;
   }
   .dark {
-    --primary-rgb: 25, 200, 100; /* Contoh warna primary yang lebih gelap untuk dark mode */
-  --secondary-rgb: 50, 150, 200; /* Contoh warna secondary yang lebih gelap untuk dark mode */
+    --primary-rgb: 25, 200, 100;
+  --secondary-rgb: 50, 150, 200; 
     --text: #ecfef7;
     --background: #010907;
     --primary: #0be084;

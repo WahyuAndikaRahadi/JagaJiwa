@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   BookHeart,
-  Sparkles,
   Save,
   Trash2,
   Zap,
@@ -91,7 +90,7 @@ const generateGeminiSummary = async (text: string): Promise<string> => {
         model: model,
         contents: prompt,
     });
-    return response.text.trim();
+    return response.text!.trim();
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "Maaf, AI gagal menganalisis. Silakan periksa koneksi atau kunci API Anda.";
@@ -102,7 +101,7 @@ const generateGeminiSummary = async (text: string): Promise<string> => {
 // ==================== VARIAN FRAMER MOTION BARU ====================
 
 // Varian AOS Kustom (untuk Header dan Input Card)
-const sophisticatedAosVariants = {
+const sophisticatedAosVariants: any = {
   hidden: { opacity: 0, y: 50, scale: 0.98 },
   visible: (i: number = 0) => ({
     opacity: 1,
@@ -117,7 +116,7 @@ const sophisticatedAosVariants = {
 };
 
 // Varian untuk daftar jurnal (staggered list)
-const listContainerVariants = {
+const listContainerVariants: any = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -129,7 +128,7 @@ const listContainerVariants = {
 };
 
 // Varian untuk item jurnal
-const listItemVariants = {
+const listItemVariants: any = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
