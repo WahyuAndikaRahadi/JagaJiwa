@@ -44,7 +44,6 @@ const Calendar: React.FC<CalendarProps> = ({
         'very-sad': '😢',
     };
 
-    // --- LIGHT MODE PALETTE (Lebih Cerah dan Estetik) ---
     const moodColorsLight: { [key: string]: string } = {
         'very-happy': 'bg-emerald-300/80 border-emerald-400 text-emerald-900',
         'happy': 'bg-cyan-300/80 border-cyan-400 text-cyan-900',
@@ -53,7 +52,6 @@ const Calendar: React.FC<CalendarProps> = ({
         'very-sad': 'bg-rose-300/80 border-rose-400 text-rose-900',
     };
 
-    // --- DARK MODE PALETTE ---
     const moodColorsDark: { [key: string]: string } = {
         'very-happy': 'bg-green-700/50 border-green-600 text-gray-100',
         'happy': 'bg-emerald-700/50 border-emerald-600 text-gray-100',
@@ -76,28 +74,19 @@ const Calendar: React.FC<CalendarProps> = ({
             const mood = moodData[dateKey];
             const emoji = mood ? moodEmojis[mood] : '';
             
-            // Tentukan kelas warna berdasarkan mode
             let colorClass = 'bg-gray-100 border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300';
             let textColor = 'text-gray-800 dark:text-gray-200';
 
             if (mood) {
-                // Terapkan Light Mode (default) dan Dark Mode (awalan dark:)
                 const light = moodColorsLight[mood];
                 const dark = moodColorsDark[mood];
-                
-                // Menggabungkan kelas light dan dark mode
                 colorClass = `${light} dark:${dark}`;
-                // Karena warna light mode sudah memiliki warna teks yang kontras, 
-                // kita ambil warna teks dari moodColorsLight untuk light mode, 
-                // dan override dengan dark:text-gray-100 untuk dark mode.
                 textColor = `${moodColorsLight[mood].match(/text-\w+-\d+/)?.[0] || 'text-gray-900'} dark:text-gray-100`;
             }
 
 
             const isToday = dateKey === TODAY_KEY;
             const isPastOrPresent = new Date(currentYear, currentMonth, day) <= TODAY;
-
-            // Primary color dari MoodTracker: #1ff498 (Emerald/Teal)
             const todayClass = isToday ? 'border-[#1ff498] ring-2 ring-[#1ff498] dark:border-[#0be084] dark:ring-[#0be084]' : '';
 
             const futureClass = !isPastOrPresent ? 'opacity-50 cursor-default pointer-events-none' : 'cursor-pointer hover:scale-105';
@@ -134,7 +123,7 @@ const Calendar: React.FC<CalendarProps> = ({
 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 shadow-lg dark:shadow-xl dark:shadow-gray-950/50">
-            {/* Header Kalender */}
+            {}
             <div className="flex justify-between items-center mb-4">
                 <button
                     onClick={onPrevMonth}
