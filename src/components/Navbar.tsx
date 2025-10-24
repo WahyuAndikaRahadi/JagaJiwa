@@ -18,7 +18,7 @@ import {
 const Brand = () => (
   <div className="flex items-center space-x-2">
     <div className="w-10 h-10 rounded-xl flex items-center justify-center transform hover:scale-105 transition duration-300 ease-in-out">
-      <img src="/public/img/jaga jiwa.png" alt="" />
+      <img src="/public/img/jagaJiwa.png" alt="" />
     </div>
     <span className="text-xl font-extrabold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent tracking-tight dark:from-primary-400 dark:to-secondary-400">
       Jaga Jiwa
