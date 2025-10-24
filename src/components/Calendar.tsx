@@ -148,7 +148,7 @@ const Calendar: React.FC<CalendarProps> = ({
                 Klik tanggal untuk mengisi mood.
             </p>
 
-            {/* Nama Hari */}
+            {}
             <div className="grid grid-cols-7 gap-2 mb-2">
                 {weekDays.map((day) => (
                     <div
@@ -160,12 +160,10 @@ const Calendar: React.FC<CalendarProps> = ({
                 ))}
             </div>
 
-            {/* Tanggal */}
+            {}
             <div className="grid grid-cols-7 gap-2">
                 {renderDays()}
             </div>
-
-            {/* Legenda */}
             <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">Legenda Mood</p>
                 <div className="flex flex-wrap justify-center gap-2 md:gap-3">
