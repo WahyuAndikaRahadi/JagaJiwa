@@ -88,7 +88,7 @@ const Footer = () => {
                 className="w-12 h-12 bg-gradient-to-br from-[#1ff498]/20 to-[#50b7f7]/20 
                                 rounded-xl pb-2 shadow-lg border-2 border-white/50"
               >
-               <img src="/img/jagaJiwa.png" alt="Jaga Jiwa Logo"/>
+               <img src="/img/jaga jiwa.png" alt="Jaga Jiwa Logo"/>
               </div>
               <span className="font-extrabold text-3xl">
                 <GradientText
