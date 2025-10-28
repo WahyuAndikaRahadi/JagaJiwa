@@ -10,13 +10,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GoogleGenAI } from "@google/genai";
 import Swal from "sweetalert2";
 
-// ==================== INITIALISASI AI ====================
-// Ganti dengan API Key Anda yang sebenarnya
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 const model = "gemini-2.5-flash";
-// =========================================================
-
-// --- KOMPONEN GRADIENTTEXT DIDEFINISIKAN LANGSUNG DI SINI ---
 interface GradientTextProps {
   children: React.ReactNode;
   colors: string[];
@@ -59,8 +54,6 @@ const GradientText: React.FC<GradientTextProps> = ({
     </>
   );
 };
-// --- AKHIR DARI KOMPONEN GRADIENTTEXT ---
-
 
 interface JournalEntry {
   id: string;
@@ -68,8 +61,6 @@ interface JournalEntry {
   content: string;
   summary?: string;
 }
-
-// ==================== FUNGSI GENERATE AI SESUNGGUHNYA ====================
 const generateGeminiSummary = async (text: string): Promise<string> => {
   if (text.split(/\s+/).filter(word => word.length > 0).length < 10) {
     return "Tulisan terlalu pendek (minimal 10 kata) untuk dianalisis oleh AI. Tambahkan detail lebih lanjut tentang perasaanmu hari ini.";
@@ -96,11 +87,7 @@ const generateGeminiSummary = async (text: string): Promise<string> => {
     return "Maaf, AI gagal menganalisis. Silakan periksa koneksi atau kunci API Anda.";
   }
 };
-// ========================================================================
 
-// ==================== VARIAN FRAMER MOTION BARU ====================
-
-// Varian AOS Kustom (untuk Header dan Input Card)
 const sophisticatedAosVariants: any = {
   hidden: { opacity: 0, y: 50, scale: 0.98 },
   visible: (i: number = 0) => ({
@@ -108,26 +95,24 @@ const sophisticatedAosVariants: any = {
     y: 0,
     scale: 1,
     transition: {
-      delay: i * 0.1, // Staggering elements inside a container
+      delay: i * 0.1, 
       duration: 0.7,
-      ease: [0.2, 0.6, 0.3, 1], // Custom bounce/spring-like ease
+      ease: [0.2, 0.6, 0.3, 1], 
     },
   }),
 };
 
-// Varian untuk daftar jurnal (staggered list)
 const listContainerVariants: any = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // Jeda antar item
+      staggerChildren: 0.1, 
       delayChildren: 0.1,
     },
   },
 };
 
-// Varian untuk item jurnal
 const listItemVariants: any = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -142,12 +127,10 @@ const listItemVariants: any = {
   hover: { 
     y: -7, 
     scale: 1.01,
-    // Bayangan yang lebih menonjol dan berpigmen
     boxShadow: "0 25px 50px -12px rgba(31, 244, 152, 0.25)",
     transition: { type: "spring", stiffness: 300, damping: 15 }
   }
 };
-// =============================================================
 
 function JournalMood() {
   const [entries, setEntries] = useState<JournalEntry[]>(() => {
@@ -175,7 +158,6 @@ function JournalMood() {
     setIsGenerating(false);
   };
 
-  // Fungsi Save dengan SweetAlert Success (Bawaan)
   const handleSaveEntry = () => {
     if (!currentEntry.trim()) return;
 
@@ -190,7 +172,6 @@ function JournalMood() {
     setCurrentEntry("");
     setGeneratedSummary("");
 
-    // SweetAlert Success TOAST
     Swal.fire({
       icon: 'success',
       title: 'Berhasil Disimpan!',
@@ -203,7 +184,6 @@ function JournalMood() {
     });
   };
 
-  // Fungsi Delete dengan SweetAlert Confirmation (Bawaan)
   const handleDeleteEntry = async (id: string) => {
     const result = await Swal.fire({
       title: 'Apakah Anda Yakin?',
@@ -214,7 +194,7 @@ function JournalMood() {
       cancelButtonText: 'Batal',
       confirmButtonColor: '#3085d6', 
       cancelButtonColor: '#d33',
-      buttonsStyling: true, // Menggunakan style bawaan SweetAlert
+      buttonsStyling: true, 
     });
 
     if (result.isConfirmed) {
@@ -246,7 +226,6 @@ function JournalMood() {
       bg-gradient-to-br from-indigo-50/70 via-white to-rose-50/70 
       dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950"
     >
-      {/* === Background Blobs (Framer Motion Blur) === */}
       <motion.div
         initial={{ scale: 0.8, x: -100, y: -100 }}
         animate={{ scale: 1.2, x: 0, y: 0 }}
@@ -261,8 +240,6 @@ function JournalMood() {
       />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-9 md:py-14 relative z-10">
-        
-        {/* === Header (AOS Effect) === */}
         <motion.div
           variants={sophisticatedAosVariants}
           initial="hidden"
@@ -271,7 +248,6 @@ function JournalMood() {
           className="mb-8 md:mb-12"
         >
           <div className="flex items-center space-x-4 mb-3">
-            {/* Animasi Ikon Masuk yang Keren */}
             <motion.div
               initial={{ rotate: -180, scale: 0, opacity: 0 }}
               animate={{ rotate: 0, scale: 1, opacity: 1 }}
@@ -291,7 +267,6 @@ function JournalMood() {
               </GradientText>
             </h1>
           </div>
-          {/* Animasi teks P dengan delay sedikit */}
           <motion.p 
             variants={sophisticatedAosVariants}
             initial="hidden"
@@ -303,14 +278,12 @@ function JournalMood() {
             Curahkan isi hatimu, biarkan AI memahami dan membantu menenangkan jiwamu.
           </motion.p>
         </motion.div>
-
-        {/* === Input Card (AOS Effect) === */}
         <motion.div
           variants={sophisticatedAosVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.5 }}
-          custom={0.4} // Delay relatif
+          custom={0.4}
           animate={{ scale: isFocused ? 1.01 : 1 }}
           className="rounded-3xl p-6 md:p-8 border-2 shadow-xl mb-8
           border-[#72e4f8] bg-white/60 backdrop-blur-md 
@@ -334,7 +307,6 @@ function JournalMood() {
           />
 
           <div className="flex flex-col sm:flex-row gap-4 mt-5">
-            {/* Tombol AI Analysis */}
             <motion.button
               whileHover={{ scale: 1.03, boxShadow: "0 10px 20px rgba(31, 244, 152, 0.4)" }}
               whileTap={{ scale: 0.95 }}
@@ -359,7 +331,6 @@ function JournalMood() {
               )}
             </motion.button>
 
-            {/* Tombol Simpan */}
             <motion.button
               whileHover={{ scale: 1.03, borderColor: "#1ff498" }}
               whileTap={{ scale: 0.95 }}
@@ -373,8 +344,6 @@ function JournalMood() {
               <span>Simpan</span>
             </motion.button>
           </div>
-
-          {/* Kartu Ringkasan AI dengan AnimatePresence */}
           <AnimatePresence>
             {generatedSummary && (
               <motion.div
@@ -403,8 +372,6 @@ function JournalMood() {
             )}
           </AnimatePresence>
         </motion.div>
-
-        {/* === Daftar Jurnal (Staggered List AOS) === */}
         <div className="space-y-6">
           <motion.h2
             variants={sophisticatedAosVariants}
@@ -444,9 +411,9 @@ function JournalMood() {
                 {entries.map((entry) => (
                   <motion.div
                     key={entry.id}
-                    variants={listItemVariants} // Menggunakan varian item list
+                    variants={listItemVariants} 
                     exit={{ opacity: 0, height: 0, marginBottom: 0, transition: { duration: 0.3 } }}
-                    whileHover="hover" // Mengaktifkan efek hover premium
+                    whileHover="hover"
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className="rounded-3xl p-6 md:p-8 border border-gray-200 
                     dark:border-gray-700 bg-white/70 backdrop-blur-sm 
@@ -502,9 +469,8 @@ function JournalMood() {
                   transition: { duration: 1, delay: 0.5 },
                 }}
               >
-                {/* Path 1: Biru terang dengan opacity rendah */}
                 <motion.path
-                  fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
+                  fill="#4079ff" 
                   fillOpacity="0.1"
                   d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
                   initial={{ pathLength: 0, pathOffset: 1 }}
@@ -519,9 +485,8 @@ function JournalMood() {
                     },
                   }}
                 />
-                {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
                 <motion.path
-                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                  fill="#40ffaa" 
                   fillOpacity="0.2"
                   d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
                   initial={{ pathLength: 0, pathOffset: 1 }}
@@ -537,9 +502,8 @@ function JournalMood() {
                     },
                   }}
                 />
-                {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
                 <motion.path
-                  fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                  fill="#40ffaa" 
                   fillOpacity="0.3"
                   d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
                   initial={{ pathLength: 0, pathOffset: 1 }}

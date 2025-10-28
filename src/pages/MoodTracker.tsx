@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import Calendar from '../components/Calendar'; // Pastikan komponen ini sudah ada
-import MoodChart from '../components/MoodChart'; // Pastikan komponen ini sudah ada
+import Calendar from '../components/Calendar';
+import MoodChart from '../components/MoodChart';
 import { Smile, Meh, ChevronLeft, CalendarDays } from 'lucide-react';
-import { motion, useInView } from 'framer-motion'; // Import Framer Motion
-import Swal from 'sweetalert2' // Sudah diimpor dengan benar
+import { motion, useInView } from 'framer-motion'; 
+import Swal from 'sweetalert2' 
 import GradientText from '../components/GradientText';
 
-// --- Variasi Animasi Framer Motion (Diambil dari Home.tsx) ---
 const fadeInUp: any = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -25,24 +24,20 @@ const itemVariants: any = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
-// --- Akhir Variasi Animasi ---
 
-// Fungsi utilitas untuk format tanggal
 const formatDate = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`; // Format kunci: YYYY-MM-DD
+    return `${year}-${month}-${day}`; 
 };
 
-// Mendapatkan bulan dan tahun saat ini
 const TODAY = new Date();
 const CURRENT_MONTH = TODAY.getMonth();
 const CURRENT_YEAR = TODAY.getFullYear();
 
 
 function MoodTracker() {
-    // --- Refs untuk Animasi In-View ---
     const headerRef = useRef(null);
     const isHeaderInView = useInView(headerRef, { once: true, amount: 0.5 });
 
@@ -51,7 +46,6 @@ function MoodTracker() {
 
     const tipsRef = useRef(null);
     const isTipsInView = useInView(tipsRef, { once: true, amount: 0.2 });
-    // ---------------------------------
 
     const [currentViewDate, setCurrentViewDate] = useState(TODAY);
 
@@ -59,7 +53,6 @@ function MoodTracker() {
     const currentYear = currentViewDate.getFullYear();
 
     const [moodData, setMoodData] = useState<{ [key: string]: string }>(() => {
-        // Memastikan inisialisasi hanya terjadi sekali dari localStorage
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('moodData');
             return saved ? JSON.parse(saved) : {};
@@ -70,41 +63,33 @@ function MoodTracker() {
     const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
 
     useEffect(() => {
-        // Menyimpan data ke localStorage
         localStorage.setItem('moodData', JSON.stringify(moodData));
     }, [moodData]);
 
 
-    // Fungsi yang dipanggil saat tanggal di kalender diklik
     const handleDateClick = (dateKey: string) => {
         setSelectedDateKey(dateKey);
     };
 
-    // Fungsi untuk update state mood
     const updateMood = (mood: string, dateKey: string) => {
         setMoodData((prev) => ({
             ...prev,
             [dateKey]: mood,
         }));
-        // Reset selected date setelah memilih mood
         setTimeout(() => setSelectedDateKey(null), 300);
     };
 
-    // Fungsi yang dipanggil saat mood dipilih
     const handleMoodSelect = (mood: string) => {
         if (!selectedDateKey) return;
 
         const existingMood = moodData[selectedDateKey];
         const isEditing = existingMood !== undefined;
         const newMoodLabel = moodOptions.find(opt => opt.value === mood)?.label || mood;
-
-        // Jika belum ada mood atau mood yang dipilih sama, langsung update
         if (!isEditing || existingMood === mood) {
             updateMood(mood, selectedDateKey);
             return;
         }
 
-        // --- Logika Konfirmasi SweetAlert2 (Hanya saat edit mood yang berbeda) ---
         Swal.fire({
             title: 'Edit Mood?',
             text: `Apakah Anda yakin ingin mengubah mood tanggal ${selectedDateLabel} menjadi ${newMoodLabel}?`,
@@ -116,28 +101,19 @@ function MoodTracker() {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                // HANYA dipanggil jika user mengklik "Ya, Ubah!"
                 updateMood(mood, selectedDateKey);
             } else {
-                // Tutup pop-up jika dibatalkan
                 setTimeout(() => setSelectedDateKey(null), 300);
             }
         });
-        // --- AKHIR Logika Konfirmasi ---
 
-        // PENTING: updateMood() yang lama di akhir dihapus!
     };
 
-    // Menghitung tanggal yang dipilih dalam format bahasa Indonesia
     const selectedDateLabel = useMemo(() => {
         if (!selectedDateKey) return '';
 
-        // Perbaikan: Parsing string YYYY-MM-DD sebagai tanggal di zona waktu lokal 
-        // dengan menambahkan waktu (misalnya, T12:00:00) agar tidak tergeser ke hari sebelumnya.
         const localKey = `${selectedDateKey}T12:00:00`;
         const date = new Date(localKey);
-
-        // **TIDAK PERLU lagi penyesuaian +1 hari**
 
         return date.toLocaleDateString('id-ID', {
             weekday: 'long',
@@ -148,7 +124,6 @@ function MoodTracker() {
     }, [selectedDateKey]);
 
     const moodOptions = [
-        // Menggunakan warna yang lebih sesuai dengan skema teal/blue
         { value: 'very-happy', label: 'Sangat Senang', emoji: '😄', color: 'from-[#1ff498] to-emerald-500', baseColor: 'emerald' },
         { value: 'happy', label: 'Senang', emoji: '😊', color: 'from-[#72e4f8] to-[#50b7f7]', baseColor: 'cyan' },
         { value: 'neutral', label: 'Netral', emoji: '😐', color: 'from-amber-400 to-yellow-500', baseColor: 'amber' },
@@ -156,7 +131,6 @@ function MoodTracker() {
         { value: 'very-sad', label: 'Sangat Sedih', emoji: '😢', color: 'from-rose-500 to-pink-600', baseColor: 'rose' },
     ];
 
-    // Navigasi Bulan
     const handleNextMonth = () => {
         setCurrentViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
     };
@@ -172,11 +146,9 @@ function MoodTracker() {
             bg-gradient-to-br from-indigo-50/70 via-white to-teal-50/70 
             dark:from-gray-900 dark:via-gray-950 dark:to-indigo-950"
         >
-            {/* === Background Blobs (Sama dengan Home.tsx) === */}
             <div className="absolute top-0 left-0 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply opacity-20 dark:bg-indigo-700 dark:opacity-10" />
             <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply opacity-20 animation-delay-2000 dark:bg-emerald-700 dark:opacity-10" />
             <div className="absolute top-1/2 left-1/4 w-52 h-52 bg-teal-300 rounded-full mix-blend-multiply opacity-20 animation-delay-4000 dark:bg-teal-700 dark:opacity-10" />
-            {/* Ornamen Pattern Titik Estetik */}
             <div
                 className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 
                 w-96 h-96 opacity-10 dark:opacity-5 pointer-events-none z-[1]"
@@ -186,12 +158,9 @@ function MoodTracker() {
                     transform: `rotate(45deg) scale(1.5)`
                 }}
             ></div>
-            {/* === AKHIR Background Blobs === */}
-
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 relative z-10">
 
-                {/* === Header (Diberi Animasi) === */}
                 <motion.div
                     ref={headerRef}
                     variants={fadeInUp}
@@ -227,7 +196,6 @@ function MoodTracker() {
                     </p>
                 </motion.div>
 
-                {/* === Popup Pemilihan Mood (Animated dan Aesthetic) === */}
                 {selectedDateKey && (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -251,11 +219,9 @@ function MoodTracker() {
                                     key={mood.value}
                                     variants={itemVariants}
                                     onClick={() => handleMoodSelect(mood.value)}
-                                    // Styling yang lebih estetik
                                     className={`group relative overflow-hidden rounded-xl p-4 md:p-6 bg-white dark:bg-gray-900/50 border-2 border-gray-200 dark:border-gray-700 
                                     hover:border-4 hover:border-transparent transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-xl hover:shadow-${mood.baseColor}-300/50 dark:hover:shadow-${mood.baseColor}-700/50`}
                                 >
-                                    {/* Layer Gradien di Hover */}
                                     <div className={`absolute inset-0 bg-gradient-to-br ${mood.color} opacity-0 group-hover:opacity-30 transition-opacity duration-300`}></div>
 
                                     <div className="flex flex-col items-center space-y-2 relative z-10">
@@ -280,7 +246,6 @@ function MoodTracker() {
                     </motion.div>
                 )}
 
-                {/* === Kalender dan Grafik (Grid Animated) === */}
                 <motion.div
                     ref={mainContentRef}
                     variants={containerVariants}
@@ -288,7 +253,6 @@ function MoodTracker() {
                     animate={isMainContentInView ? "animate" : "initial"}
                     className="grid lg:grid-cols-2 gap-8 md:gap-10 mb-12"
                 >
-                    {/* Kalender */}
                     <motion.div variants={itemVariants} className="rounded-3xl shadow-xl border-2 border-gray-100 dark:border-gray-700 p-4 md:p-6 bg-white dark:bg-gray-800">
                         <h2 className="flex items-center text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
                             <CalendarDays className="w-6 h-6 mr-2 text-[#1ff498]" /> Kalender Mood
@@ -303,7 +267,6 @@ function MoodTracker() {
                         />
                     </motion.div>
 
-                    {/* Grafik */}
                     <motion.div variants={itemVariants} className="rounded-3xl shadow-xl border-2 border-gray-100 dark:border-gray-700 p-4 md:p-6 bg-white dark:bg-gray-800">
                         <MoodChart
                             moodData={moodData}
@@ -313,7 +276,6 @@ function MoodTracker() {
                     </motion.div>
                 </motion.div>
 
-                {/* === Tips Tracking Mood (Animated) === */}
                 <motion.div
                     ref={tipsRef}
                     variants={fadeInUp}
@@ -361,9 +323,8 @@ function MoodTracker() {
                         transition: { duration: 1, delay: 0.5 },
                     }}
                 >
-                    {/* Path 1: Biru terang dengan opacity rendah */}
                     <motion.path
-                        fill="#4079ff" // Mengambil warna biru dari gradien Journal Mood
+                        fill="#4079ff" 
                         fillOpacity="0.1"
                         d="M0,120V73.71c47.79-22.2,103.59-32.17,158-28,70.36,5.37,136.33,33.31,206.8,37.5C438.64,87.57,512.34,66.33,583,47.95c69.27-18,138.3-24.88,209.4-13.08,36.15,6,69.85,17.84,104.45,29.34C989.49,95,1113,134.29,1200,67.53V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
@@ -378,9 +339,8 @@ function MoodTracker() {
                             },
                         }}
                     />
-                    {/* Path 2: Campuran biru-hijau dengan opacity sedang */}
                     <motion.path
-                        fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                        fill="#40ffaa" 
                         fillOpacity="0.2"
                         d="M0,120V104.19C13,83.08,27.64,63.14,47.69,47.95,99.41,8.73,165,9,224.58,28.42c31.15,10.15,60.09,26.07,89.67,39.8,40.92,19,84.73,46,130.83,49.67,36.26,2.85,70.9-9.42,98.6-31.56,31.77-25.39,62.32-62,103.63-73,40.44-10.79,81.35,6.69,119.13,24.28s75.16,39,116.92,43.05c59.73,5.85,113.28-22.88,168.9-38.84,30.2-8.66,59-6.17,87.09,7.5,22.43,10.89,48,26.93,60.65,49.24V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
@@ -396,9 +356,8 @@ function MoodTracker() {
                             },
                         }}
                     />
-                    {/* Path 3: Hijau terang dengan opacity lebih tinggi */}
                     <motion.path
-                        fill="#40ffaa" // Mengambil warna hijau muda dari gradien Journal Mood
+                        fill="#40ffaa" 
                         fillOpacity="0.3"
                         d="M0,120V114.37C149.93,61,314.09,48.68,475.83,77.43c43,7.64,84.23,20.12,127.61,26.46,59,8.63,112.48-12.24,165.56-35.4C827.93,42.78,886,24.76,951.2,30c86.53,7,172.46,45.71,248.8,84.81V120Z"
                         initial={{ pathLength: 0, pathOffset: 1 }}
