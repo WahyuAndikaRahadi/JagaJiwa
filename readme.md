@@ -1,13 +1,13 @@
 <div align="center">
 
-![Jaga Jiwa Logo](./public/jagaJiwa.png)
+![Jaga Jiwa Logo](./public/img/jagaJiwa.png)
 
 #  Jaga Jiwa
 
 > **Digital Innovation for Indonesian Gold**  
 > Platform Kesehatan Mental Digital Berbasis AI untuk Generasi Emas Indonesia
 
-![Banner](./public/banner.png)
+![Banner](./public/img/banner.png)
 
 </div>
 
