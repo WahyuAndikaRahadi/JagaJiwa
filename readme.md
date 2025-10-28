@@ -1,15 +1,16 @@
 <div align="center">
 
-![Jaga Jiwa Logo](./public/img/jagaJiwa.png)
+  <img src="./public/img/jagaJiwa.png" alt="Jaga Jiwa Logo" width="150">
 
-#  Jaga Jiwa
+  <h1>Jaga Jiwa</h1>
 
-> **Digital Innovation for Indonesian Gold**  
-> Platform Kesehatan Mental Digital Berbasis AI untuk Generasi Emas Indonesia
+  <blockquote><b>Digital Innovation for Indonesian Gold</b><br>
+  Platform Kesehatan Mental Digital Berbasis AI untuk Generasi Emas Indonesia</blockquote>
 
-![Banner](./public/img/banner.png)
+  <img src="./public/img/banner.png" alt="Banner" width="600">
 
 </div>
+
 
 
 
