@@ -227,7 +227,7 @@ const About: React.FC = () => {
     { year: "2021", value: 11.0 },
     { year: "2022", value: 13.0 },
     { year: "2023", value: 17.0 },
-    { year: "2024 (Est)", value: 19.0 },
+    { year: "2024", value: 19.0 },
     { year: "2025 (Est)", value: 20.0 },
   ];
 
