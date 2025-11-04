@@ -506,7 +506,7 @@ function Home() {
             >
               <motion.h1
                 variants={fadeInUp}
-                className="text-6xl md:text-7xl font-extrabold tracking-tight"
+                className="text-6xl md:text-7xl font-extrabold tracking-normal"
               >
                 <GradientText
                   colors={[
