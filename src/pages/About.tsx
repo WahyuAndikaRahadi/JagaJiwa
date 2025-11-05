@@ -176,7 +176,7 @@ const About: React.FC = () => {
     },
     {
       icon: Sparkles, 
-      title: "Jiwaku",
+      title: "Jiwamu",
       description:
         "Teman virtual yang siap mendengarkan curahan hati Anda kapan saja, tanpa menghakimi, dan memberikan respon empatik.",
     },
